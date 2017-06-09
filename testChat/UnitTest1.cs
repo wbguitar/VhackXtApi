@@ -67,10 +67,10 @@ namespace testChat
         }
 
         static IConfig cfg = new Config();
-        static VhackXtApi.Api.vHackAPI api;
+        static VhackXtApi.Api.vhAPI api;
         static UnitTest1()
         {
-            api = new VhackXtApi.Api.vHackAPIBuilder()
+            api = new VhackXtApi.Api.vhAPIBuilder()
                .config(cfg)
                .getAPI();
         }

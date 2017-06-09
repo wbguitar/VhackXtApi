@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="vhackdbModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=C:\Users\wuby\Downloads\VhackXtApi\VhackXtApi\vhackdb.db" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Attacks">
+          <Key>
+            <PropertyRef Name="Dt" />
+          </Key>
+          <Property Name="Dt" Type="integer" Nullable="false" />
+          <Property Name="IP" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="MoneyOwned" Type="integer" />
+          <Property Name="MoneyWon" Type="integer" />
+        </EntityType>
+        <EntityType Name="IPs">
+          <Key>
+            <PropertyRef Name="IP" />
+          </Key>
+          <Property Name="IP" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="LastUpdate" Type="integer" Nullable="false" />
+          <Property Name="LastAttack" Type="integer" />
+          <Property Name="Money" Type="integer" />
+          <Property Name="WinChance" Type="integer" />
+        </EntityType>
+        <EntityType Name="Version">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Major" Type="integer" Nullable="false" />
+          <Property Name="Minor" Type="integer" Nullable="false" />
+          <Property Name="Patch" Type="integer" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="2147483647" />
+        </EntityType>
+        <Association Name="FK_Attacks_0_0">
+          <End Role="IPs" Type="Self.IPs" Multiplicity="1" />
+          <End Role="Attacks" Type="Self.Attacks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IPs">
+              <PropertyRef Name="IP" />
+            </Principal>
+            <Dependent Role="Attacks">
+              <PropertyRef Name="IP" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="vhackdbModelStoreContainer">
+          <EntitySet Name="Attacks" EntityType="Self.Attacks" store:Type="Tables" />
+          <EntitySet Name="IPs" EntityType="Self.IPs" store:Type="Tables" />
+          <EntitySet Name="Version" EntityType="Self.Version" store:Type="Tables" />
+          <AssociationSet Name="FK_Attacks_0_0" Association="Self.FK_Attacks_0_0">
+            <End Role="IPs" EntitySet="IPs" />
+            <End Role="Attacks" EntitySet="Attacks" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="vhackdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Attacks">
+          <Key>
+            <PropertyRef Name="Dt" />
+          </Key>
+          <Property Name="Dt" Type="Int64" Nullable="false" />
+          <Property Name="IP" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MoneyOwned" Type="Int64" />
+          <Property Name="MoneyWon" Type="Int64" />
+          <NavigationProperty Name="IPs" Relationship="Self.FK_Attacks_0_0" FromRole="Attacks" ToRole="IPs" />
+        </EntityType>
+        <EntityType Name="IPs">
+          <Key>
+            <PropertyRef Name="IP" />
+          </Key>
+          <Property Name="IP" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastUpdate" Type="Int64" Nullable="false" />
+          <Property Name="LastAttack" Type="Int64" />
+          <Property Name="Money" Type="Int64" />
+          <Property Name="WinChance" Type="Int64" />
+          <NavigationProperty Name="Attacks" Relationship="Self.FK_Attacks_0_0" FromRole="IPs" ToRole="Attacks" />
+        </EntityType>
+        <EntityType Name="Version">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Major" Type="Int64" Nullable="false" />
+          <Property Name="Minor" Type="Int64" Nullable="false" />
+          <Property Name="Patch" Type="Int64" Nullable="false" />
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_Attacks_0_0">
+          <End Role="IPs" Type="Self.IPs" Multiplicity="1" />
+          <End Role="Attacks" Type="Self.Attacks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IPs">
+              <PropertyRef Name="IP" />
+            </Principal>
+            <Dependent Role="Attacks">
+              <PropertyRef Name="IP" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="vhackdbEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Attacks" EntityType="Self.Attacks" />
+          <EntitySet Name="IPs" EntityType="Self.IPs" />
+          <EntitySet Name="Version" EntityType="Self.Version" />
+          <AssociationSet Name="FK_Attacks_0_0" Association="Self.FK_Attacks_0_0">
+            <End Role="IPs" EntitySet="IPs" />
+            <End Role="Attacks" EntitySet="Attacks" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="vhackdbModelStoreContainer" CdmEntityContainer="vhackdbEntities">
+          <EntitySetMapping Name="Attacks">
+            <EntityTypeMapping TypeName="vhackdbModel.Attacks">
+              <MappingFragment StoreEntitySet="Attacks">
+                <ScalarProperty Name="Dt" ColumnName="Dt" />
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="MoneyOwned" ColumnName="MoneyOwned" />
+                <ScalarProperty Name="MoneyWon" ColumnName="MoneyWon" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IPs">
+            <EntityTypeMapping TypeName="vhackdbModel.IPs">
+              <MappingFragment StoreEntitySet="IPs">
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="LastUpdate" ColumnName="LastUpdate" />
+                <ScalarProperty Name="LastAttack" ColumnName="LastAttack" />
+                <ScalarProperty Name="Money" ColumnName="Money" />
+                <ScalarProperty Name="WinChance" ColumnName="WinChance" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Version">
+            <EntityTypeMapping TypeName="vhackdbModel.Version">
+              <MappingFragment StoreEntitySet="Version">
+                <ScalarProperty Name="Major" ColumnName="Major" />
+                <ScalarProperty Name="Minor" ColumnName="Minor" />
+                <ScalarProperty Name="Patch" ColumnName="Patch" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

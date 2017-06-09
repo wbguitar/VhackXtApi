@@ -60,7 +60,7 @@ namespace vHackChat
         static Config cfg = new Config();
         static void Main(string[] args)
         {
-            var api = new VhackXtApi.Api.vHackAPI(cfg);
+            var api = new VhackXtApi.Api.vhAPI(cfg);
             VhackXtApi.Chat.ChatTest.Test(api);
         }
     }

@@ -108,10 +108,10 @@ namespace vHackBot
         {
             try
             {
-                var builder = new vHackAPIBuilder()
+                var builder = new vhAPIBuilder()
                     .config(cfg);
 
-                vHackAPI api = builder.getAPI();
+                vhAPI api = builder.getAPI();
 
                 // TODO Auto-generated method stub
 
@@ -217,7 +217,7 @@ namespace vHackBot
             }
         }
 
-        private static async void callback(Cons console)
+        private static async void callback(vhConsole console)
         {
             while (true)
             {
@@ -232,7 +232,7 @@ namespace vHackBot
                     cfg.logger.Log(e.ToString());
                 }
 
-                Thread.Sleep(Cons.WaitStep * 5);
+                Thread.Sleep(vhConsole.WaitStep * 5);
             }
         }
     }
