@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tesseract;
 using vHackApi.Api;
+using vHackApi.Interfaces;
 
 namespace vHackApi.Console
 {

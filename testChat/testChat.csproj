@@ -63,9 +63,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VhackXtApi\VhackXtApi.csproj">
+    <ProjectReference Include="..\vHackApi\vHackApi.csproj">
       <Project>{AD0BD02E-6749-4C62-9740-D6F23EE35966}</Project>
-      <Name>VhackXtApi</Name>
+      <Name>vHackApi</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

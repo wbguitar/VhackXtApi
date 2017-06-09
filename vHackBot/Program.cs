@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using VhackXtApi;
-using VhackXtApi.Api;
-using VhackXtApi.Console;
+using vHackApi;
+using vHackApi.Api;
+using vHackApi.Console;
 
 namespace vHackBot
 {

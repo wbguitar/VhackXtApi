@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VhackXtApi;
-using VhackXtApi.Chat;
+using vHackApi;
+using vHackApi.Chat;
 using System.Threading;
 using System.Net.Sockets;
-using VhackXtApi.Api;
+using vHackApi.Api;
 using System.Text;
 using System.Diagnostics;
 
@@ -67,10 +67,10 @@ namespace testChat
         }
 
         static IConfig cfg = new Config();
-        static VhackXtApi.Api.vhAPI api;
+        static vHackApi.Api.vhAPI api;
         static UnitTest1()
         {
-            api = new VhackXtApi.Api.vhAPIBuilder()
+            api = new vHackApi.Api.vhAPIBuilder()
                .config(cfg)
                .getAPI();
         }

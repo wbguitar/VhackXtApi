@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using vHackApi.Api;
+using vHackApi.Interfaces;
 
 namespace vHackApi.Console
 {

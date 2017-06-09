@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VhackXtApi;
+using vHackApi;
 
 namespace vHackChat
 {
     class Program
     {
-        class ConsoleLogger : VhackXtApi.ILogger
+        class ConsoleLogger : vHackApi.ILogger
         {
 
             #region ILogger Members
@@ -23,7 +23,7 @@ namespace vHackChat
             #endregion
         }
 
-        class Config : VhackXtApi.IConfig
+        class Config : vHackApi.IConfig
         {
             #region IConfig Members
 
@@ -60,8 +60,8 @@ namespace vHackChat
         static Config cfg = new Config();
         static void Main(string[] args)
         {
-            var api = new VhackXtApi.Api.vhAPI(cfg);
-            VhackXtApi.Chat.ChatTest.Test(api);
+            var api = new vHackApi.Api.vhAPI(cfg);
+            vHackApi.Chat.ChatTest.Test(api);
         }
     }
 }

@@ -129,13 +129,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Api.cs" />
+    <Compile Include="Api\Enums.cs" />
+    <Compile Include="Api\IPAddress.cs" />
+    <Compile Include="Api\Passwords.cs" />
     <Compile Include="Api\vHackAPIBuilder.cs" />
     <Compile Include="Attacks.cs">
       <DependentUpon>VhackDbModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Chat\Chat.cs" />
     <Compile Include="Chat\ChatUtils.cs" />
-    <Compile Include="Classes.cs" />
     <Compile Include="Console\Connection.cs" />
     <Compile Include="Console\Console.cs" />
     <Compile Include="Console\vhImage.cs" />
@@ -148,6 +150,8 @@
     <Compile Include="Api\Utils.cs" />
     <Compile Include="DbManager.cs" />
     <Compile Include="HackTheDev.cs" />
+    <Compile Include="Interfaces\IConfig.cs" />
+    <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="IPs.cs">
       <DependentUpon>VhackDbModel.tt</DependentUpon>
     </Compile>
@@ -191,6 +195,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>VhackDbModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="vhackdb.db" />
     <None Include="VhackDbModel.edmx.diagram">
       <DependentUpon>VhackDbModel.edmx</DependentUpon>
     </None>
