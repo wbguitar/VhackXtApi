@@ -14,10 +14,10 @@ namespace vHackApi
     
     public partial class Version
     {
+        public long Id { get; set; }
         public long Major { get; set; }
         public long Minor { get; set; }
         public long Patch { get; set; }
-        public long Id { get; set; }
         public string Description { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi.Console;
+using vHackApi.Interfaces;
 
 namespace vHackApi.Api
 {

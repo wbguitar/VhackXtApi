@@ -98,13 +98,13 @@ namespace vHackApi.Api
          * @throws ExecutionException 
          * @throws InterruptedException 
          */
-        public static async Task<JObject> JSONRequest(string format, string data, string php)
+        public static async Task<JObject> JSONRequest(string format, string data, string php, int attempts = -1)
         {
             string jsonText = "";
             try
             {
 
-                jsonText = await Request(format, data, php);
+                jsonText = await Request(format, data, php, attempts);
 
                 if (string.IsNullOrEmpty(jsonText))
                 {
@@ -145,11 +145,10 @@ namespace vHackApi.Api
          * @return The resulte Json as a Future<string>.
          */
         //JDOC needs rewriting
-        public static async Task<string> Request(string format, string data, string php)
+        public static async Task<string> Request(string format, string data, string php, int attempts)
         {
             try
             {
-
                 var elapsed = DateTime.Now - lastReq;
                 if (elapsed.TotalMilliseconds < vhConsole.WaitStep)
                     Thread.Sleep(vhConsole.WaitStep - (int)elapsed.TotalMilliseconds);
@@ -168,16 +167,21 @@ namespace vHackApi.Api
             {
                 Debug.Print(e.StackTrace);
                 Thread.Sleep(vhConsole.WaitStep);
-                
             }
 
-            var ret = await Request(format, data, php);
+            if (attempts == 0)
+                return "0";
+
+            if (attempts != -1)
+                attempts--;
+
+            var ret = await Request(format, data, php, attempts);
             return ret;
         }
 
-        public static async Task<string> StringRequest(string format, string data, string php)
+        public static async Task<string> StringRequest(string format, string data, string php, int attempts = -1)
         {
-            return await Request(format, data, php);
+            return await Request(format, data, php, attempts);
         }
 
         private static byte[] m9179a(byte[] arrby, int n2, int n3, byte[] arrby2, int n4, byte[] arrby3)
@@ -447,6 +451,34 @@ namespace vHackApi.Api
             Debug.Print(retStr);
 
             return retStr;
+        }
+
+    }
+
+    public static class ExtUtils
+    {
+        /// <summary>
+        /// Parse all the properties of an object and copies them to related properties of the destination object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        public static bool CopyProperties<T>(this T from, ref T to)
+        {
+            try
+            {
+                foreach (var prop in from.GetType().GetProperties())
+                {
+                    var val = prop.GetValue(from);
+                    prop.SetValue(to, val);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
     }

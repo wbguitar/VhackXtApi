@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using vHackApi.Api;
 
 namespace vHackApi.Interfaces
 {
@@ -13,6 +14,10 @@ namespace vHackApi.Interfaces
         string tessdata { get; }
         int waitstep { get; }
         int winchance { get; }
+        int maxFirewall { get; }
+        int maxAntivirus { get; }
+
+        string dbConnectionString { get; }
 
         Tasks[] updates { get; }
 

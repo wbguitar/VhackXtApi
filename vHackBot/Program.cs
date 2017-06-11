@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using vHackApi;
 using vHackApi.Api;
 using vHackApi.Console;
+using vHackApi.Interfaces;
 
 namespace vHackBot
 {
@@ -64,6 +62,12 @@ namespace vHackBot
 
             public int winchance => Properties.Settings.Default.WinChance;
 
+            public string dbConnectionString => Properties.Settings.Default.dbConnString;
+
+            public int maxFirewall => Properties.Settings.Default.maxFirewall;
+
+            public int maxAntivirus => Properties.Settings.Default.maxAntivirus;
+
             #endregion
         }
 
@@ -99,6 +103,30 @@ namespace vHackBot
 
             public int winchance => Properties.Settings.Default.WinChance;
 
+            public string dbConnectionString
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public int maxFirewall
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public int maxAntivirus
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
             #endregion
         }
 
@@ -108,6 +136,9 @@ namespace vHackBot
         {
             try
             {
+                if (!DbManager.Initialize(cfg))
+                    return;
+
                 var builder = new vhAPIBuilder()
                     .config(cfg);
 
@@ -119,7 +150,7 @@ namespace vHackBot
                 Debug.Print(String.Format("azz {0}", api.getStats(Stats.money)));
 
                 var console = api.getConsole();
-                var info = await console.myinfo();
+                var info = await console.MyInfo();
                 //var user = await console.scanUser();
                 //var pos = await console.GetTournamentPosition();
                 //var clus = await console.ScanCluster("PCO");
@@ -127,7 +158,40 @@ namespace vHackBot
 
                 var uhash = (string)info["uhash"];
                 var bnInfo = await api.botnetInfo(uhash);
-                
+
+
+                //var urlBadScan = vhUtils.generateURL("user::::pass::::uhash::::target",
+                //                     cfg.username + "::::" + cfg.password + "::::" + uhash + "::::" + "66.49.82.44",
+                //                     "vh_loadRemoteData.php");
+                //var urlGoodScan = vhUtils.generateURL("user::::pass::::uhash::::target",
+                //                     cfg.username + "::::" + cfg.password + "::::" + uhash + "::::" + "225.129.253.141",
+                //                     "vh_loadRemoteData.php");
+
+
+
+
+                ////var jo1 = await console.ScanIp("127.0.0.1");
+                //var ip = "66.49.82.44";
+                //var jo1 = await console.ScanIp(ip);
+                //if (jo1 == null)
+                //    cfg.logger.Log("IP {0} doesn't exist", ip);
+
+                var ip = "225.129.253.141";
+                var jo1 = await console.ScanIp(ip);
+                if (jo1 == null)
+                    cfg.logger.Log("IP {0} doesn't exist", ip);
+                else
+                {
+                    var dbip = new IPs(jo1);
+                    var jo2 = await console.ScanHost((string)jo1["hostname"]);
+
+                    if (DbManager.IpExist(dbip.IP))
+                        DbManager.UpdateIp(dbip);
+                    else
+                        DbManager.AddIp(dbip);
+                }
+
+
 
 
                 //var sol = await console.attackIp("52.35.189.199", 8000);
@@ -139,14 +203,14 @@ namespace vHackBot
                     {
                         try
                         {
-                            var s = console.attackIp("127.0.0.1", 8000);
+                            var s = console.AttackIp("127.0.0.1");
                         }
                         catch (Exception e)
                         {
                             cfg.logger.Log(e.ToString());
                         }
 
-                        Thread.Sleep(30000);
+                        Thread.Sleep(TimeSpan.FromSeconds(15));
                     }
                 }).Start();
 
@@ -223,8 +287,7 @@ namespace vHackBot
             {
                 try
                 {
-
-                    var img = await console.getIP(8000);
+                    var img = await console.FindHostsAndAttack(vhConsole.config.maxFirewall); 
                 }
                 catch (Exception e)
                 {
@@ -232,7 +295,7 @@ namespace vHackBot
                     cfg.logger.Log(e.ToString());
                 }
 
-                Thread.Sleep(vhConsole.WaitStep * 5);
+                Thread.Sleep(vhConsole.WaitStep);
             }
         }
     }

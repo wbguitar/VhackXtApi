@@ -14,10 +14,11 @@ namespace vHackApi
     
     public partial class Attacks
     {
-        public long Dt { get; set; }
+        public System.DateTime Dt { get; set; }
         public string IP { get; set; }
         public Nullable<long> MoneyOwned { get; set; }
         public Nullable<long> MoneyWon { get; set; }
+        public Nullable<long> RepWon { get; set; }
     
         public virtual IPs IPs { get; set; }
     }

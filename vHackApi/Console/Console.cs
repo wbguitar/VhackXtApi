@@ -29,6 +29,9 @@ namespace vHackApi.Console
             vhConsole.uHash = uHash;
             config = cfg;
 
+            //var info = MyInfo().Result;
+            //vhConsole.uHash = (string)info["uhash"];
+
             if (!Directory.Exists(cfg.tessdata))
             {
                 cfg.logger.Log("Cannot find tessdata path: {0}", Path.GetFullPath(cfg.tessdata));
@@ -41,14 +44,14 @@ namespace vHackApi.Console
             WaitStep = cfg.waitstep;
         }
 
-        public async Task<JObject> myinfo()
+        public async Task<JObject> MyInfo()
         {
             return await vhUtils.JSONRequest("user::::pass::::gcm::::uhash",
                                      config.username + "::::" + config.password + "::::" + "eW7lxzLY9bE:APA91bEO2sZd6aibQerL3Uy-wSp3gM7zLs93Xwoj4zIhnyNO8FLyfcODkIRC1dc7kkDymiWxy_dTQ-bXxUUPIhN6jCUBVvGqoNXkeHhRvEtqAtFuYJbknovB_0gItoXiTev7Lc5LJgP2" + "::::" + "userHash_not_needed",
                                      "vh_update.php");
         }
 
-        public async Task<JObject> requestPassword(string ip)
+        public async Task<JObject> RequestPassword(string ip)
         {
             return await vhUtils.JSONRequest("user::::pass::::target",
                                    config.username + "::::" + config.password + "::::" + ip,
@@ -56,18 +59,21 @@ namespace vHackApi.Console
             
         }
 
-        public async Task<JObject> enterPassword(string passwd, string target, string uhash)
+        public async Task<JObject> EnterPassword(string passwd, string target, string uhash = null)
         {
+            if (string.IsNullOrEmpty(uhash))
+                uhash = vhConsole.uHash;
+
             var pass = passwd.Split('p');
             var temp = await vhUtils.JSONRequest("user::::pass::::port::::target::::uhash",
                                      config.username + "::::" + config.password + "::::" +
                                          pass[1] + "::::" + target + "::::" + uhash,
-                                     "vh_trTransfer.php");
+                                     "vh_trTransfer.php", 3);
 
             return temp;
         }
 
-        public async Task<JObject> check_Cluster(string uhash = null)
+        public async Task<JObject> CheckCluster(string uhash = null)
         {
             uhash = string.IsNullOrEmpty(uhash) ? "userHash_not_needed" : uhash;
             return await vhUtils.JSONRequest("user::::pass::::uhash",
@@ -75,13 +81,13 @@ namespace vHackApi.Console
                                      "vh_ClusterData.php");
         }
 
-        public async Task<JObject> scanUser()
-        {
-            //var req = await Utils.StringRequest("user::::pass::::",
-            //                       config.username + "::::" + config.password + "::::", "vh_scanHost.php");
-            return await vhUtils.JSONRequest("user::::pass::::",
-                                   config.username + "::::" + config.password + "::::", "vh_scanHost.php");
-        }
+        //public async Task<JObject> scanUser()
+        //{
+        //    //var req = await Utils.StringRequest("user::::pass::::",
+        //    //                       config.username + "::::" + config.password + "::::", "vh_scanHost.php");
+        //    return await vhUtils.JSONRequest("user::::pass::::",
+        //                           config.username + "::::" + config.password + "::::", "vh_scanHost.php");
+        //}
 
         public async Task<string> GetTournamentPosition()
         {
@@ -132,12 +138,17 @@ namespace vHackApi.Console
 
         static Random r = new Random((int)DateTime.Now.Ticks);
 
-
         public enum ScanMode { Secure, Potator };
         public TesseractEngine engine;
-        
 
-        public async Task<int> calc_img(string imgstring, string uhash, string hostname, int max, ScanMode mode)
+        /// <summary>
+        /// Process an image extracting host info and attacks it if possible
+        /// </summary>
+        /// <param name="imgstring">host image represented by its bytes string</param>
+        /// <param name="hostname"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public async Task<int> ProcessImgAndAttack(string imgstring, string hostname, ScanMode mode)
         {
             var image = new NetworkImage(imgstring);
             string text = "";
@@ -195,12 +206,12 @@ namespace vHackApi.Console
                 if (firewall.Length > 2)
                 {
                     var val = Convert.ToInt32(firewall[2].Trim());
-                    if (val > max) // TODO: insert max firewall from config
+                    if (val > config.maxFirewall)
                     {
                         config.logger.Log("Firewall is too high: {0}", val);
                     }
                     else {
-                        var scan = await scanHost(uhash, hostname);
+                        var scan = await ScanHost(hostname);
                         if (scan == null)
                         {
                             config.logger.Log("Unable to scan host {0}", hostname);
@@ -218,7 +229,7 @@ namespace vHackApi.Console
 
                             try
                             {
-                                var res = await attackIp(ip, 8000);
+                                var res = await AttackIp(ip);
 
                                 // remove spyware
                                 // TODO
@@ -253,37 +264,69 @@ namespace vHackApi.Console
             return -1;
         }
 
-        public async Task<JObject> scanHost(string uhash, string hostname)
+        public async Task<JObject> ScanHost(string hostname, int attempts = 3)
         {
-            //return await Utils.JSONRequest("user::::pass::::uhash::::hostname",
-            //    config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + hostname,
-            //    "vh_scanHost.php");
-
             return await vhUtils.JSONRequest("user::::pass::::hostname",
                 config.username + "::::" + config.password + "::::" + hostname,
-                "vh_scanHost.php");
+                "vh_scanHost.php", attempts);
         }
 
+        public async Task<JObject> ScanIp(string ip, int attempts = 3)
+        {
+            //    return await vhUtils.JSONRequest("user::::pass::::uhash::::target",
+            //                             config.username + "::::" + config.password + "::::" + uhash + "::::" + ip,
+            //                             "vh_loadRemoteData.php");
+
+            var uhash = vhConsole.uHash;
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::target",
+                                     config.username + "::::" + config.password + "::::" + uhash + "::::" + ip,
+                                     "vh_loadRemoteData.php", attempts);
+        }
+
+        object semaphore = new object();
         /// <summary>
-        /// 
+        /// Attacks a given ip
         /// </summary>
         /// <param name="ip"></param>
-        /// <param name="max"></param>
         /// <param name="mode"></param>
         /// <returns>0 on success, -1 on failure, 1 on skip</returns>
-        public async Task<int> attackIp(string ip, int max, ScanMode mode = ScanMode.Potator)
+        public async Task<int> AttackIp(string ip, ScanMode mode = ScanMode.Potator)
         {
-            var info = await myinfo();
+            var info = await MyInfo();
             var uhash = (string)info["uhash"];
 
             if (mode == ScanMode.Secure)
                 Thread.Sleep(vhConsole.WaitStep);
 
+
             config.logger.Log("attacking IP {0}", ip);
 
-            var jsons = await vhUtils.JSONRequest("user::::pass::::uhash::::target",
-                                     config.username + "::::" + config.password + "::::" + uhash + "::::" + ip,
-                                     "vh_loadRemoteData.php");
+            // loads IP related data, if it can be scanned
+            //var jsons = await vhUtils.JSONRequest("user::::pass::::uhash::::target",
+            //                         config.username + "::::" + config.password + "::::" + uhash + "::::" + ip,
+            //                         "vh_loadRemoteData.php");
+            var jsons = await ScanIp(ip, 3);
+            if (jsons == null)
+            {
+                config.logger.Log("Unable to scan ip {0}", ip);
+                return -1;
+            }
+
+            var dbIp = new IPs(jsons);
+            lock (this)
+            {
+                // create DB ip
+                if (DbManager.IpExist(dbIp.IP))
+                    dbIp = DbManager.GetIp(dbIp.IP);
+                else
+                    dbIp = DbManager.AddIp(dbIp);
+
+                Debug.Assert(dbIp != null);
+
+            }
+
+
 
             var ocr = new OCR(engine);
             try
@@ -351,7 +394,7 @@ namespace vHackApi.Console
                     //config.logger.Log("Cannot scan antivirus, skipping");
                     //return 1;
                 }
-                else if (max < Convert.ToInt32(avlevel))
+                else if (config.maxAntivirus < Convert.ToInt32(avlevel))
                 {
                     //config.logger.Log("Antivirus is too hign, skipping");
                     //return 1;
@@ -362,14 +405,17 @@ namespace vHackApi.Console
                 }
                 else
                 {
-                    JObject pass = null;
-                    do
+                    JObject pass = await EnterPassword(sol, ip, uhash);
+                    if (pass == null)
                     {
-                        // loops while get result
-                        pass = await enterPassword(sol, ip, uhash);
-                    } while (pass == null);
+                        config.logger.Log("Unable to enter password for ip {0}", ip);
+                        return -1;
+                    }
 
-                    if ((int)pass["result"] == 0)
+                    int retval = 0;
+                    var result = (int)pass["result"];
+
+                    if (result == 0)
                     {
                         // success!!
                         config.logger.Log(@"
@@ -381,16 +427,46 @@ Antivirus: {4} Firewall: {5} Sdk: {6} TotalMoney: {7}
 YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
 , (string)pass["newmoney"]
 , ip
-, (string)pass["amount"], (string)pass["eloch"], avlevel
-, fwlevel, sdklevel, money
+, (string)pass["amount"], (string)pass["eloch"]
+, avlevel, fwlevel, sdklevel, money
 , winchance, anonymous, user, saving);
-                        return 0;
+
+                        lock (this)
+                        {
+                            var att = new Attacks();
+                            att.MoneyWon = (long)pass["amount"];
+                            att.RepWon = (long)pass["eloch"];
+                            att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
+
+                            var addRes = DbManager.AddAttack(dbIp.IP, att);
+                            Debug.Assert(addRes);
+                        }
+
+                        retval = 0;
                     }
                     else
                     {
+                        lock (this)
+                        {
+                            var att = new Attacks();
+                            //att.MoneyWon = (long)pass["amount"];
+                            //att.RepWon = (long)pass["eloch"];
+                            //att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
+
+                            if (dbIp.IP != "127.0.0.1")
+                            {
+                                var addRes = DbManager.AddAttack(dbIp.IP, att);
+                                Debug.Assert(addRes);
+                            }
+                        }
+
                         config.logger.Log("enter password failed");
-                        return -1;
+                        retval = -1;
                     }
+
+                    
+
+                    return retval;
                 }
             }
             catch (Exception e)
@@ -411,20 +487,20 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             return 0;
         }
 
-        public async Task<int> getIP(int max, ScanMode mode = ScanMode.Potator, bool active_protecte_cluster_ddos = false)
+        public async Task<int> FindHostsAndAttack(int maxFwall, ScanMode mode = ScanMode.Potator, bool active_protecte_cluster_ddos = false)
         {
-            string uhash = "";
-            try
-            {
-                var info = await this.myinfo();
-                uhash = (string)info["uhash"];
-            }
-            catch (Exception e)
-            {
-                config.logger.Log("Error: {0}", e.Message);
-            }
+            //string uhash = "";
+            //try
+            //{
+            //    var info = await this.MyInfo();
+            //    uhash = (string)info["uhash"];
+            //}
+            //catch (Exception e)
+            //{
+            //    config.logger.Log("Error: {0}", e.Message);
+            //}
 
-            var stats = await check_Cluster(uhash);
+            var stats = await CheckCluster(vhConsole.uHash);
             var clusterBlocked = (string)stats["blocked"];
             if (clusterBlocked.Contains("Your Cluster is blocked") && active_protecte_cluster_ddos)
             {
@@ -432,11 +508,9 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             }
             else
             {
-                var temp = await getImg(uhash);
+                var temp = await GetImg(vhConsole.uHash);
                 var data = (JArray)temp["data"];
 
-                List<dynamic> objs = new List<dynamic>();
-                List<dynamic> whitelist = new List<dynamic>();
                 foreach (var d in data)
                 {
                     try
@@ -444,7 +518,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
                         var hostname = (string)d["hostname"];
                         //var imgString = "data: image/png;base64," + (string)d["img"];
                         var imgString = (string)d["img"];
-                        var res = await calc_img(imgString, uhash, hostname, max, mode);
+                        var res = await ProcessImgAndAttack(imgString, hostname, mode);
                     }
                     catch (Exception e)
                     {
@@ -456,61 +530,11 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             return 0;
         }
 
-        public async Task<JObject> getImg(string uhash)
+        public async Task<JObject> GetImg(string uhash)
         {
             return await vhUtils.JSONRequest("user::::pass::::uhash::::by",
-                                         config.username + "::::" + config.password + "::::" + uhash + "::::" + r.Next(0, 1000), 
+                                         config.username + "::::" + config.password + "::::" + uhash + "::::" + r.Next(10000), 
                                          "vh_getImg.php");
         }
-
-
-        //Random r = new Random();
-        //public async Task<Target[]> getTargets()
-        //{
-
-        //    JObject json = await Utils.JSONRequest("user::::pass::::uhash::::by", config.username + "::::" + config.password 
-        //        + "::::" + uHash + "::::" + r.Next(1).ToString(), "vh_getImg.php");
-
-        //    JArray jarray = (JArray)json.GetValue("data");
-        //    Target[] targets = new Target[jarray.Count];
-
-        //    for (int i = 0; i < jarray.Count; i++)
-        //    {
-        //        try
-        //        {
-        //            var tempjo = (JObject)jarray[i];
-        //            var host = (string)tempjo.GetValue("hostname");
-        //            var img = (string)tempjo.GetValue("img");
-        //            var nimg = new NetworkImage(img);
-        //            nimg.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName()) + ".png");
-        //            targets[i] = new Target(host,nimg);
-
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            Debug.Print(e.ToString());
-        //        }
-        //    }
-
-        //    //for (int i = 0; i < jarray.Count; i++)
-        //    //{
-
-        //    //    JObject tempjo = jarray.getJSONObject(i);
-        //    //    try
-        //    //    {
-
-        //    //        targets[i] = new Target(tempjo.getString("hostname"), new NetworkImage(tempjo.getString("img")));
-
-        //    //    }
-        //    //    catch (Exception e)
-        //    //    {
-
-        //    //    }
-
-        //    //}
-
-        //    return targets;
-
-        //}
     }
 }

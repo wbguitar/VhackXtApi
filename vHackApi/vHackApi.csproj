@@ -134,7 +134,7 @@
     <Compile Include="Api\Passwords.cs" />
     <Compile Include="Api\vHackAPIBuilder.cs" />
     <Compile Include="Attacks.cs">
-      <DependentUpon>VhackDbModel.tt</DependentUpon>
+      <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Chat\Chat.cs" />
     <Compile Include="Chat\ChatUtils.cs" />
@@ -153,8 +153,9 @@
     <Compile Include="Interfaces\IConfig.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="IPs.cs">
-      <DependentUpon>VhackDbModel.tt</DependentUpon>
+      <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="IPScanner.cs" />
     <Compile Include="OCR.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -164,22 +165,22 @@
     </Compile>
     <Compile Include="Update.cs" />
     <Compile Include="Version.cs">
-      <DependentUpon>VhackDbModel.tt</DependentUpon>
+      <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="VhackDbModel.Context.cs">
+    <Compile Include="vHackDbModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>VhackDbModel.Context.tt</DependentUpon>
+      <DependentUpon>vHackDbModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="VhackDbModel.cs">
+    <Compile Include="vHackDbModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>VhackDbModel.tt</DependentUpon>
+      <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="VhackDbModel.Designer.cs">
+    <Compile Include="vHackDbModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>VhackDbModel.edmx</DependentUpon>
+      <DependentUpon>vHackDbModel.edmx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -191,31 +192,42 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <EntityDeploy Include="VhackDbModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>VhackDbModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
+    <Content Include="tessdata\eng.traineddata">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="vhackdb.db" />
-    <None Include="VhackDbModel.edmx.diagram">
-      <DependentUpon>VhackDbModel.edmx</DependentUpon>
+    <EntityDeploy Include="vHackDbModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>vHackDbModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="vHackDbModel.edmx.diagram">
+      <DependentUpon>vHackDbModel.edmx</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="VhackDbModel.Context.tt">
+    <Content Include="vHackDbModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>VhackDbModel.edmx</DependentUpon>
-      <LastGenOutput>VhackDbModel.Context.cs</LastGenOutput>
+      <DependentUpon>vHackDbModel.edmx</DependentUpon>
+      <LastGenOutput>vHackDbModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="VhackDbModel.tt">
+    <Content Include="vHackDbModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>VhackDbModel.edmx</DependentUpon>
-      <LastGenOutput>VhackDbModel.cs</LastGenOutput>
+      <DependentUpon>vHackDbModel.edmx</DependentUpon>
+      <LastGenOutput>vHackDbModel.cs</LastGenOutput>
     </Content>
-    <Content Include="x64\liblept172.dll" />
-    <Content Include="x64\libtesseract304.dll" />
-    <Content Include="x86\liblept172.dll" />
-    <Content Include="x86\libtesseract304.dll" />
+    <Content Include="x64\liblept172.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x64\libtesseract304.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\liblept172.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\libtesseract304.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

@@ -3,13 +3,22 @@
   <Profiles />
   <Settings>
     <Setting Name="TessdataPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\tessdata</Value>
+      <Value Profile="(Default)">.\tessdata</Value>
     </Setting>
     <Setting Name="WaitStep" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="WinChance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">75</Value>
+    </Setting>
+    <Setting Name="dbConnString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">metadata=res://*/vHackDbModel.csdl|res://*/vHackDbModel.ssdl|res://*/vHackDbModel.msl;provider=System.Data.SQLite.EF6;provider connection string='data source=.\vhackdb.db'</Value>
+    </Setting>
+    <Setting Name="maxFirewall" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="maxAntivirus" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

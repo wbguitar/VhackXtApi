@@ -25,8 +25,8 @@ namespace vHackApi
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Attacks> Attacks { get; set; }
         public virtual DbSet<IPs> IPs { get; set; }
         public virtual DbSet<Version> Version { get; set; }
+        public virtual DbSet<Attacks> Attacks { get; set; }
     }
 }

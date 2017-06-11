@@ -2,6 +2,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using vHackApi.Interfaces;
 
 namespace vHackApi.Api
 {

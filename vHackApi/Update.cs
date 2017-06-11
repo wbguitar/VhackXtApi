@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi.Api;
+using vHackApi.Interfaces;
 
 namespace vHackApi
 {
@@ -79,7 +80,7 @@ namespace vHackApi
 
         public async Task<bool> finishTask(string taskID)
         {
-            throw new NotImplementedException(); // non funziona
+            throw new NotImplementedException(); // not working
 
             var res = await vhUtils.JSONRequest("user::::pass::::uhash::::taskid",
                                 config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + taskID,

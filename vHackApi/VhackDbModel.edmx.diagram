@@ -4,11 +4,11 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c6d1745424cb45a5a8474aa57045bbc1" Name="Diagram1">
-        <EntityTypeShape EntityType="vhackdbModel.Attacks" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="vhackdbModel.IPs" Width="1.5" PointX="0.75" PointY="0.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="vhackdbModel.Version" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
-        <AssociationConnector Association="vhackdbModel.FK_Attacks_0_0" ManuallyRouted="false" />
+      <Diagram DiagramId="5b556b5ca82346a786384e6a437d21f8" Name="Diagram1">
+        <EntityTypeShape EntityType="vhackdbModel.IPs" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="vhackdbModel.Version" Width="1.5" PointX="5.875" PointY="1.5" />
+        <EntityTypeShape EntityType="vhackdbModel.Attacks" Width="1.5" PointX="3" PointY="1.625" />
+        <AssociationConnector Association="vhackdbModel.FK_Attacks_0_0" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

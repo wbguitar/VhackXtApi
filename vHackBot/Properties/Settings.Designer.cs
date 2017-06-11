@@ -12,7 +12,7 @@ namespace vHackBot.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,7 +25,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\tessdata")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\tessdata")]
         public string TessdataPath {
             get {
                 return ((string)(this["TessdataPath"]));
@@ -56,6 +56,44 @@ namespace vHackBot.Properties {
             }
             set {
                 this["WinChance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("metadata=res://*/vHackDbModel.csdl|res://*/vHackDbModel.ssdl|res://*/vHackDbModel" +
+            ".msl;provider=System.Data.SQLite.EF6;provider connection string=\'data source=.\\v" +
+            "hackdb.db\'")]
+        public string dbConnString {
+            get {
+                return ((string)(this["dbConnString"]));
+            }
+            set {
+                this["dbConnString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
+        public int maxFirewall {
+            get {
+                return ((int)(this["maxFirewall"]));
+            }
+            set {
+                this["maxFirewall"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        public int maxAntivirus {
+            get {
+                return ((int)(this["maxAntivirus"]));
+            }
+            set {
+                this["maxAntivirus"] = value;
             }
         }
     }
