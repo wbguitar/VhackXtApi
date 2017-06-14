@@ -57,7 +57,7 @@ namespace vHackApi.Api
             return this;
         }
 
-        public vhAPIBuilder config(IConfig cfg)
+        public vhAPIBuilder useConfig(IConfig cfg)
         {
             this.cfg = cfg;
             return this;

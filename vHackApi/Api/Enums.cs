@@ -6,9 +6,4 @@ using System.Threading.Tasks;
 
 namespace vHackApi.Api
 {
-    public enum Tasks
-    {
-        spam,
-        antivirus,
-    }
 }

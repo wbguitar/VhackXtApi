@@ -14,15 +14,16 @@ namespace vHackApi.Api
 
     public class vhAPI
     {
-
         IConfig config;
         protected string userHash;
         private JObject stats = null;
 
-
+        vhConsole console;
         public vhConsole getConsole()
         {
-            vhConsole console = new vhConsole(config, userHash);
+            if (console == null)
+                 console = new vhConsole(config, userHash);
+
             return console;
         }
 
@@ -173,21 +174,35 @@ namespace vHackApi.Api
                 "vh_botnetInfo.php"); ;
         }
 
-        public async Task attackbotnetserver(int i, string userhash)
+        public async Task attackbotnetserver(string userhash = null)
         {
+            if (string.IsNullOrEmpty(userhash))
+                userhash = vhConsole.uHash;
+
             JObject response = null;
             var bnInfo = await botnetInfo(userhash);
-            if ((int)bnInfo["canAtt1"] == 1)
+            if (bnInfo == null)
+            {
+                config.logger.Log("Unable to fetch botnet info");
+                return;
+            }
+
+            JToken value = null;
+            var count = (int)bnInfo["count"];
+            //if (count >= 1 && (int)bnInfo["canAtt1"] == 1)
+            if (bnInfo.TryGetValue("canAtt1", out value) && (int)value == 1)
                 response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
                     config.username + "::::" + config.password + "::::" + userhash + "::::" + "1",
                     "vh_attackCompany.php");
 
-            if ((int)bnInfo["canAtt2"] == 1)
+            //if (count >= 2 && (int)bnInfo["canAtt2"] == 1)
+            if (bnInfo.TryGetValue("canAtt2", out value) && (int)value == 1)
                 response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
                     config.username + "::::" + config.password + "::::" + userhash + "::::" + "2",
                     "vh_attackCompany2.php");
 
-            if ((int)bnInfo["canAtt3"] == 1)
+            //if (count >= 3 && (int)bnInfo["canAtt3"] == 1)
+            if (bnInfo.TryGetValue("canAtt3", out value) && (int)value == 1)
                 response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
                     config.username + "::::" + config.password + "::::" + userhash + "::::" + "3",
                     "vh_attackCompany3.php");
