@@ -49,7 +49,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("75")]
+        [global::System.Configuration.DefaultSettingValueAttribute("65")]
         public int WinChance {
             get {
                 return ((int)(this["WinChance"]));
@@ -75,7 +75,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15000")]
         public int maxFirewall {
             get {
                 return ((int)(this["maxFirewall"]));
@@ -87,13 +87,37 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15000")]
         public int maxAntivirus {
             get {
                 return ((int)(this["maxAntivirus"]));
             }
             set {
                 this["maxAntivirus"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        public global::System.TimeSpan hackDevPolling {
+            get {
+                return ((global::System.TimeSpan)(this["hackDevPolling"]));
+            }
+            set {
+                this["hackDevPolling"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        public global::System.TimeSpan hackBotnetPolling {
+            get {
+                return ((global::System.TimeSpan)(this["hackBotnetPolling"]));
+            }
+            set {
+                this["hackBotnetPolling"] = value;
             }
         }
     }
