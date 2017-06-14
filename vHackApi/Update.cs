@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Threading;
@@ -11,7 +10,7 @@ namespace vHackApi
 {
     public class Update
     {
-        IConfig config;
+        private IConfig config;
 
         public Update(IConfig conf)
         {
@@ -53,13 +52,12 @@ namespace vHackApi
             return temp.Select(it => (string)it["taskid"]).ToArray();
         }
 
-
         public async Task<int> startTask(Tasks type)
         {
             var temp = await vhUtils.JSONRequest("user::::pass::::uhash::::utype",
-                                config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + type,
+                                config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + type.ToString(),
                                 "vh_addUpdate.php");
-            var res = (int)temp["result"]; // 0 ok, 3 pieno
+            var res = (int)temp["result"]; // 0 ok, 3 full
             return res;
         }
 
@@ -109,16 +107,16 @@ namespace vHackApi
                                 "vh_tasks.php");
         }
 
-        public async void doTasks(TimeSpan wait)
-        {
-            foreach (var update in config.updates)
-            {
-                config.logger.Log("updating {0} level +1", update);
-                Thread.Sleep(wait);
-                var res = await this.startTask(config.updates.Last());
-                if (res == 0)
-                    config.logger.Log("update failed");
-            }
-        }
+        //public async void doTasks(TimeSpan wait)
+        //{
+        //    foreach (var update in config.updates)
+        //    {
+        //        config.logger.Log("updating {0} level +1", update);
+        //        Thread.Sleep(wait);
+        //        var res = await this.startTask(config.updates.Last());
+        //        if (res == 0)
+        //            config.logger.Log("update failed");
+        //    }
+        //}
     }
 }
