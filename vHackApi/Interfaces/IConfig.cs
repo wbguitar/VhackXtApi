@@ -17,10 +17,17 @@ namespace vHackApi.Interfaces
         int maxFirewall { get; }
         int maxAntivirus { get; }
 
+        TimeSpan hackDevPolling { get; }
+        TimeSpan hackBotnetPolling { get; }
+
         string dbConnectionString { get; }
 
-        Tasks[] updates { get; }
-
         ILogger logger { get; }
+
+        IIPselector ipSelector { get; }
+
+        IUpgradeStrategy upgradeStrategy { get; }
+
+        IPersistanceMgr persistanceMgr { get; }
     }
 }
