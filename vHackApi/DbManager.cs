@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using vHackApi.Interfaces;
 using vHackApi.Api;
+using vHackApi.Interfaces.Reflection;
 
 namespace vHackApi
 {
@@ -29,7 +30,7 @@ namespace vHackApi
                 this.SDK = ((string)jsons["sdk"]).Contains('?') ? null : (long?)jsons["sdk"];
                 this.IPSpoofing = ((string)jsons["ipsp"]).Contains('?') ? null : (long?)jsons["ipsp"];
                 this.Spyware = ((string)jsons["spyware"]).Contains('?') ? null : (long?)jsons["spyware"];
-                this.Money = ((string)jsons["money"]).Contains('?') ? null : (long?)jsons["money"];
+                this.Money = ((string)jsons["money"]).Contains('?') ? 0 : (int)jsons["money"];
                 this.WinChance = ((string)jsons["winchance"]).Contains('?') ? null : (long?)jsons["winchance"];
 
                 this.Anonymous = (string)jsons["anonymous"] == "YES";
@@ -86,18 +87,17 @@ namespace vHackApi
         }
     }
 
-    public static class DbManager
+    public class DbManager: Interfaces.Reflection.Singleton<DbManager>, IPersistanceMgr
     {
+        private DbManager() { }
+
         private static readonly string DbVersion = "1.0.0";
-        private static vhackdbEntities model;
-        private static IConfig config;
+        private vhackdbEntities model;
+        private IConfig config;
 
-        static DbManager()
-        { }
+        public void Update() => model = new vhackdbEntities();
 
-        public static void Update() => model = new vhackdbEntities();
-
-        public static bool Initialize(IConfig cfg)
+        public bool Initialize(IConfig cfg)
         {
             config = cfg;
 
@@ -126,53 +126,83 @@ namespace vHackApi
             return true;
         }
 
-        public static bool IpExist(string ip) => model.IPs.Any(it => it.IP == ip);
+        public bool IpExist(string ip) => model.IPs.Any(it => it.IP == ip);
 
-        public static IPs AddIp(IPs ip)
+        public IPs AddIp(IPs ip)
         {
-            try
+            lock (semaphore)
             {
-                var found = model.IPs.FirstOrDefault(it => ip.IP == it.IP);
-                //var found = model.IPs.ToList().FirstOrDefault(it => ip.Equals(it));
-                if (found != null)
-                    return found;
+                try
+                {
+                    var found = model.IPs.FirstOrDefault(it => ip.IP == it.IP);
+                    //var found = model.IPs.ToList().FirstOrDefault(it => ip.Equals(it));
+                    if (found != null)
+                        return found;
 
-                var added = model.IPs.Add(ip);
-                model.SaveChanges();
-                return added;
-            }
-            catch (Exception e)
-            {
-                config.logger.Log("DB error adding ip {0}: {1}", ip, e.Message);
-                return null;
+                    var added = model.IPs.Add(ip);
+                    model.SaveChanges();
+                    return added;
+                }
+                catch (Exception e)
+                {
+                    config.logger.Log("DB error adding ip {0}: {1}", ip, e.Message);
+                    return null;
+                } 
             }
         }
 
-        public static IPs GetIp(string ip) => model.IPs.FirstOrDefault(it => ip == it.IP);
+        public bool RemoveIp(string ip)
+        {
+            var found = GetIp(ip);
+            if (found == null)
+                return false;
 
-        public static IEnumerable<IPs> GetIps() => model.IPs.AsEnumerable();
+            lock (semaphore)
+            {
+                try
+                {
+                    model.IPs.Remove(found);
+                    model.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    config.logger.Log("RemoveIp error: {0}", e.Message);
+                    return false;
+                } 
+            }
+            return true;
+        }
 
-        public static bool UpdateIp(IPs newIp)
+        public IPs GetIp(string ip) => model.IPs.FirstOrDefault(it => ip == it.IP);
+
+        public IEnumerable<IPs> GetIps() => model.IPs.AsEnumerable();
+
+        static object semaphore = new object();
+        public bool UpdateIp(IPs newIp)
         {
             var oldIp = GetIp(newIp.IP);
             if (oldIp == null)
                 return false;
 
-            try
+            lock (semaphore)
             {
-                newIp.CopyProperties(ref oldIp);
-                oldIp.LastUpdate = DateTime.Now;
-                model.SaveChanges();
-            }
-            catch (Exception)
-            {
-                return false;
+                try
+                {
+                    newIp.CopyProperties(ref oldIp);
+                    oldIp.LastUpdate = DateTime.Now;
+                    model.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    config.logger.Log("UpdateIp error: {0}", e.Message);
+                    return false;
+                } 
             }
 
             return true;
         }
 
-        public static bool AddAttack(string ip, Attacks attack)
+        public bool AddAttack(string ip, Attacks attack)
         {
             var found = GetIp(ip);
             if (found == null)
@@ -181,19 +211,43 @@ namespace vHackApi
             if (found.Attacks == null)
                 found.Attacks = new List<Attacks>();
 
-            try
+            lock (semaphore)
             {
-                attack.IP = ip;
-                attack.Dt = DateTime.Now;
-                found.Attacks.Add(attack);
+                try
+                {
+                    attack.IP = ip;
+                    found.LastAttack = attack.Dt = DateTime.Now;
+                    found.Attacks.Add(attack);
 
-                model.SaveChanges();
-            }
-            catch (Exception)
-            {
-                return false;
+                    model.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    config.logger.Log("AddAttack error: {0}", e.Message);
+                    return false;
+                } 
             }
             return true;
+        }
+
+        public IEnumerable<IPs> ScannableIps()
+        {
+            var now = DateTime.Now;
+            return GetIps()
+                    .Where(ip =>
+                    {
+                        return (now - ip.LastAttack) > TimeSpan.FromHours(1);
+
+                        //if (ip.Attacks == null || ip.Attacks.Count == 0)
+                        //    return true; // not yet attacked
+
+                        //var lastAttack = ip.Attacks
+                        //    .Select(att => att.Dt)
+                        //    .OrderByDescending(dt => dt)
+                        //    .FirstOrDefault();
+
+                        //return (now - lastAttack) > TimeSpan.FromHours(1);
+                    });
         }
     }
 
