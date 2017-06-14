@@ -5,7 +5,13 @@ using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
-    public abstract class AHackTimer
+    public interface IHackTimer
+    {
+        void Set(IConfig cfg, vhAPI api);
+    }
+
+    public abstract class AHackTimer<T> : vHackApi.Interfaces.Reflection.Singleton<T>, IHackTimer
+        where T : vHackApi.Interfaces.Reflection.Singleton<T>
     {
         protected static object globalSemaphore = new object();
         protected object localSemaphore = new object();
@@ -21,8 +27,8 @@ namespace vHackApi.Bot
 
         static readonly int everyNow = 10;
         static readonly int andThen = 30;
-        static readonly int aWhileLo = 2;
-        static readonly int aWhileHi = 6;
+        static readonly int aWhileLo = 15;
+        static readonly int aWhileHi = 30;
 
         private static Random r = new Random();
 
@@ -64,12 +70,14 @@ namespace vHackApi.Bot
 
         private static DateTime NextPauseSchedule()
         {
-            return DateTime.Now + TimeSpan.FromMinutes(r.Next(everyNow, andThen));
+            //return DateTime.Now + TimeSpan.FromMinutes(r.Next(everyNow, andThen));
+            return DateTime.Now + TimeSpan.FromSeconds(r.Next(everyNow, andThen));
         }
 
         private static TimeSpan SetPauseDuration()
         {
-            return TimeSpan.FromMinutes(r.Next(aWhileLo, aWhileHi));
+            //return TimeSpan.FromMinutes(r.Next(aWhileLo, aWhileHi));
+            return TimeSpan.FromSeconds(r.Next(aWhileLo, aWhileHi));
         }
     }
 }
