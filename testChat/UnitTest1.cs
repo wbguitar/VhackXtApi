@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using vHackApi.Api;
 using System.Text;
 using System.Diagnostics;
+using vHackApi.Interfaces;
 
 namespace testChat
 {
@@ -64,6 +65,62 @@ namespace testChat
             public Tasks[] updates => null;
 
             public ILogger logger => consoleLogger;
+
+            public int maxFirewall
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public int maxAntivirus
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public TimeSpan hackDevPolling
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public TimeSpan hackBotnetPolling
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public string dbConnectionString
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IIPselector ipSelector
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IUpgradeStrategy upgradeStrategy
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
         static IConfig cfg = new Config();
@@ -71,7 +128,7 @@ namespace testChat
         static UnitTest1()
         {
             api = new vHackApi.Api.vhAPIBuilder()
-               .config(cfg)
+               .useConfig(cfg)
                .getAPI();
         }
 
