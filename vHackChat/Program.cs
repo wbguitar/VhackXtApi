@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using vHackApi;
+using vHackApi.Interfaces;
 
 namespace vHackChat
 {
     class Program
     {
-        class ConsoleLogger : vHackApi.ILogger
+        class ConsoleLogger : ILogger
         {
 
             #region ILogger Members
@@ -23,7 +23,7 @@ namespace vHackChat
             #endregion
         }
 
-        class Config : vHackApi.IConfig
+        class Config : IConfig
         {
             #region IConfig Members
 
@@ -36,11 +36,7 @@ namespace vHackChat
             {
                 get { return "rancido"; }
             }
-
-            public Tasks[] updates
-            {
-                get { return new[] { Tasks.spam }; }
-            }
+            
 
             ConsoleLogger cl = new ConsoleLogger();
             public ILogger logger
@@ -53,6 +49,62 @@ namespace vHackChat
             public int waitstep => 1000;
 
             public int winchance => 75;
+
+            public int maxFirewall
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public int maxAntivirus
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public TimeSpan hackDevPolling
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public TimeSpan hackBotnetPolling
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public string dbConnectionString
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IIPselector ipSelector
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IUpgradeStrategy upgradeStrategy
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
 
             #endregion
         }
