@@ -22,7 +22,7 @@
           <Property Name="IP" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
           <Property Name="LastUpdate" Type="datetime" />
           <Property Name="LastAttack" Type="datetime" />
-          <Property Name="Money" Type="integer" />
+          <Property Name="Money" Type="int" Nullable="false" />
           <Property Name="SDK" Type="integer" />
           <Property Name="Antivirus" Type="integer" />
           <Property Name="Firewall" Type="integer" />
@@ -70,14 +70,25 @@
     <edmx:ConceptualModels>
       <Schema Namespace="vhackdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="vhackdbEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Attacks" EntityType="vhackdbModel.Attacks" />
           <EntitySet Name="IPs" EntityType="vhackdbModel.IPs" />
           <EntitySet Name="Version" EntityType="vhackdbModel.Version" />
-          <EntitySet Name="Attacks" EntityType="vhackdbModel.Attacks" />
           <AssociationSet Name="FK_Attacks_0_0" Association="vhackdbModel.FK_Attacks_0_0">
             <End Role="IPs" EntitySet="IPs" />
             <End Role="Attacks" EntitySet="Attacks" />
           </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Attacks">
+          <Key>
+            <PropertyRef Name="Dt" />
+          </Key>
+          <Property Name="Dt" Type="DateTime" Nullable="false" />
+          <Property Name="IP" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Name="MoneyOwned" Type="Int64" />
+          <Property Name="MoneyWon" Type="Int64" />
+          <Property Name="RepWon" Type="Int64" />
+          <NavigationProperty Name="IPs" Relationship="vhackdbModel.FK_Attacks_0_0" FromRole="Attacks" ToRole="IPs" />
+        </EntityType>
         <EntityType Name="IPs">
           <Key>
             <PropertyRef Name="IP" />
@@ -85,7 +96,7 @@
           <Property Name="IP" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
           <Property Name="LastUpdate" Type="DateTime" />
           <Property Name="LastAttack" Type="DateTime" />
-          <Property Name="Money" Type="Int64" />
+          <Property Name="Money" Type="Int32" Nullable="false" />
           <Property Name="SDK" Type="Int64" />
           <Property Name="Antivirus" Type="Int64" />
           <Property Name="Firewall" Type="Int64" />
@@ -108,17 +119,6 @@
           <Property Name="Patch" Type="Int64" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="Attacks">
-          <Key>
-            <PropertyRef Name="Dt" />
-          </Key>
-          <Property Name="Dt" Type="DateTime" Nullable="false" />
-          <Property Name="IP" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-          <Property Name="MoneyOwned" Type="Int64" />
-          <Property Name="MoneyWon" Type="Int64" />
-          <Property Name="RepWon" Type="Int64" />
-          <NavigationProperty Name="IPs" Relationship="vhackdbModel.FK_Attacks_0_0" FromRole="Attacks" ToRole="IPs" />
-        </EntityType>
         <Association Name="FK_Attacks_0_0">
           <End Type="vhackdbModel.IPs" Role="IPs" Multiplicity="1" />
           <End Type="vhackdbModel.Attacks" Role="Attacks" Multiplicity="*" />
@@ -137,6 +137,17 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="vhackdbModelStoreContainer" CdmEntityContainer="vhackdbEntities">
+          <EntitySetMapping Name="Attacks">
+            <EntityTypeMapping TypeName="vhackdbModel.Attacks">
+              <MappingFragment StoreEntitySet="Attacks">
+                <ScalarProperty Name="RepWon" ColumnName="RepWon" />
+                <ScalarProperty Name="MoneyWon" ColumnName="MoneyWon" />
+                <ScalarProperty Name="MoneyOwned" ColumnName="MoneyOwned" />
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="Dt" ColumnName="Dt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="IPs">
             <EntityTypeMapping TypeName="vhackdbModel.IPs">
               <MappingFragment StoreEntitySet="IPs">
@@ -165,17 +176,6 @@
                 <ScalarProperty Name="Minor" ColumnName="Minor" />
                 <ScalarProperty Name="Major" ColumnName="Major" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Attacks">
-            <EntityTypeMapping TypeName="vhackdbModel.Attacks">
-              <MappingFragment StoreEntitySet="Attacks">
-                <ScalarProperty Name="RepWon" ColumnName="RepWon" />
-                <ScalarProperty Name="MoneyWon" ColumnName="MoneyWon" />
-                <ScalarProperty Name="MoneyOwned" ColumnName="MoneyOwned" />
-                <ScalarProperty Name="IP" ColumnName="IP" />
-                <ScalarProperty Name="Dt" ColumnName="Dt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
