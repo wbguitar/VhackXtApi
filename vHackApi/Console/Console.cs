@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -36,7 +35,6 @@ namespace vHackApi.Console
             {
                 cfg.logger.Log("Cannot find tessdata path: {0}", Path.GetFullPath(cfg.tessdata));
                 throw new Exception();
-
             }
 
             engine = new Tesseract.TesseractEngine(cfg.tessdata, "eng");
@@ -56,7 +54,6 @@ namespace vHackApi.Console
             return await vhUtils.JSONRequest("user::::pass::::target",
                                    config.username + "::::" + config.password + "::::" + ip,
                                    "vh_vulnScan.php");
-            
         }
 
         public async Task<JObject> EnterPassword(string passwd, string target, string uhash = null)
@@ -99,14 +96,14 @@ namespace vHackApi.Console
         public async Task<string> AttackCluster(string tag)
         {
             return await vhUtils.StringRequest("user::::pass::::uhash::::ctag",
-                                     config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + tag, 
+                                     config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + tag,
                                      "vh_startDDoS.php");
         }
 
         public async Task<string> ScanCluster(string tag)
         {
             return await vhUtils.StringRequest("user::::pass::::uhash::::ctag",
-                                     config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::"  + tag, 
+                                     config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + tag,
                                      "vh_scanTag.php");
         }
 
@@ -117,7 +114,10 @@ namespace vHackApi.Console
                                    "vh_trTransfer.php");
         }
 
-        public void clearLog() { throw new NotImplementedException(); }
+        public void clearLog()
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<bool> uploadSpyware(string ip)
         {
@@ -136,9 +136,10 @@ namespace vHackApi.Console
             return val == 2;
         }
 
-        static Random r = new Random((int)DateTime.Now.Ticks);
+        private static Random r = new Random((int)DateTime.Now.Ticks);
 
         public enum ScanMode { Secure, Potator };
+
         public TesseractEngine engine;
 
         /// <summary>
@@ -210,8 +211,9 @@ namespace vHackApi.Console
                     {
                         config.logger.Log("Firewall is too high: {0}", val);
                     }
-                    else {
-                        var scan = await ScanHost(hostname);
+                    else
+                    {
+                        var scan = await ScanHost(hostname, 10);
                         if (scan == null)
                         {
                             config.logger.Log("Unable to scan host {0}", hostname);
@@ -242,7 +244,7 @@ namespace vHackApi.Console
                                 //}
 
                                 if (res == -1)
-                                    config.logger.Log("\nAttack to IP {0} failed\n", ip);
+                                    config.logger.Log("Attack to IP {0} failed\n", ip);
 
                                 return res;
                             }
@@ -284,7 +286,8 @@ namespace vHackApi.Console
                                      "vh_loadRemoteData.php", attempts);
         }
 
-        object semaphore = new object();
+        private object semaphore = new object();
+
         /// <summary>
         /// Attacks a given ip
         /// </summary>
@@ -299,7 +302,6 @@ namespace vHackApi.Console
             if (mode == ScanMode.Secure)
                 Thread.Sleep(vhConsole.WaitStep);
 
-
             config.logger.Log("attacking IP {0}", ip);
 
             // loads IP related data, if it can be scanned
@@ -310,23 +312,18 @@ namespace vHackApi.Console
             if (jsons == null)
             {
                 config.logger.Log("Unable to scan ip {0}", ip);
-                return -1;
+                return 1;
             }
 
             var dbIp = new IPs(jsons);
-            lock (this)
-            {
-                // create DB ip
-                if (DbManager.IpExist(dbIp.IP))
-                    dbIp = DbManager.GetIp(dbIp.IP);
-                else
-                    dbIp = DbManager.AddIp(dbIp);
 
-                Debug.Assert(dbIp != null);
+            // create DB ip
+            if (config.persistanceMgr.IpExist(dbIp.IP))
+                dbIp = config.persistanceMgr.GetIp(dbIp.IP);
+            else
+                dbIp = config.persistanceMgr.AddIp(dbIp);
 
-            }
-
-
+            Debug.Assert(dbIp != null);
 
             var ocr = new OCR(engine);
             try
@@ -337,16 +334,13 @@ namespace vHackApi.Console
                     config.logger.Log("unable to find the password :(");
                     return -1;
                 }
-                else
-                {
 
-                }
                 var user = (string)jsons["username"];
                 var winchance = ((string)jsons["winchance"]).Contains("?") ? 0 : (int)jsons["winchance"];
 
                 if (winchance <= config.winchance)
                 {
-                    config.logger.Log("Winchance too poor: {0}, skipping", winchance);
+                    config.logger.Log("Winchance too low: {0}, skipping", winchance);
                     return 1;
                 }
 
@@ -363,6 +357,10 @@ namespace vHackApi.Console
 
                 var res = jsons["result"];
 
+                // if not dev ip update stats
+                if (ip != "127.0.0.1")
+                    config.persistanceMgr.UpdateIp(new IPs(jsons));
+
                 //if (mode == ScanMode.Potator)
                 //{
                 //    //var solution = (string)jsons.GetValue(sol);
@@ -371,7 +369,6 @@ namespace vHackApi.Console
 
                 //    if (!money.Contains("?") && (int)jsons["result"] == 0)
                 //    {
-
                 //    }
                 //}
 
@@ -381,47 +378,46 @@ namespace vHackApi.Console
                 //    return 1;
                 //}
 
-                if (sdklevel.Contains("?"))
-                {
-                    config.logger.Log("Cannot scan SDK, skipping");
-                }
-                else if (Convert.ToInt32(sdklevel) > (int)info["sdk"])
-                {
-                    config.logger.Log("SDK is too hign, skipping");
-                }
-                else if (avlevel.Contains("?") )
-                {
-                    //config.logger.Log("Cannot scan antivirus, skipping");
-                    //return 1;
-                }
-                else if (config.maxAntivirus < Convert.ToInt32(avlevel))
+                //if (sdklevel.Contains("?"))
+                //{
+                //    config.logger.Log("Cannot scan SDK, skipping");
+                //}
+                //else if (Convert.ToInt32(sdklevel) > (int)info["sdk"])
+                //{
+                //    config.logger.Log("SDK is too hign, skipping");
+                //}
+                //else if (avlevel.Contains("?") )
+                //{
+                //    config.logger.Log("Cannot scan antivirus, skipping");
+                //    return 1;
+                //}
+
+                if (config.maxAntivirus < Convert.ToInt32(avlevel))
                 {
                     //config.logger.Log("Antivirus is too hign, skipping");
                     //return 1;
                 }
-                else if (anonymous.ToLower() != "yes")
+                if (anonymous.ToLower() != "yes")
                 {
                     //config.logger.Log("Not anonymous, skipping");
                 }
-                else
+
+                JObject pass = await EnterPassword(sol, ip, uhash);
+                if (pass == null)
                 {
-                    JObject pass = await EnterPassword(sol, ip, uhash);
-                    if (pass == null)
-                    {
-                        config.logger.Log("Unable to enter password for ip {0}", ip);
-                        return -1;
-                    }
+                    config.logger.Log("Unable to enter password for ip {0}", ip);
+                    return -1;
+                }
 
-                    int retval = 0;
-                    var result = (int)pass["result"];
+                int retval = 0;
+                var result = (int)pass["result"];
 
-                    if (result == 0)
-                    {
-                        // success!!
-                        config.logger.Log(@"
+                if (result == 0)
+                {
+                    // success!!
+                    config.logger.Log(@"
 Your Money: {0}
 [TargetIP: {1}]
-
 Made {2} and {3} Rep.
 Antivirus: {4} Firewall: {5} Sdk: {6} TotalMoney: {7}
 YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
@@ -431,53 +427,42 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
 , avlevel, fwlevel, sdklevel, money
 , winchance, anonymous, user, saving);
 
-                        lock (this)
-                        {
-                            var att = new Attacks();
-                            att.MoneyWon = (long)pass["amount"];
-                            att.RepWon = (long)pass["eloch"];
-                            att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
-
-                            var addRes = DbManager.AddAttack(dbIp.IP, att);
-                            Debug.Assert(addRes);
-                        }
-
-                        retval = 0;
-                    }
-                    else
-                    {
-                        lock (this)
-                        {
-                            var att = new Attacks();
-                            //att.MoneyWon = (long)pass["amount"];
-                            //att.RepWon = (long)pass["eloch"];
-                            //att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
-
-                            if (dbIp.IP != "127.0.0.1")
-                            {
-                                var addRes = DbManager.AddAttack(dbIp.IP, att);
-                                Debug.Assert(addRes);
-                            }
-                        }
-
-                        config.logger.Log("enter password failed");
-                        retval = -1;
-                    }
-
+                    var att = new Attacks();
+                    att.MoneyWon = (long)pass["amount"];
+                    att.RepWon = (long)pass["eloch"];
+                    att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
                     
+                    var addRes = config.persistanceMgr.AddAttack(dbIp.IP, att);
+                    Debug.Assert(addRes);
 
-                    return retval;
+                    retval = 0;
                 }
+                else
+                {
+                    var att = new Attacks();
+                    //att.MoneyWon = (long)pass["amount"];
+                    //att.RepWon = (long)pass["eloch"];
+                    //att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
+
+                    if (dbIp.IP != "127.0.0.1")
+                    {
+                        var addRes = config.persistanceMgr.AddAttack(dbIp.IP, att);
+                        Debug.Assert(addRes);
+                    }
+
+                    config.logger.Log("enter password failed");
+                    retval = -1;
+                }
+
+                return retval;
             }
             catch (Exception e)
             {
                 throw;
             }
-
-            return -1;
         }
 
-        public async Task<int> attackIp2(string ip, string uhash, int max, ScanMode mode)
+        public async Task<int> attackIp2(string ip, string uhash, ScanMode mode)
         {
             var password = await vhUtils.JSONRequest("user::::pass::::uhash::::target",
                                      config.username + "::::" + config.password + "::::" + uhash + "::::" + ip,
@@ -487,7 +472,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             return 0;
         }
 
-        public async Task<int> FindHostsAndAttack(int maxFwall, ScanMode mode = ScanMode.Potator, bool active_protecte_cluster_ddos = false)
+        public async Task<int> FindHostsAndAttack(ScanMode mode = ScanMode.Potator, bool active_protecte_cluster_ddos = false)
         {
             //string uhash = "";
             //try
@@ -500,13 +485,13 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             //    config.logger.Log("Error: {0}", e.Message);
             //}
 
-            var stats = await CheckCluster(vhConsole.uHash);
-            var clusterBlocked = (string)stats["blocked"];
-            if (clusterBlocked.Contains("Your Cluster is blocked") && active_protecte_cluster_ddos)
-            {
-                config.logger.Log("Cluster blocked, skipping"); // TODO
-            }
-            else
+            //var stats = await CheckCluster(vhConsole.uHash);
+            //var clusterBlocked = (string)stats["blocked"];
+            //if (clusterBlocked.Contains("Your Cluster is blocked") && active_protecte_cluster_ddos)
+            //{
+            //    config.logger.Log("Cluster blocked, skipping"); // TODO
+            //}
+            //else
             {
                 var temp = await GetImg(vhConsole.uHash);
                 var data = (JArray)temp["data"];
@@ -533,7 +518,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
         public async Task<JObject> GetImg(string uhash)
         {
             return await vhUtils.JSONRequest("user::::pass::::uhash::::by",
-                                         config.username + "::::" + config.password + "::::" + uhash + "::::" + r.Next(10000), 
+                                         config.username + "::::" + config.password + "::::" + uhash + "::::" + r.Next(9000, 10000),
                                          "vh_getImg.php");
         }
     }
