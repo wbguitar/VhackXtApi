@@ -17,12 +17,13 @@ namespace vHackApi
             config = conf;
         }
 
-        public async Task<JArray> getTasks()
+        public async Task<JObject> getTasks()
         {
             var temp = await vhUtils.JSONRequest("user::::pass::::uhash",
                                 config.username + "::::" + config.password + "::::" + "userHash_not_needed",
                                 "vh_tasks.php");
-            return (JArray)temp["data"];
+            //return (JArray)temp["data"];
+            return temp;
         }
 
         public async Task<JArray> SpywareInfo()
@@ -49,7 +50,8 @@ namespace vHackApi
         public async Task<string[]> getTaskIDs()
         {
             var temp = await getTasks();
-            return temp.Select(it => (string)it["taskid"]).ToArray();
+            var tasks = (JArray)temp["data"];
+            return tasks.Select(it => (string)it["taskid"]).ToArray();
         }
 
         public async Task<int> startTask(Tasks type)
@@ -89,15 +91,11 @@ namespace vHackApi
             return false;
         }
 
-        public async Task<bool> finishAll()
+        public async Task<JObject> finishAll()
         {
-            var res = await vhUtils.JSONRequest("user::::pass::::uhash",
+            return await vhUtils.JSONRequest("user::::pass::::uhash",
                                 config.username + "::::" + config.password + "::::" + "userHash_not_needed",
                                 "vh_finishAll.php");
-            if ((int)res == 0)
-                return true;
-
-            return false;
         }
 
         public async Task<JObject> useBooster()
