@@ -69,6 +69,7 @@ namespace vHackApi.Api
 
         public int Id => (int)json["id"];
         public int IP => (int)json["ip"];
+        public int Money => (int)json["money"];
         public int Internet => (int)json["inet"];
         public int HDD => (int)json["hdd"];
         public int CPU => (int)json["cpu"];
