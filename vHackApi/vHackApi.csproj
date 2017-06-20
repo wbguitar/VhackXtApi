@@ -28,7 +28,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -195,6 +195,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>vHackDbModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="XmlMgr.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
