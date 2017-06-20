@@ -75,11 +75,13 @@ namespace vHackBot
             public TimeSpan hackBotnetPolling => Properties.Settings.Default.hackBotnetPolling;
 
             //public IIPselector ipSelector => IPSelectorASAP.Instance;
-            public IIPselector ipSelector => IPSelectorRandom.Instance;
+            public IIPselector ipSelector => IPSelectorRandom.Default;
 
-            public IUpgradeStrategy upgradeStrategy => new FixedUpgradeStrategy(Tasks.Sdk);
+            //public IUpgradeStrategy upgradeStrategy => new FixedUpgradeStrategy(Tasks.Sdk);
+            public IUpgradeStrategy upgradeStrategy => ProportionalUpgradeStrategy.Default;
 
-            public IPersistanceMgr persistanceMgr => DbManager.Instance;
+            //public IPersistanceMgr persistanceMgr => DbManager.Instance;
+            public IPersistanceMgr persistanceMgr => XmlMgr.Default;
 
             #endregion IConfig Members
         }
@@ -128,12 +130,27 @@ namespace vHackBot
                 if (!DbManager.Instance.Initialize(cfg))
                     return;
 
+                try
+                {
+                    foreach (var ip in DbManager.Instance.GetIps())
+                    {
+                        XmlMgr.Default.IPs.Add(ip);
+                    }
+                }
+                catch (Exception e)
+                {
+
+                }
+
+                XmlMgr.Default.Save();
+                //XmlMgr.Default.Load();
+
                 var builder = new vhAPIBuilder()
                     .useConfig(cfg);
 
                 vhAPI api = builder.getAPI();
 
-                
+                ProportionalUpgradeStrategy.Default.Init(api);
 
                 // sets and starts timers
                 var timers = new List<IHackTimer>
@@ -142,12 +159,16 @@ namespace vHackBot
                     IPScanner.Instance,
                     HackBotNet.Instance,
                     IPAttack.Instance,
-                    //UpgradeMgr.Instance,
+                    UpgradeMgr.Instance,
                 };
 
+                // sets the timers
                 timers.ForEach(wd => wd.Set(cfg, api));
 
-                Thread.Sleep(Timeout.Infinite);
+                // wait for exit
+                Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
+
+                timers.ForEach(wd => wd.Dispose());
             }
             catch (Exception e)
             {
