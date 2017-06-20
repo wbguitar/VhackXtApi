@@ -54,13 +54,13 @@ namespace vHackApi
             return tasks.Select(it => (string)it["taskid"]).ToArray();
         }
 
-        public async Task<int> startTask(Tasks type)
+        public async Task<JObject> startTask(Tasks type)
         {
             var temp = await vhUtils.JSONRequest("user::::pass::::uhash::::utype",
                                 config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + type.ToString(),
                                 "vh_addUpdate.php");
-            var res = (int)temp["result"]; // 0 ok, 3 full
-            return res;
+            //var res = (int)temp["result"]; // 0 ok, 3 full
+            return temp;
         }
 
         public async Task<JArray> botnetInfo()

@@ -5,7 +5,7 @@ using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
-    public interface IHackTimer
+    public interface IHackTimer : IDisposable
     {
         void Set(IConfig cfg, vhAPI api);
     }
@@ -78,6 +78,14 @@ namespace vHackApi.Bot
         {
             //return TimeSpan.FromMinutes(r.Next(aWhileLo, aWhileHi));
             return TimeSpan.FromSeconds(r.Next(aWhileLo, aWhileHi));
+        }
+
+        public void Dispose()
+        {
+            if (this.hackTimer != null)
+            {
+                hackTimer.Dispose();
+            }
         }
     }
 }

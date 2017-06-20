@@ -21,19 +21,20 @@ namespace vHackApi
         }
     
         public string IP { get; set; }
-        public Nullable<System.DateTime> LastUpdate { get; set; }
-        public Nullable<System.DateTime> LastAttack { get; set; }
+        public System.DateTime LastUpdate { get; set; }
+        public System.DateTime LastAttack { get; set; }
         public int Money { get; set; }
-        public Nullable<long> SDK { get; set; }
-        public Nullable<long> Antivirus { get; set; }
-        public Nullable<long> Firewall { get; set; }
-        public Nullable<long> Spam { get; set; }
+        public long SDK { get; set; }
+        public long Antivirus { get; set; }
+        public long Firewall { get; set; }
+        public long Spam { get; set; }
         public string Name { get; set; }
-        public Nullable<long> IPSpoofing { get; set; }
-        public Nullable<long> Spyware { get; set; }
-        public Nullable<long> WinChance { get; set; }
-        public Nullable<long> RepOnSuccess { get; set; }
-        public Nullable<bool> Anonymous { get; set; }
+        public long IPSpoofing { get; set; }
+        public long Spyware { get; set; }
+        public long WinChance { get; set; }
+        public long RepOnSuccess { get; set; }
+        public bool Anonymous { get; set; }
+        public string Hostname { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Attacks> Attacks { get; set; }

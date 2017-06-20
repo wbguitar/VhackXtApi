@@ -60,7 +60,7 @@ namespace vHackApi.Bot
 
                 if (hackTimer != null)
                 {
-                    cfg.logger.Log("*** PAUSING IP SCANNER");
+                    cfg.logger.Log("*** PAUSING IP ATTACK");
                     hackTimer.Change(TimeSpan.Zero, pause);
                 }
             };
@@ -69,7 +69,7 @@ namespace vHackApi.Bot
             {
                 if (hackTimer != null)
                 {
-                    cfg.logger.Log("*** RESUMING IP SCANNER");
+                    cfg.logger.Log("*** RESUMING IP ATTACK");
                     hackTimer.Change(TimeSpan.Zero, Period); 
                 }
             };
@@ -92,7 +92,7 @@ namespace vHackApi.Bot
                         else
                             ip.LastAttack = DateTime.Now - TimeSpan.FromMinutes(45);
                         if (!cfg.persistanceMgr.UpdateIp(ip))
-                            Debug.Assert(false);
+                            ;//   Debug.Assert(false);
                     }
                 }
             }

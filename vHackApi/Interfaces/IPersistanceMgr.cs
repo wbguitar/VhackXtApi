@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 
 namespace vHackApi.Interfaces
 {
@@ -9,6 +11,8 @@ namespace vHackApi.Interfaces
         IPs AddIp(IPs dbIp);
 
         IPs GetIp(string iP);
+
+        IEnumerable<IPs> GetIps();
 
         bool IpExist(string iP);
 

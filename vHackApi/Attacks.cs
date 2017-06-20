@@ -16,9 +16,9 @@ namespace vHackApi
     {
         public System.DateTime Dt { get; set; }
         public string IP { get; set; }
-        public Nullable<long> MoneyOwned { get; set; }
-        public Nullable<long> MoneyWon { get; set; }
-        public Nullable<long> RepWon { get; set; }
+        public long MoneyOwned { get; set; }
+        public long MoneyWon { get; set; }
+        public long RepWon { get; set; }
     
         public virtual IPs IPs { get; set; }
     }

@@ -11,13 +11,7 @@ namespace vHackApi.Interfaces
         where T : Singleton<T>, new()
     {
         protected static Lazy<T> inst = new Lazy<T>(() => new T());
-        public static T Instance
-        {
-            get
-            {
-                return inst.Value;
-            }
-        }
+        public static T Default => inst.Value;
     }
 
     namespace Reflection
@@ -47,7 +41,7 @@ namespace vHackApi.Interfaces
             /// <summary>
             /// Get the singleton instance for the class.
             /// </summary>
-            public static T Instance { get { return _instance.Value; } }
+            public static T Instance => _instance.Value;
         }
     }
 }

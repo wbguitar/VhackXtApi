@@ -38,7 +38,7 @@ namespace vHackApi.Bot
             {
                 if (hackTimer != null)
                 {
-                    cfg.logger.Log("*** PAUSING IP SEARCH SCHEDULE");
+                    cfg.logger.Log("*** PAUSING IP SCANNER");
                     hackTimer.Change(TimeSpan.Zero, pause);
                 }
             };
@@ -47,7 +47,7 @@ namespace vHackApi.Bot
             {
                 if (hackTimer != null)
                 {
-                    cfg.logger.Log("*** RESUMING IP SEARCH SCHEDULE");
+                    cfg.logger.Log("*** RESUMING IP SCANNER");
                     hackTimer.Change(TimeSpan.Zero, Period);
                 }
             };
