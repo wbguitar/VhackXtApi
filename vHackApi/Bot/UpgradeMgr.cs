@@ -70,7 +70,8 @@ namespace vHackApi.Bot
         private Status CurrentStatus(MyInfo info, JObject tasks)
         {
             // if no money or no boost => idle
-            if (info.Boost == 0 || info.Netcoins < 1000)
+            //if (info.Boost == 0 || info.Netcoins < 1000)
+            if (info.Netcoins < 1000)
                 return Status.Idle;
 
             var tasksData = (JArray)tasks["data"];
@@ -83,8 +84,6 @@ namespace vHackApi.Bot
             }
             else
                 return Status.EndTasks;
-
-            return Status.Idle;
         }
 
         private async Task doBoost(MyInfo info, Update upd, IConfig cfg, JObject tasks)
@@ -120,11 +119,17 @@ namespace vHackApi.Bot
             for (int i = 0; i < info.RAM - tasksData.Count; i++)
             {
                 var task = cfg.upgradeStrategy.NextTaskToUpgrade();
-                var started = await upd.startTask(task);
+                var temp = await upd.startTask(task);
+                var started = (int)temp["result"];
                 if (started == 0)
                     cfg.logger.Log("Added task {0}, {1} slots available", task, info.RAM - tasksData.Count - i - 1); // ok TODO
                 else if (started == 3)
                     cfg.logger.Log("No slot are available to upgrade"); // full
+                else if (started == 1) // no money
+                {
+                    cfg.logger.Log("No more money to add tasks");
+                    break;
+                }
                 else
                 {
                     Debug.Assert(false);
