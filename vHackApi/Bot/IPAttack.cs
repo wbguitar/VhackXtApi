@@ -26,11 +26,10 @@ namespace vHackApi.Bot
         //    }
         //}
 
-        private IConfig cfg;
-
-        public override void Set(IConfig cfg, vhAPI api)
+        public override void Set()
         {
-            this.cfg = cfg;
+            var cfg = GlobalConfig.Config;
+            var api = GlobalConfig.Api;
 
             if (hackTimer != null)
             {

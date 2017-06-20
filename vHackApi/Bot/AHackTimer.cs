@@ -5,9 +5,20 @@ using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
+    public static class GlobalConfig
+    {
+        public static IConfig Config { get; private set; }
+        public static vhAPI Api { get; private set; }
+
+        public static void Init(IConfig cfg, vhAPI api)
+        {
+            Api = api;
+            Config = cfg;
+        }
+    }
     public interface IHackTimer : IDisposable
     {
-        void Set(IConfig cfg, vhAPI api);
+        void Set();
     }
 
     public abstract class AHackTimer<T> : vHackApi.Interfaces.Reflection.Singleton<T>, IHackTimer
@@ -45,6 +56,11 @@ namespace vHackApi.Bot
             {
                 while (true)
                 {
+                    Thread.Sleep(1);
+
+                    if (!GlobalConfig.Config.safeScan)
+                        continue;
+
                     if (DateTime.Now >= nextPause)
                     {
                         pause = SetPauseDuration();
@@ -54,7 +70,6 @@ namespace vHackApi.Bot
                         Resume();
                     }
 
-                    Thread.Sleep(1);
                 }
             });
 
@@ -66,7 +81,7 @@ namespace vHackApi.Bot
         /// </summary>
         public TimeSpan Period { get; protected set; }
 
-        public abstract void Set(IConfig cfg, vhAPI api);
+        public abstract void Set();
 
         private static DateTime NextPauseSchedule()
         {
@@ -86,6 +101,9 @@ namespace vHackApi.Bot
             {
                 hackTimer.Dispose();
             }
+
+            if (tTimeForAPause != null && tTimeForAPause.IsAlive)
+                tTimeForAPause.Abort();
         }
     }
 }

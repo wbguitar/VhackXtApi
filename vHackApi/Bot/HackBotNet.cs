@@ -21,13 +21,16 @@ namespace vHackApi.Bot
         //    }
         //}
 
-        public override void Set(IConfig cfg, vhAPI api)
+        public override void Set()
         {
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
                 hackTimer = null;
             }
+
+            var cfg = GlobalConfig.Config;
+            var api = GlobalConfig.Api;
 
             var upd = new Update(cfg);
             hackTimer = new Timer(async (o) =>

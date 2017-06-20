@@ -25,34 +25,46 @@ namespace vHackApi.Bot
     public class IPSelectorRandom : Singleton<IPSelectorRandom>, IIPselector
     {
         static Random r = new Random();
+        private IConfig cfg;
+
+        public void Init(IConfig cfg) => this.cfg = cfg;
+
         public IPs NextHackabletIp(IPersistanceMgr pm)
         {
-            IPs ret = null;
-            var now = DateTime.Now;
-            foreach (var ip in pm.ScannableIps())
-            {
-                if (ip.IP == "127.0.0.1")
-                    continue;
+            //IPs ret = null;
+            //var now = DateTime.Now;
+            //foreach (var ip in pm.ScannableIps())
+            //{
+            //    if (ip.IP == "127.0.0.1")
+            //        continue;
 
-                ret = ip;
-                if (r.NextBoolean()) // throws the dice
-                    return ip;
-            }
+            //    ret = ip;
+            //    if (r.NextBoolean()) // throws the dice
+            //        return ip;
+            //}
 
-            return ret;
+            //return ret;
 
-            // the below commented part is formally correct but throws exception, maybe dew to a sqlite EF driver bug
-            // that's the reason for the less elegant solution used
+            //// the below commented part is formally correct but throws exception, maybe dew to a sqlite EF driver bug
+            //// that's the reason for the less elegant solution used
 
             //var scannables = pm.ScannableIps()
             //     .Where(ip => ip.IP != "127.0.0.1"); // filter dev ip
 
-            //var scannables = from ip in pm.ScannableIps()
-            //                 //where ip.IP != "127.0.0.1"
-            //                 select ip;
+            var scannables = from ip in pm.ScannableIps()
+                             where ip.IP != "127.0.0.1"
+                             select ip;
 
-            //var i = r.Next(0, scannables.Count());
-            //return scannables.ElementAt(i);
+            var unk = from ip in scannables
+                      where ip.Hostname == "unknown" && ip.WinChance >= cfg.winchance
+                      select ip;
+
+            // if there are unknown hostnames let them be selected first
+            if (unk.Any())
+                scannables = unk;
+
+            var i = r.Next(0, scannables.Count());
+            return scannables.ElementAt(i);
         }
         
     }

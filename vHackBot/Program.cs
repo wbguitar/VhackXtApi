@@ -74,6 +74,8 @@ namespace vHackBot
 
             public TimeSpan hackBotnetPolling => Properties.Settings.Default.hackBotnetPolling;
 
+            public bool safeScan => Properties.Settings.Default.safeScan;
+
             //public IIPselector ipSelector => IPSelectorASAP.Instance;
             public IIPselector ipSelector => IPSelectorRandom.Default;
 
@@ -82,6 +84,7 @@ namespace vHackBot
 
             //public IPersistanceMgr persistanceMgr => DbManager.Instance;
             public IPersistanceMgr persistanceMgr => XmlMgr.Default;
+
 
             #endregion IConfig Members
         }
@@ -130,27 +133,33 @@ namespace vHackBot
                 if (!DbManager.Instance.Initialize(cfg))
                     return;
 
-                try
-                {
-                    foreach (var ip in DbManager.Instance.GetIps())
-                    {
-                        XmlMgr.Default.IPs.Add(ip);
-                    }
-                }
-                catch (Exception e)
-                {
+                //try
+                //{
+                //    foreach (var ip in DbManager.Instance.GetIps())
+                //    {
+                //        XmlMgr.Default.IPs.Add(ip);
+                //    }
+                //}
+                //catch (Exception e)
+                //{
 
-                }
+                //}
 
-                XmlMgr.Default.Save();
-                //XmlMgr.Default.Load();
+                //XmlMgr.Default.Save();
+                XmlMgr.Default.Load();
+
+                IPSelectorRandom.Default.Init(cfg);
 
                 var builder = new vhAPIBuilder()
                     .useConfig(cfg);
 
                 vhAPI api = builder.getAPI();
 
+                GlobalConfig.Init(cfg, api);
+
+
                 ProportionalUpgradeStrategy.Default.Init(api);
+
 
                 // sets and starts timers
                 var timers = new List<IHackTimer>
@@ -163,7 +172,7 @@ namespace vHackBot
                 };
 
                 // sets the timers
-                timers.ForEach(wd => wd.Set(cfg, api));
+                timers.ForEach(wd => wd.Set());
 
                 // wait for exit
                 Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C

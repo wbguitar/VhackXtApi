@@ -16,6 +16,7 @@ namespace vHackApi.Interfaces
         int winchance { get; }
         int maxFirewall { get; }
         int maxAntivirus { get; }
+        bool safeScan { get; }
 
         TimeSpan hackDevPolling { get; }
         TimeSpan hackBotnetPolling { get; }

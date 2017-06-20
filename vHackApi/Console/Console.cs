@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Tesseract;
 using vHackApi.Api;
 using vHackApi.Interfaces;
+using System.Linq;
 
 namespace vHackApi.Console
 {
@@ -231,6 +232,12 @@ namespace vHackApi.Console
 
                             try
                             {
+                                var ips = config.persistanceMgr.GetIp(ip);
+                                if (ips != null && ips.Hostname == "unknown")
+                                {
+                                    ips.Hostname = hostname;
+                                    config.persistanceMgr.UpdateIp(ips);
+                                }
                                 var res = await AttackIp(ip);
 
                                 // remove spyware
@@ -359,7 +366,10 @@ namespace vHackApi.Console
 
                 // if not dev ip update stats
                 if (ip != "127.0.0.1")
-                    config.persistanceMgr.UpdateIp(new IPs(jsons));
+                {
+                    
+                    config.persistanceMgr.UpdateIp(new IPs(jsons) { Attacks = dbIp.Attacks });
+                }
 
                 //if (mode == ScanMode.Potator)
                 //{
@@ -430,7 +440,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
                     var att = new Attacks();
                     att.MoneyWon = (long)pass["amount"];
                     att.RepWon = (long)pass["eloch"];
-                    att.MoneyOwned = money.Contains("?") ? null : (long?)jsons["money"];
+                    att.MoneyOwned = money.Contains("?") ? 0 : (long)jsons["money"];
                     
                     var addRes = config.persistanceMgr.AddAttack(dbIp.IP, att);
                     Debug.Assert(addRes);
@@ -501,6 +511,34 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
                     try
                     {
                         var hostname = (string)d["hostname"];
+
+                        // the purpose of this guy is to search for new ips: if this hostname
+                        // is one of the ones already stored we pass away, someone else will
+                        // hack him some time, sooner or later
+
+                        //var found = config.persistanceMgr
+                        //    .GetIps()
+                        //    .FirstOrDefault(ip => ip.Hostname == hostname);
+                        IPs found = null;
+                        //foreach (var ip in config.persistanceMgr.GetIps())
+                        //{
+                        //    try
+                        //    {
+                        //        if (hostname.Equals(ip.Hostname))
+                        //        {
+                        //            found = ip;
+                        //            break;
+                        //        }
+                        //    }
+                        //    catch (Exception e)
+                        //    {
+                        //        throw;
+                        //    }
+                        //}
+
+                        if (found != null)
+                            continue; // skips
+
                         //var imgString = "data: image/png;base64," + (string)d["img"];
                         var imgString = (string)d["img"];
                         var res = await ProcessImgAndAttack(imgString, hostname, mode);

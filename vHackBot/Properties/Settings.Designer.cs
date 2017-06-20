@@ -120,5 +120,17 @@ namespace vHackBot.Properties {
                 this["hackBotnetPolling"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool safeScan {
+            get {
+                return ((bool)(this["safeScan"]));
+            }
+            set {
+                this["safeScan"] = value;
+            }
+        }
     }
 }
