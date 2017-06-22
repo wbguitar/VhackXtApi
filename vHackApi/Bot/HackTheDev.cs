@@ -9,29 +9,14 @@ namespace vHackApi.Bot
     public class HackTheDev : AHackTimer<HackTheDev>
     {
         private HackTheDev() { }
-
-        //private static HackTheDev inst;
-        //public static HackTheDev Instance
-        //{
-        //    get
-        //    {
-        //        if (inst == null)
-        //            inst = new HackTheDev();
-
-        //        return inst;
-        //    }
-        //}
-
-        public override void Set()
+        
+        public override void Set(IConfig cfg, vhAPI api)
         {
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
                 hackTimer = null;
             }
-
-            var cfg = GlobalConfig.Config;
-            var api = GlobalConfig.Api;
 
             var console = api.getConsole();
 
@@ -45,7 +30,7 @@ namespace vHackApi.Bot
                         cfg.logger.Log(e.ToString());
                     }
                 }
-                , null, TimeSpan.Zero, GlobalConfig.Config.hackDevPolling);
+                , null, TimeSpan.Zero, cfg.hackDevPolling);
         }
     }
 }

@@ -9,28 +9,13 @@ namespace vHackApi.Bot
     {
         private HackBotNet() { }
 
-        //private static HackBotNet inst;
-        //public static HackBotNet Instance
-        //{
-        //    get
-        //    {
-        //        if (inst == null)
-        //            inst = new HackBotNet();
-
-        //        return inst;
-        //    }
-        //}
-
-        public override void Set()
+        public override void Set(IConfig cfg, vhAPI api)
         {
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
                 hackTimer = null;
             }
-
-            var cfg = GlobalConfig.Config;
-            var api = GlobalConfig.Api;
 
             var upd = new Update(cfg);
             hackTimer = new Timer(async (o) =>

@@ -20,16 +20,13 @@ namespace vHackApi.Bot
         private UpgradeMgr()
         { }
 
-        public override void Set()
+        public override void Set(IConfig cfg, vhAPI api)
         {
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
                 hackTimer = null;
             }
-
-            var cfg = GlobalConfig.Config;
-            var api = GlobalConfig.Api;
 
             var console = api.getConsole();
             var upd = new Update(cfg);

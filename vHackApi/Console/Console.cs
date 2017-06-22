@@ -178,6 +178,19 @@ namespace vHackApi.Console
                         if (pix == hackedColor)
                         {
                             config.logger.Log("Host {0} already hacked, skip", hostname);
+                            // only updates hostname
+                            var scan = await ScanHost(hostname, 10);
+                            if (scan != null)
+                            {
+                                var ip = (string)scan["ipaddress"];
+                                var ips = config.persistanceMgr.GetIp(ip);
+                                if (ips != null && ips.Hostname == "unknown")
+                                {
+                                    ips.Hostname = hostname;
+                                    if (config.persistanceMgr.UpdateIp(ips))
+                                        config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
+                                }
+                            }
                             return 1;
                         }
                         //if (pix.R != 0)
@@ -236,7 +249,8 @@ namespace vHackApi.Console
                                 if (ips != null && ips.Hostname == "unknown")
                                 {
                                     ips.Hostname = hostname;
-                                    config.persistanceMgr.UpdateIp(ips);
+                                    if (config.persistanceMgr.UpdateIp(ips))
+                                        config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
                                 }
                                 var res = await AttackIp(ip);
 

@@ -13,37 +13,26 @@ namespace vHackApi.Bot
         private IPAttack()
         { }
 
-        //private static IPAttack inst;
+        IConfig config;
 
-        //public static IPAttack Instance
-        //{
-        //    get
-        //    {
-        //        if (inst == null)
-        //            inst = new IPAttack();
-
-        //        return inst;
-        //    }
-        //}
-
-        public override void Set()
+        public override void Set(IConfig cfg, vhAPI api)
         {
-            var cfg = GlobalConfig.Config;
-            var api = GlobalConfig.Api;
-
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
                 hackTimer = null;
             }
 
+            config = cfg;
+
             Period = TimeSpan.FromSeconds(2);
 
             var console = api.getConsole();
 
             hackTimer = new Timer(async (o) => await timerCallback(o), new object[] { cfg, api, console }, TimeSpan.Zero, Period);
-        }
 
+            safeScan = cfg.safeScan;
+        }
 
         private async Task timerCallback(object state)
         {
@@ -56,7 +45,6 @@ namespace vHackApi.Bot
 
             Pause = () =>
             {
-
                 if (hackTimer != null)
                 {
                     cfg.logger.Log("*** PAUSING IP ATTACK");

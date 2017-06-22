@@ -9,20 +9,9 @@ namespace vHackApi.Bot
     {
         private IPScanner() { }
 
-        //private static IPScanner inst;
+        IConfig config;
 
-        //public static IPScanner Instance
-        //{
-        //    get
-        //    {
-        //        if (inst == null)
-        //            inst = new IPScanner();
-
-        //        return inst;
-        //    }
-        //}
-
-        public override void Set()
+        public override void Set(IConfig cfg, vhAPI api)
         {
             if (hackTimer != null)
             {
@@ -30,9 +19,7 @@ namespace vHackApi.Bot
                 hackTimer = null;
             }
 
-            var cfg = GlobalConfig.Config;
-            var api = GlobalConfig.Api;
-
+            config = cfg;
             var console = api.getConsole();
 
             Period = TimeSpan.FromMilliseconds(cfg.waitstep);
@@ -74,6 +61,8 @@ namespace vHackApi.Bot
                 }
             }
             , null, TimeSpan.Zero, Period);
+
+            safeScan = cfg.safeScan;
         }
     }
 }

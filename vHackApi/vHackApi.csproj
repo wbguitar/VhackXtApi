@@ -133,6 +133,7 @@
     <Compile Include="Api\ExtUtils.cs" />
     <Compile Include="Api\IPAddress.cs" />
     <Compile Include="Api\MyInfo.cs" />
+    <Compile Include="Api\Package.cs" />
     <Compile Include="Api\Passwords.cs" />
     <Compile Include="Api\Tasks.cs" />
     <Compile Include="Api\vHackAPIBuilder.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="DbManager.cs" />
     <Compile Include="Bot\HackTheDev.cs" />
     <Compile Include="Interfaces\IConfig.cs" />
+    <Compile Include="Interfaces\IHackTimer.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\IIPselector.cs" />
     <Compile Include="Interfaces\Singleton.cs" />
@@ -176,7 +178,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Update.cs" />
+    <Compile Include="Api\Update.cs" />
     <Compile Include="Version.cs">
       <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
