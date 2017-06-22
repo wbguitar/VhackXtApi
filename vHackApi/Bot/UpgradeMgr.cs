@@ -42,8 +42,6 @@ namespace vHackApi.Bot
 
                     try
                     {
-
-
                         var info = await MyInfo.Fetch(console);
                         var tasks = await upd.getTasks();
 
@@ -106,6 +104,18 @@ namespace vHackApi.Bot
             {
                 cfg.logger.Log("{0} money needed to end tasks, continue", finishAllFor);
                 await upd.useBooster();
+            }
+            else if (info.Packages > 10)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    var pack = await upd.openPackage(info.UHash);
+                    if (pack != null)
+                    {
+                        var package = PackageResults.FromType((int)pack["type"]);
+                        cfg.logger.Log("Opened package {0}", package);
+                    }
+                }
             }
         }
 

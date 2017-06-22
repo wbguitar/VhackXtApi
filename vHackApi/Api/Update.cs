@@ -116,5 +116,16 @@ namespace vHackApi
         //            config.logger.Log("update failed");
         //    }
         //}
+
+        public async Task<JObject> openPackage(string userHash)
+        {
+            return await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + "userHash_not_needed", "vh_openFreeBonus.php", 5);
+        }
+
+        public async Task<JObject> openAllPackages(string userHash)
+        {
+            return await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + "userHash_not_needed", "vh_openAllBonus.php");
+        }
+
     }
 }
