@@ -31,40 +31,22 @@ namespace vHackApi.Bot
 
         public IPs NextHackabletIp(IPersistanceMgr pm)
         {
-            //IPs ret = null;
-            //var now = DateTime.Now;
-            //foreach (var ip in pm.ScannableIps())
-            //{
-            //    if (ip.IP == "127.0.0.1")
-            //        continue;
+            //var scannables = from ip in pm.ScannableIps()
+            //                 where ip.IP != "127.0.0.1"
+            //                 select ip;
 
-            //    ret = ip;
-            //    if (r.NextBoolean()) // throws the dice
-            //        return ip;
-            //}
+            //var i = r.Next(0, scannables.Count());
+            //return scannables.ElementAt(i);
 
-            //return ret;
+            // takes the richest ips that are actually hackable and select randomly 
+            var scannablesASAP = pm.ScannableIps()
+                .Where(ip => ip.IP != "127.0.0.1") // filter dev ip
+                .OrderBy(ip => ip.Money)
+                .ThenByDescending(ip => ip.LastAttack);
 
-            //// the below commented part is formally correct but throws exception, maybe dew to a sqlite EF driver bug
-            //// that's the reason for the less elegant solution used
-
-            //var scannables = pm.ScannableIps()
-            //     .Where(ip => ip.IP != "127.0.0.1"); // filter dev ip
-
-            var scannables = from ip in pm.ScannableIps()
-                             where ip.IP != "127.0.0.1"
-                             select ip;
-
-            var unk = from ip in scannables
-                      where ip.Hostname == "unknown" && ip.WinChance >= cfg.winchance
-                      select ip;
-
-            // if there are unknown hostnames let them be selected first
-            if (unk.Any())
-                scannables = unk;
-
-            var i = r.Next(0, scannables.Count());
-            return scannables.ElementAt(i);
+            // randomly generated index, the lowest are more likely 
+            var i = (int)(Math.Pow(r.NextDouble(), 3) * (double)scannablesASAP.Count());
+            return scannablesASAP.ElementAt(i);
         }
         
     }
