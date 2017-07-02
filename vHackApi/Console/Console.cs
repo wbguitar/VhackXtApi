@@ -165,40 +165,77 @@ namespace vHackApi.Console
                 text = page.GetText();
 
                 // get subimage for the second line: if orange the host is already been hacked
-                var subimg = image.GetSubImage(0, image.image.Height / 3, image.image.Width, image.image.Height / 3);
-                //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + ".png");
-                //subimg.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                var subimgHostname = image.GetSubImage(0, image.image.Height / 3, image.image.Width, image.image.Height / 3);
+                // get subimage for the third line: if red the host is watched by FBI
+                var subimgFwall = image.GetSubImage(0, image.image.Height / 3 * 2, image.image.Width, image.image.Height / 3);
+
+                
+               
+
                 var hackedColor = Color.FromArgb(255, 250, 152, 25);
-                for (int i = 0; i < subimg.Width; i++)
+                var watchedbyFBIColor = Color.FromArgb(255, 136, 0, 0);
+                if (hasColor(subimgHostname, hackedColor))
                 {
-                    int j = 0;
-                    for (; j < subimg.Height; j++)
+                    //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + ".png");
+                    //subimgHostname.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+
+                    config.logger.Log("Host {0} already hacked, skip", hostname);
+                    // only updates hostname
+                    var scan = await ScanHost(hostname, 10);
+                    if (scan != null)
                     {
-                        var pix = subimg.GetPixel(i, j);
-                        if (pix == hackedColor)
+                        var ip = (string)scan["ipaddress"];
+                        var ips = config.persistanceMgr.GetIp(ip);
+                        if (ips != null && ips.Hostname == "unknown")
                         {
-                            config.logger.Log("Host {0} already hacked, skip", hostname);
-                            // only updates hostname
-                            var scan = await ScanHost(hostname, 10);
-                            if (scan != null)
-                            {
-                                var ip = (string)scan["ipaddress"];
-                                var ips = config.persistanceMgr.GetIp(ip);
-                                if (ips != null && ips.Hostname == "unknown")
-                                {
-                                    ips.Hostname = hostname;
-                                    if (config.persistanceMgr.UpdateIp(ips))
-                                        config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
-                                }
-                            }
-                            return 1;
+                            ips.Hostname = hostname;
+                            if (config.persistanceMgr.UpdateIp(ips))
+                                config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
                         }
-                        //if (pix.R != 0)
-                        //    break;
                     }
-                    if (j < subimg.Height)
-                        break;
+                    return 1;
                 }
+                if (hasColor(subimgFwall, watchedbyFBIColor))
+                {
+                    //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + "_FBI.png");
+                    //subimgFwall.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                    config.logger.Log("Host {0} is watched by FBI!! skipping", hostname);
+                    return 1;
+                }
+                else
+                {
+                    
+                }
+                //for (int i = 0; i < subimgHostname.Width; i++)
+                //{
+                //    int j = 0;
+                //    for (; j < subimgHostname.Height; j++)
+                //    {
+                //        var pix = subimgHostname.GetPixel(i, j);
+                //        if (pix == hackedColor)
+                //        {
+                //            config.logger.Log("Host {0} already hacked, skip", hostname);
+                //            // only updates hostname
+                //            var scan = await ScanHost(hostname, 10);
+                //            if (scan != null)
+                //            {
+                //                var ip = (string)scan["ipaddress"];
+                //                var ips = config.persistanceMgr.GetIp(ip);
+                //                if (ips != null && ips.Hostname == "unknown")
+                //                {
+                //                    ips.Hostname = hostname;
+                //                    if (config.persistanceMgr.UpdateIp(ips))
+                //                        config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
+                //                }
+                //            }
+                //            return 1;
+                //        }
+                //        //if (pix.R != 0)
+                //        //    break;
+                //    }
+                //    if (j < subimgHostname.Height)
+                //        break;
+                //}
             }
             catch (Exception e)
             {
@@ -484,6 +521,22 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             {
                 throw;
             }
+        }
+
+        bool hasColor(Bitmap subimgHostname, Color findColor)
+        {
+            for (int i = 0; i < subimgHostname.Width; i++)
+            {
+                int j = 0;
+                for (; j < subimgHostname.Height; j++)
+                {
+                    var pix = subimgHostname.GetPixel(i, j);
+                    if (pix == findColor)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         public async Task<int> attackIp2(string ip, string uhash, ScanMode mode)

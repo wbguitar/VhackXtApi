@@ -27,10 +27,18 @@ namespace vHackApi.Bot
     /// </summary>
     public class ProportionalUpgradeStrategy : Singleton<ProportionalUpgradeStrategy>, IUpgradeStrategy
     {
-        vhConsole console;
-        public void Init(vhAPI api) => console = api.getConsole();
+        protected static vhConsole console;
+        protected static vhAPI api;
+        protected static IConfig cfg;
 
-        Ratios percents = new Ratios
+        public void Init(IConfig config, vhAPI api)
+        {
+            console = api.getConsole();
+            cfg = config;
+            ProportionalUpgradeStrategy.api = api;
+        }
+
+        protected Ratios percents = new Ratios
         {
             // sum to 1
             { Tasks.Firewall, 0.13 },
@@ -42,9 +50,14 @@ namespace vHackApi.Bot
             { Tasks.Spyware, 0.08 },
         };
 
-        public Tasks NextTaskToUpgrade()
+        public virtual Tasks NextTaskToUpgrade()
         {
             var info = MyInfo.Fetch(console).Result;
+            return chooseTask(info);
+        }
+
+        protected Tasks chooseTask(MyInfo info)
+        {
             var total = info.Firewall + info.Antivirus + info.SDK
                 + info.IPSpoofing + info.Spam + info.Scan + info.Spyware;
 
@@ -69,19 +82,65 @@ namespace vHackApi.Bot
             var c = asdf.First();
             return c.Key;
         }
+    }
 
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public class StatisticalUpgradeStrategy : Singleton<StatisticalUpgradeStrategy>, IUpgradeStrategy
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public class StatisticalUpgradeStrategy : ProportionalUpgradeStrategy
+    {
+        public class Ston : Singleton<Ston>, IUpgradeStrategy
         {
-            public Tasks NextTaskToUpgrade()
-            {
-                throw new NotImplementedException();
-            }
+            private StatisticalUpgradeStrategy strategy = new StatisticalUpgradeStrategy();
+            public Tasks NextTaskToUpgrade() => strategy.NextTaskToUpgrade();
         }
 
+        private StatisticalUpgradeStrategy() { }
+
+        new private static Lazy<StatisticalUpgradeStrategy> inst = new Lazy<StatisticalUpgradeStrategy>(() => new StatisticalUpgradeStrategy());
+        public static StatisticalUpgradeStrategy Instance => inst.Value;
+
+        public override Tasks NextTaskToUpgrade()
+        {
+            var info = MyInfo.Fetch(console).Result;
+            RebuildPercentages(info, cfg);
+            return chooseTask(info);
+        }
+
+        /// <summary>
+        /// Rebuild stats percentages based on actual informations from the other users
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="cfg"></param>
+        public void RebuildPercentages(MyInfo info, IConfig cfg)
+        {
+            var ips = from ip in cfg.persistanceMgr.GetIps()
+                      where ip.Firewall > 0 && ip.Antivirus > 0 && ip.SDK > 0
+                            && ip.IPSpoofing > 0 && ip.Spam > 0 && ip.Spyware > 0
+                      select ip;
+
+            if (ips.Count() < 10) // bad statistic
+                return;
+
+            double avgFw = ips.Average(ip => ip.Firewall);
+            double avgAv = ips.Average(ip => ip.Antivirus);
+            double avgsdk = ips.Average(ip => ip.SDK);
+            double avgIpsp = ips.Average(ip => ip.IPSpoofing);
+            double avgSpam = ips.Average(ip => ip.Spam);
+            double avgAdw = ips.Average(ip => ip.Spyware);
+            double avgScan = 0; // don't know other players scan
+
+            double total = avgFw + avgAv + avgsdk + avgIpsp + avgSpam + avgAdw + avgScan;
+            percents[Tasks.Firewall] = avgFw / total;
+            percents[Tasks.Antivirus] = avgAv / total;
+            percents[Tasks.Sdk] = avgsdk / total;
+            percents[Tasks.IPSpoofing] = avgIpsp / total;
+            percents[Tasks.Spam] = avgSpam / total;
+            percents[Tasks.Spyware] = avgAdw / total;
+            percents[Tasks.Scan] = avgScan / total;
+        }
     }
+    
 }
 
 

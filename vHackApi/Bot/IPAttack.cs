@@ -63,6 +63,14 @@ namespace vHackApi.Bot
 
             try
             {
+                //// during contests better run as an IP scanner, so that can find ips 
+                //// that are watched by FBI
+                //if (IsContestRunning())
+                //{
+                //    var res = await c.FindHostsAndAttack();
+                //    return;
+                //}
+
                 cfg.persistanceMgr.Update();
                 var ip = cfg.ipSelector.NextHackabletIp(cfg.persistanceMgr);
                 if (ip == null)
@@ -93,7 +101,12 @@ namespace vHackApi.Bot
             }
         }
 
-
-        
+        private bool IsContestRunning()
+        {
+            var tod = DateTime.Now;
+            var res = (DateTime.Parse("9:00") <= tod && tod <= DateTime.Parse("11:00")) ||
+                (DateTime.Parse("21:00") <= tod && tod <= DateTime.Parse("23:00"));
+            return res;
+        }
     }
 }

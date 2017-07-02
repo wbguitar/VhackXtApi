@@ -132,5 +132,41 @@ namespace vHackBot.Properties {
                 this["safeScan"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("185.25.105.255")]
+        public string proxyAddress {
+            get {
+                return ((string)(this["proxyAddress"]));
+            }
+            set {
+                this["proxyAddress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8080")]
+        public int proxyPort {
+            get {
+                return ((int)(this["proxyPort"]));
+            }
+            set {
+                this["proxyPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1500")]
+        public int finishAllFor {
+            get {
+                return ((int)(this["finishAllFor"]));
+            }
+            set {
+                this["finishAllFor"] = value;
+            }
+        }
     }
 }

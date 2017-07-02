@@ -9,11 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi.Console;
+using vHackApi.Interfaces;
 
 namespace vHackApi.Api
 {
     public static class vhUtils
     {
+        public static IConfig config { get; set; }
+
         public static string jsonTextC;
         /**
          * The url of the current api.<br>
@@ -155,6 +158,10 @@ namespace vHackApi.Api
 
                 var url = vhUtils.generateURL(format, data, php);
                 var req = WebRequest.CreateHttp(url);
+
+                var proxy = config.proxy;
+                if (proxy != null)
+                    req.Proxy = proxy;
 
                 var res = req.GetResponse();
                 var resTxt = new StreamReader(res.GetResponseStream()).ReadToEnd();

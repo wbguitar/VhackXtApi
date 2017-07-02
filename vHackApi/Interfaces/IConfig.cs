@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using vHackApi.Api;
@@ -17,6 +18,7 @@ namespace vHackApi.Interfaces
         int maxFirewall { get; }
         int maxAntivirus { get; }
         bool safeScan { get; }
+        int finishAllFor { get; }
 
         TimeSpan hackDevPolling { get; }
         TimeSpan hackBotnetPolling { get; }
@@ -30,5 +32,7 @@ namespace vHackApi.Interfaces
         IUpgradeStrategy upgradeStrategy { get; }
 
         IPersistanceMgr persistanceMgr { get; }
+       
+        IWebProxy proxy { get; }
     }
 }

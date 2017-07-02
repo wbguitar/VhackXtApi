@@ -67,44 +67,44 @@ namespace vHackApi.Api
             return info;
         }
 
-        public int Id => (int)json["id"];
-        public int IP => (int)json["ip"];
-        public int Money => (int)json["money"];
-        public int Internet => (int)json["inet"];
-        public int HDD => (int)json["hdd"];
-        public int CPU => (int)json["cpu"];
-        public int RAM => (int)json["ram"];
-        public int Firewall => (int)json["fw"];
-        public int Antivirus => (int)json["av"];
-        public int SDK => (int)json["sdk"];
-        public int IPSpoofing => (int)json["ipsp"];
-        public int Spam => (int)json["spam"];
-        public int Scan => (int)json["scan"];
-        public int Spyware => (int)json["adw"];
+        public long Id => (long)json["id"];
+        public long IP => (long)json["ip"];
+        public long Money => (long)json["money"];
+        public long Internet => (long)json["inet"];
+        public long HDD => (long)json["hdd"];
+        public long CPU => (long)json["cpu"];
+        public long RAM => (long)json["ram"];
+        public long Firewall => (long)json["fw"];
+        public long Antivirus => (long)json["av"];
+        public long SDK => (long)json["sdk"];
+        public long IPSpoofing => (long)json["ipsp"];
+        public long Spam => (long)json["spam"];
+        public long Scan => (long)json["scan"];
+        public long Spyware => (long)json["adw"];
         /// <summary>
         /// Numbero of adware infections
         /// </summary>
-        public int ActiveAdware => (int)json["actadw"];
-        public int Netcoins => (int)json["netcoins"];
-        public int Energy => (int)json["energy"];
-        public int Score => (int)json["score"];
-        //public int IP => (int)json["urmail"];
-        //public int IP => (int)json["active"];
-        public int Reputation => (int)json["elo"];
+        public long ActiveAdware => (long)json["actadw"];
+        public long Netcoins => (long)json["netcoins"];
+        public long Energy => (long)json["energy"];
+        public long Score => (long)json["score"];
+        //public long IP => (long)json["urmail"];
+        //public long IP => (long)json["active"];
+        public long Reputation => (long)json["elo"];
         //public string IP => (string)json["clusterID"];
         //public string IP => (string)json["position"];
         //public string IP => (string)json["syslog"];
         //public string IP => (string)json["lastcmsg"];
-        public int Rank => (int)json["rank"];
+        public long Rank => (long)json["rank"];
         //public string IP => (string)json["event"];
-        public int Packages => (int)json["bonus"];
+        public long Packages => (long)json["bonus"];
         //public string IP => (string)json["mystery"];
         //public string IP => (string)json["vipleft"];
         public string Hash => (string)json["hash"];
         public string UHash => (string)json["uhash"];
         //public string IP => (string)json["use"];
         //public string IP => (string)json["tournamentActive"];
-        public int Boost => (int)json["boost"];
+        public long Boost => (long)json["boost"];
         /// <summary>
         /// Number of active spyware on remote machines
         /// </summary>

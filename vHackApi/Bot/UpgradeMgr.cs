@@ -92,7 +92,7 @@ namespace vHackApi.Bot
             if (finishAllFor == null)
                 return;
             
-            if (finishAllFor < 500)
+            if (finishAllFor < cfg.finishAllFor)
             {
                 cfg.logger.Log("{0} money needed to end tasks, finish", finishAllFor);
                 await upd.finishAll();

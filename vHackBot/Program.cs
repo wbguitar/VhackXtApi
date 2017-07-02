@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi;
@@ -9,6 +10,7 @@ using vHackApi.Api;
 using vHackApi.Bot;
 using vHackApi.Console;
 using vHackApi.Interfaces;
+using System.Net;
 
 namespace vHackBot
 {
@@ -16,7 +18,36 @@ namespace vHackBot
     {
         private static void Main(string[] args)
         {
-            Run();
+            var cfg1 = new Config();
+            var cfg2 = new Config();
+            cfg2.proxy = new WebProxy("94.200.103.99", 3128);
+            var cfg3 = new Config();
+            cfg3.proxy = null;
+            var t1 = new Thread(() => Run(cfg1));
+            var t2 = new Thread(() => Run(cfg2));
+            var t3 = new Thread(() => Run(cfg3));
+            
+            ConsoleUtils.OnConsole += (sig) =>
+            {
+                if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
+                    sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
+                {
+                    timers.ForEach(tm => tm.Dispose());
+                    return false;
+                }
+
+                return true;
+            };
+
+            //t1.Start();
+            //Thread.Sleep(100);
+            //t2.Start();
+            //Thread.Sleep(100);
+            t3.Start();
+
+            if (t1.IsAlive) t1.Join();
+            if (t2.IsAlive) t2.Join();
+            if (t3.IsAlive) t3.Join();
         }
 
         private class ConsoleLogger : ILogger
@@ -79,12 +110,15 @@ namespace vHackBot
             //public IIPselector ipSelector => IPSelectorASAP.Instance;
             public IIPselector ipSelector => IPSelectorRandom.Default;
 
-            //public IUpgradeStrategy upgradeStrategy => new FixedUpgradeStrategy(Tasks.Sdk);
             public IUpgradeStrategy upgradeStrategy => ProportionalUpgradeStrategy.Default;
+            //public IUpgradeStrategy upgradeStrategy => StatisticalUpgradeStrategy.Ston.Default;
 
             //public IPersistanceMgr persistanceMgr => DbManager.Instance;
             public IPersistanceMgr persistanceMgr => XmlMgr.Default;
 
+            public IWebProxy proxy { get; set; } = new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort);
+
+            public int finishAllFor => Properties.Settings.Default.finishAllFor;
 
             #endregion IConfig Members
         }
@@ -123,13 +157,13 @@ namespace vHackBot
             #endregion IConfig Members
         }
 
-        private static IConfig cfg = new Config();
         private static List<Timer> timers = new List<Timer>();
 
-        private static void Run()
+        private static void Run(IConfig cfg)
         {
             try
             {
+                
                 if (!DbManager.Instance.Initialize(cfg))
                     return;
 
@@ -150,6 +184,8 @@ namespace vHackBot
 
                 IPSelectorRandom.Default.Init(cfg);
 
+                vhUtils.config = cfg;
+
                 var builder = new vhAPIBuilder()
                     .useConfig(cfg);
 
@@ -158,8 +194,7 @@ namespace vHackBot
                 GlobalConfig.Init(cfg, api);
 
 
-                ProportionalUpgradeStrategy.Default.Init(api);
-
+                ProportionalUpgradeStrategy.Default.Init(cfg, api);
 
                 // sets and starts timers
                 var timers = new List<IHackTimer>
@@ -172,17 +207,73 @@ namespace vHackBot
                 };
 
                 // sets the timers
-                timers.ForEach(wd => wd.Set());
+                timers.ForEach(tm => tm.Set(GlobalConfig.Config, GlobalConfig.Api));
+
+
+                // dispose on CTRL+C
+                //Console.CancelKeyPress += (s, e) =>
+                //{
+                //    if (e.SpecialKey == ConsoleSpecialKey.ControlC)
+                //        timers.ForEach(tm => tm.Dispose());
+                //};
+
+                //Process.GetCurrentProcess().Exited += (s, e) =>
+                //{
+                //    timers.ForEach(tm => tm.Dispose());
+                //};
+
+                //ConsoleUtils.OnConsole += (sig) =>
+                //{
+                //    if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
+                //        sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
+                //    {
+                //        timers.ForEach(tm => tm.Dispose());                        
+                //        return false;
+                //    }
+
+                //    return true;
+                //};
 
                 // wait for exit
                 Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
 
-                timers.ForEach(wd => wd.Dispose());
             }
             catch (Exception e)
             {
                 cfg.logger.Log(e.ToString());
             }
         }
+    }
+
+    public class ConsoleUtils
+    {
+        [DllImport("Kernel32")]
+        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
+
+        public delegate bool EventHandler(CtrlType sig);
+        static EventHandler _handler;
+
+        public enum CtrlType
+        {
+            CTRL_C_EVENT = 0,
+            CTRL_BREAK_EVENT = 1,
+            CTRL_CLOSE_EVENT = 2,
+            CTRL_LOGOFF_EVENT = 5,
+            CTRL_SHUTDOWN_EVENT = 6
+        }
+
+        public static event EventHandler OnConsole
+        {
+            add
+            {
+                SetConsoleCtrlHandler(value, true);
+            }
+
+            remove
+            {
+                SetConsoleCtrlHandler(value, false);
+            }
+        }
+        
     }
 }

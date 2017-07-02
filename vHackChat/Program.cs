@@ -106,6 +106,22 @@ namespace vHackChat
                 }
             }
 
+            public bool safeScan
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IPersistanceMgr persistanceMgr
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
             #endregion
         }
 
