@@ -460,5 +460,13 @@ namespace vHackApi.Api
             return retStr;
         }
 
+        public static bool IsContestRunning()
+        {
+            var tod = DateTime.Now;
+            var res = (DateTime.Parse("9:00") <= tod && tod <= DateTime.Parse("11:00")) ||
+                (DateTime.Parse("21:00") <= tod && tod <= DateTime.Parse("23:00"));
+            return res;
+        }
+
     }
 }

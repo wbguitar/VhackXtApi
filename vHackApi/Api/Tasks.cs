@@ -7,8 +7,11 @@ namespace vHackApi.Api
         private string task;
         private int upgradePrice;
 
-        private Tasks(string task, int upg)
+        public int Max { get; private set; }
+
+        private Tasks(string task, int upg, int max = 0)
         {
+            Max = max;
             this.task = task;
             upgradePrice = upg;
         }
@@ -32,9 +35,9 @@ namespace vHackApi.Api
         public static readonly Tasks Spyware = new Tasks("adw", 650);
 
         // Hardware (limited)
-        public static readonly Tasks CPU = new Tasks("cpu", 100);
-        public static readonly Tasks RAM = new Tasks("ram", 100);
-        public static readonly Tasks HDD = new Tasks("hdd", 100);
-        public static readonly Tasks Internet = new Tasks("inet", 100);
+        public static readonly Tasks CPU = new Tasks("cpu", 100, 10);
+        public static readonly Tasks RAM = new Tasks("ram", 100, 14);
+        public static readonly Tasks HDD = new Tasks("hdd", 100, 10);
+        public static readonly Tasks Internet = new Tasks("inet", 100, 10);
     }
 }

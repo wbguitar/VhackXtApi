@@ -179,6 +179,8 @@ namespace vHackApi.Console
                     //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + ".png");
                     //subimgHostname.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
 
+                    
+
                     config.logger.Log("Host {0} already hacked, skip", hostname);
                     // only updates hostname
                     var scan = await ScanHost(hostname, 10);
@@ -197,6 +199,13 @@ namespace vHackApi.Console
                 }
                 if (hasColor(subimgFwall, watchedbyFBIColor))
                 {
+                    //if (vhUtils.IsContestRunning())
+                    //{
+                    //    var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    //        , "FBI_WATCHED_" + hostname + "_" + Path.GetRandomFileName() + ".png");
+                    //    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                    //}
+
                     //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + "_FBI.png");
                     //subimgFwall.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
                     config.logger.Log("Host {0} is watched by FBI!! skipping", hostname);
@@ -249,6 +258,13 @@ namespace vHackApi.Console
 
             if (text.Contains("Matched by the FBI") || text.Contains("Watched by the FBI"))
             {
+                //if (vhUtils.IsContestRunning())
+                //{
+                //    var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                //        , "FBI_WATCHED_" + hostname + "_" + Path.GetRandomFileName() + ".png");
+                //    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                //}
+
                 config.logger.Log("Host {0} is watched by FBI!! skipping", hostname);
                 return 1;
             }
@@ -289,6 +305,14 @@ namespace vHackApi.Console
                                     if (config.persistanceMgr.UpdateIp(ips))
                                         config.logger.Log("Updated hostname {0} for ip {1}", ips.Hostname, ips.IP);
                                 }
+
+                                //if (vhUtils.IsContestRunning())
+                                //{
+                                //    var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                                //        , "FBI_FREE_" + hostname + "_" + Path.GetRandomFileName() + ".png");
+                                //    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                                //}
+
                                 var res = await AttackIp(ip);
 
                                 // remove spyware
@@ -453,15 +477,18 @@ namespace vHackApi.Console
                 //    return 1;
                 //}
 
+                if (!config.hackIfNotAnonymous && anonymous != "YES")
+                {
+                    config.logger.Log("Not anonymous, skipping ip {0}", ip);
+                    return 1;
+                }
+
                 if (config.maxAntivirus < Convert.ToInt32(avlevel))
                 {
                     //config.logger.Log("Antivirus is too hign, skipping");
                     //return 1;
                 }
-                if (anonymous.ToLower() != "yes")
-                {
-                    //config.logger.Log("Not anonymous, skipping");
-                }
+                
 
                 JObject pass = await EnterPassword(sol, ip, uhash);
                 if (pass == null)

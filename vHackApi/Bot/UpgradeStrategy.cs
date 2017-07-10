@@ -56,8 +56,32 @@ namespace vHackApi.Bot
             return chooseTask(info);
         }
 
+        protected Tasks chooseTaskHw(MyInfo info)
+        {
+            var ratios = new Ratios();
+            if (info.CPU < Tasks.CPU.Max)
+                ratios[Tasks.CPU] = info.CPU;
+            if (info.HDD < Tasks.HDD.Max)
+                ratios[Tasks.HDD] = info.HDD;
+            if (info.Internet < Tasks.Internet.Max)
+                ratios[Tasks.Internet] = info.Internet;
+            if (info.RAM < Tasks.RAM.Max)
+                ratios[Tasks.RAM] = info.RAM;
+
+            if (ratios.Count == 0)
+                return null; // all HW stats are fully upgraded
+
+            var ordered = ratios.OrderBy(r => r.Value);
+            var task = ordered.First();
+            return task.Key;
+        }
+
         protected Tasks chooseTask(MyInfo info)
         {
+            var hwTask = chooseTaskHw(info);
+            if (hwTask != null)
+                return hwTask;
+
             var total = info.Firewall + info.Antivirus + info.SDK
                 + info.IPSpoofing + info.Spam + info.Scan + info.Spyware;
 

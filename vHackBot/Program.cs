@@ -46,7 +46,7 @@ namespace vHackBot
             t3.Start();
 
             if (t1.IsAlive) t1.Join();
-            if (t2.IsAlive) t2.Join();
+            if (t2.IsAlive) t2.Join();  
             if (t3.IsAlive) t3.Join();
         }
 
@@ -67,20 +67,11 @@ namespace vHackBot
         {
             #region IConfig Members
 
-            public virtual string username
-            {
-                get { return "wonderboy"; }
-            }
+            public virtual string username => Properties.Settings.Default.user;
 
-            public virtual string password
-            {
-                get { return "rancido"; }
-            }
+            public virtual string password => Properties.Settings.Default.pass;
 
-            public Tasks[] updates
-            {
-                get { return new[] { Tasks.Sdk }; }
-            }
+            public virtual bool hackIfNotAnonymous => Properties.Settings.Default.hackIfNotAnonymous;
 
             private ConsoleLogger cl = new ConsoleLogger();
 

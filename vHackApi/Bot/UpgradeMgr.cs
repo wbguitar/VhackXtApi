@@ -69,8 +69,8 @@ namespace vHackApi.Bot
         {
             // if no money or no boost => idle
             //if (info.Boost == 0 || info.Netcoins < 1000)
-            if (info.Netcoins < 1000)
-                return Status.Idle;
+            //if (info.Netcoins < 1000)
+            //    return Status.Idle;
 
             var tasksData = (JArray)tasks["data"];
             if (tasksData == null || tasksData.Count < info.RAM) // slots are available to add task => upgrade

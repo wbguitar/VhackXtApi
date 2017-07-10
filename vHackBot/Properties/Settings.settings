@@ -6,7 +6,7 @@
       <Value Profile="(Default)">.\tessdata</Value>
     </Setting>
     <Setting Name="WaitStep" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1000</Value>
+      <Value Profile="(Default)">1500</Value>
     </Setting>
     <Setting Name="WinChance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">65</Value>
@@ -36,7 +36,16 @@
       <Value Profile="(Default)">8080</Value>
     </Setting>
     <Setting Name="finishAllFor" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1500</Value>
+      <Value Profile="(Default)">2000</Value>
+    </Setting>
+    <Setting Name="user" Type="System.String" Scope="User">
+      <Value Profile="(Default)">katsone</Value>
+    </Setting>
+    <Setting Name="pass" Type="System.String" Scope="User">
+      <Value Profile="(Default)">rancido</Value>
+    </Setting>
+    <Setting Name="hackIfNotAnonymous" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
