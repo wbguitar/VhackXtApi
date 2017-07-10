@@ -11,10 +11,12 @@ using vHackApi.Bot;
 using vHackApi.Console;
 using vHackApi.Interfaces;
 using System.Net;
+using vHackApi.HTTP;
+using static vHackApi.HTTP.vhApiServer;
 
 namespace vHackBot
 {
-    internal class Program
+    public class Program
     {
         private static void Main(string[] args)
         {
@@ -63,7 +65,7 @@ namespace vHackBot
             #endregion ILogger Members
         }
 
-        private class Config : IConfig
+        public class Config : IConfig
         {
             #region IConfig Members
 
@@ -198,40 +200,113 @@ namespace vHackBot
                 };
 
                 // sets the timers
-                timers.ForEach(tm => tm.Set(GlobalConfig.Config, GlobalConfig.Api));
+                //timers.ForEach(tm => tm.Set(GlobalConfig.Config, GlobalConfig.Api));
+                timers.ForEach(tm => tm.Set(cfg, GlobalConfig.Api));
 
-
-                // dispose on CTRL+C
-                //Console.CancelKeyPress += (s, e) =>
-                //{
-                //    if (e.SpecialKey == ConsoleSpecialKey.ControlC)
-                //        timers.ForEach(tm => tm.Dispose());
-                //};
-
-                //Process.GetCurrentProcess().Exited += (s, e) =>
-                //{
-                //    timers.ForEach(tm => tm.Dispose());
-                //};
-
-                //ConsoleUtils.OnConsole += (sig) =>
-                //{
-                //    if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
-                //        sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
-                //    {
-                //        timers.ForEach(tm => tm.Dispose());                        
-                //        return false;
-                //    }
-
-                //    return true;
-                //};
+                // HTTP server
+                var srv = new vhApiServer(cfg, Properties.Settings.Default.httpPort);
+                var cfgParser = new ConfigParser();
+                srv.ConfigParser = cfgParser;
+                cfgParser.ConfigParsed += (c) =>
+                {
+                    if (c != null)
+                    {
+                        cfg.logger.Log($"New config received from remote client");
+                        // TODO
+                    }
+                    else
+                        cfg.logger.Log($"Null config received from remote client");
+                };
+                cfgParser.ParseError += (e) =>
+                {
+                    cfg.logger.Log($"Error parsing config from remote client: {e.Message}");
+                };
+                new Thread(() => srv.listen()).Start();
 
                 // wait for exit
                 Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
-
+                
             }
             catch (Exception e)
             {
                 cfg.logger.Log(e.ToString());
+            }
+        }
+
+        class ConfigParser : IConfigParser
+        {
+            public class Config : IConfig
+            {
+                public Config() { }
+                public Config(JObject json)
+                {
+                    // {
+                    //     "waitstep": 2000,
+                    //     "winchance": 75,
+                    //     "maxFirewall": 15000,
+                    //     "finishAllFor": 2000,
+                    //     "maxAntivirus": 15000,
+                    //     "hackIfNotAnonymous": true,
+                    // }
+
+                    waitstep = (int)json["waitstep"];
+                    winchance = (int)json["winchance"];
+                    maxFirewall = (int)json["maxFirewall"];
+                    finishAllFor = (int)json["finishAllFor"];
+                    maxAntivirus = (int)json["maxAntivirus"];
+                    hackIfNotAnonymous = (bool)json["hackIfNotAnonymous"];
+                }
+
+                public string username => throw new NotSupportedException();
+
+                public string password => throw new NotSupportedException();
+
+                public string tessdata => null;
+
+                public int waitstep { get; private set; }
+
+                public int winchance { get; private set; }
+
+                public int maxFirewall { get; private set; }
+
+                public int maxAntivirus { get; private set; }
+
+                public bool safeScan => throw new NotSupportedException();
+
+                public int finishAllFor { get; private set; }
+
+                public bool hackIfNotAnonymous { get; private set; }
+
+                public TimeSpan hackDevPolling => throw new NotSupportedException();
+
+                public TimeSpan hackBotnetPolling => throw new NotSupportedException();
+
+                public string dbConnectionString => throw new NotSupportedException();
+
+                public ILogger logger => throw new NotSupportedException();
+
+                public IIPselector ipSelector => throw new NotSupportedException();
+
+                public IUpgradeStrategy upgradeStrategy => throw new NotSupportedException();
+
+                public IPersistanceMgr persistanceMgr => throw new NotSupportedException();
+
+                public IWebProxy proxy => throw new NotSupportedException();
+            }
+            public event Action<IConfig> ConfigParsed = (cfg) => { };
+            public event Action<Exception> ParseError = (e) => { };
+
+            public void ParseConfig(JObject config)
+            {
+                try
+                {
+                    var cfg = new Config(config);
+                    ConfigParsed(cfg);
+                }
+                catch (Exception e)
+                {
+                    ParseError(e);
+                }
             }
         }
     }

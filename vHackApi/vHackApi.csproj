@@ -182,6 +182,8 @@
     <Compile Include="Api\Utils.cs" />
     <Compile Include="DbManager.cs" />
     <Compile Include="Bot\HackTheDev.cs" />
+    <Compile Include="HTTP\HttpServer.cs" />
+    <Compile Include="HTTP\vhApiServer.cs" />
     <Compile Include="Interfaces\IConfig.cs" />
     <Compile Include="Interfaces\IHackTimer.cs" />
     <Compile Include="Interfaces\ILogger.cs" />

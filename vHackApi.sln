@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vHackApi", "vHackApi\vHackApi.csproj", "{AD0BD02E-6749-4C62-9740-D6F23EE35966}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testChat", "testChat\testChat.csproj", "{4A6C024D-6A9F-4133-B08F-6A79443B1CC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vHackChat", "vHackChat\vHackChat.csproj", "{CFBA5690-A509-42E9-A10F-16912872285C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vHackHttpSrvTest", "vHackHttpSrvTest\vHackHttpSrvTest.csproj", "{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{CFBA5690-A509-42E9-A10F-16912872285C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFBA5690-A509-42E9-A10F-16912872285C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFBA5690-A509-42E9-A10F-16912872285C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

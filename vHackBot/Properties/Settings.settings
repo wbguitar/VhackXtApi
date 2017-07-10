@@ -47,5 +47,8 @@
     <Setting Name="hackIfNotAnonymous" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="httpPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6666</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

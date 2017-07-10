@@ -53,62 +53,62 @@ namespace vHackApi.Api
     /// </summary>
     public class MyInfo
     {
-        private JObject json;
+        public JObject Json { get; private set; }
         private MyInfo() { }
 
         public static async Task<MyInfo> Fetch(vhConsole c)
         {
             var info = new MyInfo();
             
-            info.json = await c.MyInfo();
-            if (info.json == null)
+            info.Json = await c.MyInfo();
+            if (info.Json == null)
                 return null;
 
             return info;
         }
 
-        public long Id => (long)json["id"];
-        public long IP => (long)json["ip"];
-        public long Money => (long)json["money"];
-        public long Internet => (long)json["inet"];
-        public long HDD => (long)json["hdd"];
-        public long CPU => (long)json["cpu"];
-        public long RAM => (long)json["ram"];
-        public long Firewall => (long)json["fw"];
-        public long Antivirus => (long)json["av"];
-        public long SDK => (long)json["sdk"];
-        public long IPSpoofing => (long)json["ipsp"];
-        public long Spam => (long)json["spam"];
-        public long Scan => (long)json["scan"];
-        public long Spyware => (long)json["adw"];
+        public long Id => (long)Json["id"];
+        public long IP => (long)Json["ip"];
+        public long Money => (long)Json["money"];
+        public long Internet => (long)Json["inet"];
+        public long HDD => (long)Json["hdd"];
+        public long CPU => (long)Json["cpu"];
+        public long RAM => (long)Json["ram"];
+        public long Firewall => (long)Json["fw"];
+        public long Antivirus => (long)Json["av"];
+        public long SDK => (long)Json["sdk"];
+        public long IPSpoofing => (long)Json["ipsp"];
+        public long Spam => (long)Json["spam"];
+        public long Scan => (long)Json["scan"];
+        public long Spyware => (long)Json["adw"];
         /// <summary>
         /// Numbero of adware infections
         /// </summary>
-        public long ActiveAdware => (long)json["actadw"];
-        public long Netcoins => (long)json["netcoins"];
-        public long Energy => (long)json["energy"];
-        public long Score => (long)json["score"];
+        public long ActiveAdware => (long)Json["actadw"];
+        public long Netcoins => (long)Json["netcoins"];
+        public long Energy => (long)Json["energy"];
+        public long Score => (long)Json["score"];
         //public long IP => (long)json["urmail"];
         //public long IP => (long)json["active"];
-        public long Reputation => (long)json["elo"];
+        public long Reputation => (long)Json["elo"];
         //public string IP => (string)json["clusterID"];
         //public string IP => (string)json["position"];
         //public string IP => (string)json["syslog"];
         //public string IP => (string)json["lastcmsg"];
-        public long Rank => (long)json["rank"];
+        public long Rank => (long)Json["rank"];
         //public string IP => (string)json["event"];
-        public long Packages => (long)json["bonus"];
+        public long Packages => (long)Json["bonus"];
         //public string IP => (string)json["mystery"];
         //public string IP => (string)json["vipleft"];
-        public string Hash => (string)json["hash"];
-        public string UHash => (string)json["uhash"];
+        public string Hash => (string)Json["hash"];
+        public string UHash => (string)Json["uhash"];
         //public string IP => (string)json["use"];
         //public string IP => (string)json["tournamentActive"];
-        public long Boost => (long)json["boost"];
+        public long Boost => (long)Json["boost"];
         /// <summary>
         /// Number of active spyware on remote machines
         /// </summary>
-        public string ActiveSpyware => (string)json["actspyware"];
+        public string ActiveSpyware => (string)Json["actspyware"];
         //public string IP => (string)json["tos"];
         //public string IP => (string)json["unreadmsg"];
 

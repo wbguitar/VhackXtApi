@@ -159,7 +159,7 @@ namespace vHackApi.Api
                 var url = vhUtils.generateURL(format, data, php);
                 var req = WebRequest.CreateHttp(url);
 
-                var proxy = config.proxy;
+                var proxy = config?.proxy;
                 if (proxy != null)
                     req.Proxy = proxy;
 

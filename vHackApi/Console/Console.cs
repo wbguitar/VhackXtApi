@@ -35,7 +35,7 @@ namespace vHackApi.Console
             if (!Directory.Exists(cfg.tessdata))
             {
                 cfg.logger.Log("Cannot find tessdata path: {0}", Path.GetFullPath(cfg.tessdata));
-                throw new Exception();
+                //throw new Exception();
             }
 
             engine = new Tesseract.TesseractEngine(cfg.tessdata, "eng");
