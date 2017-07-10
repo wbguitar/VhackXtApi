@@ -155,8 +155,8 @@ namespace vHackBot
             try
             {
                 
-                if (!DbManager.Instance.Initialize(cfg))
-                    return;
+                //if (!DbManager.Instance.Initialize(cfg))
+                //    return;
 
                 //try
                 //{
