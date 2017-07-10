@@ -257,9 +257,9 @@ namespace vHackBot
                     hackIfNotAnonymous = (bool)json["hackIfNotAnonymous"];
                 }
 
-                public string username => throw new NotSupportedException();
+                public string username { get { throw new NotSupportedException(); } }
 
-                public string password => throw new NotSupportedException();
+                public string password { get { throw new NotSupportedException(); } }
 
                 public string tessdata => null;
 
@@ -271,27 +271,27 @@ namespace vHackBot
 
                 public int maxAntivirus { get; private set; }
 
-                public bool safeScan => throw new NotSupportedException();
+                public bool safeScan { get { throw new NotSupportedException(); } }
 
                 public int finishAllFor { get; private set; }
 
                 public bool hackIfNotAnonymous { get; private set; }
 
-                public TimeSpan hackDevPolling => throw new NotSupportedException();
+                public TimeSpan hackDevPolling { get { throw new NotSupportedException(); } }
 
-                public TimeSpan hackBotnetPolling => throw new NotSupportedException();
+                public TimeSpan hackBotnetPolling { get { throw new NotSupportedException(); } }
 
-                public string dbConnectionString => throw new NotSupportedException();
+                public string dbConnectionString { get { throw new NotSupportedException(); } }
 
-                public ILogger logger => throw new NotSupportedException();
+                public ILogger logger { get { throw new NotSupportedException(); } }
 
-                public IIPselector ipSelector => throw new NotSupportedException();
+                public IIPselector ipSelector { get { throw new NotSupportedException(); } }
 
-                public IUpgradeStrategy upgradeStrategy => throw new NotSupportedException();
+                public IUpgradeStrategy upgradeStrategy { get { throw new NotSupportedException(); } }
 
-                public IPersistanceMgr persistanceMgr => throw new NotSupportedException();
+                public IPersistanceMgr persistanceMgr { get { throw new NotSupportedException(); } }
 
-                public IWebProxy proxy => throw new NotSupportedException();
+                public IWebProxy proxy { get { throw new NotSupportedException(); } }
             }
             public event Action<IConfig> ConfigParsed = (cfg) => { };
             public event Action<Exception> ParseError = (e) => { };
