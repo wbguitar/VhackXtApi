@@ -84,34 +84,85 @@ namespace vHackApi.Bot
                 return Status.EndTasks;
         }
 
+        int packagesBlock = 10;
         private async Task doBoost(MyInfo info, Update upd, IConfig cfg, JObject tasks)
         {
-            var res = await upd.getTasks();
+            //var res = await upd.getTasks();
 
-            var finishAllFor = (int?)res["fAllCosts"];
+            var finishAllFor = (int?)tasks["fAllCosts"];
             if (finishAllFor == null)
                 return;
             
             if (finishAllFor < cfg.finishAllFor)
             {
-                cfg.logger.Log("{0} money needed to end tasks, finish", finishAllFor);
-                await upd.finishAll();
+                if (info.Netcoins < finishAllFor)
+                {
+                    // not enough netcoins -> try with packages
+                    await doPackages(info, upd, cfg);
+                }
+                else
+                {
+                    cfg.logger.Log("{0} money needed to end tasks, finish", finishAllFor);
+                    await upd.finishAll();
+                }
             }
             else if (info.Boost > 0)
             {
                 cfg.logger.Log("{0} money needed to end tasks, continue", finishAllFor);
                 await upd.useBooster();
             }
-            else if (info.Packages > 10)
+            else if (info.Packages > packagesBlock)
             {
-                for (int i = 0; i < 10; i++)
+                await doPackages(info, upd, cfg);
+            }
+            //else
+            {
+                // upgrade botnet PCs anyway
+                await doUpgradePc(info, upd);
+            }
+        }
+
+        private async Task doUpgradePc(MyInfo info, Update upd)
+        {
+            var bnInfo = await upd.botnetInfo();
+            long idToUpgrade = 0;
+            long minLevel = long.MaxValue;
+            for (int i = 0; i < bnInfo.Count; i++)
+            {
+                var it = bnInfo[i];
+                var price = (long)it["bPRICE"];
+                var level = (long)it["bLVL"];
+                var id = (long)it["bID"];
+
+                if (level == 50)
+                    continue; // max level reached
+
+                if (price > info.Money)
+                    continue;
+
+                if (minLevel > level)
                 {
-                    var pack = await upd.openPackage(info.UHash);
-                    if (pack != null)
-                    {
-                        var package = PackageResults.FromType((int)pack["type"]);
-                        cfg.logger.Log("Opened package {0}", package);
-                    }
+                    minLevel = level;
+                    idToUpgrade = id;
+                }                
+            }
+
+            if (idToUpgrade > 0)
+                await upd.upgradeBotnet(idToUpgrade.ToString());
+        }
+
+        private async Task doPackages(MyInfo info, Update upd, IConfig cfg)
+        {
+            if (info.Packages < packagesBlock)
+                return;
+
+            for (int i = 0; i < packagesBlock; i++)
+            {
+                var pack = await upd.openPackage(info.UHash);
+                if (pack != null)
+                {
+                    var package = PackageResults.FromType((int)pack["type"]);
+                    cfg.logger.Log("Opened package {0}", package);
                 }
             }
         }

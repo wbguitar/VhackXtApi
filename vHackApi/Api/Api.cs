@@ -174,6 +174,21 @@ namespace vHackApi.Api
                 "vh_botnetInfo.php"); ;
         }
 
+        public async Task<JObject> upgradeComputer(string userHash, int i)
+        {
+            /*
+             * Supplied with a bot net computer ID, upgrade the computer.
+             *  :param id: bot net computer id
+             *  :return: str
+             *  containing: 
+             *  "money":"3479746","old":"13","costs":"4100000","lvl":"41","mm":"7579746","new":"42","strength":"42"}
+             */
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::bID",
+                              config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + i.ToString(),
+                              "vh_upgradeBotnet.php"); ;
+        }
+
         public async Task attackbotnetserver(string userhash = null)
         {
             if (string.IsNullOrEmpty(userhash))

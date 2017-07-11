@@ -44,7 +44,7 @@ namespace vHackApi.Api
         }
 
         //public override string ToString() => toString;
-        public override string ToString() => this.GetType().Name;
+        public override string ToString() => this.toString; //this.GetType().Name;
     }
 
 
