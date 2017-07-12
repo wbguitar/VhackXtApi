@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -39,5 +40,10 @@ namespace vHackApi.Interfaces
         IPersistanceMgr persistanceMgr { get; }
        
         IWebProxy proxy { get; }
+    }
+
+    public interface IConfigParser
+    {
+        void ParseConfig(JObject config);
     }
 }

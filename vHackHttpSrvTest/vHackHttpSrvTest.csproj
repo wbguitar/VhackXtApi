@@ -33,6 +33,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Griffin.Core, Version=1.0.41.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Framework.1.0.41\lib\net45\Griffin.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Griffin.Networking, Version=0.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Networking.0.5.7\lib\net40\Griffin.Networking.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Griffin.Networking.Protocol.Http, Version=0.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Networking.Protocol.Http.0.5.2\lib\net40\Griffin.Networking.Protocol.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\vHackApi\vHackApi.csproj">

@@ -134,7 +134,7 @@ namespace vHackApi.Bot
                 var level = (long)it["bLVL"];
                 var id = (long)it["bID"];
 
-                if (level == 50)
+                if (level == 100)
                     continue; // max level reached
 
                 if (price > info.Money)

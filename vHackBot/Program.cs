@@ -11,7 +11,7 @@ using vHackApi.Bot;
 using vHackApi.Console;
 using vHackApi.Interfaces;
 using System.Net;
-using vHackApi.HTTP;
+using vHackApi.HTTP.Griffin;
 using static vHackApi.HTTP.vhApiServer;
 
 namespace vHackBot
@@ -208,9 +208,7 @@ namespace vHackBot
                 timers.ForEach(tm => tm.Set(cfg, GlobalConfig.Api));
 
                 // HTTP server
-                var srv = new vhApiServer(cfg);
                 var cfgParser = new ConfigParser();
-                srv.ConfigParser = cfgParser;
                 cfgParser.ConfigParsed += (c) =>
                 {
                     if (c != null)
@@ -225,7 +223,10 @@ namespace vHackBot
                 {
                     cfg.logger.Log($"Error parsing config from remote client: {e.Message}");
                 };
-                new Thread(() => srv.listen()).Start();
+
+                var srv = new vhApiServer(cfg, cfgParser);
+
+                new Thread(() => srv.Listen()).Start();
 
                 // wait for exit
                 Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
@@ -253,12 +254,20 @@ namespace vHackBot
                     //     "hackIfNotAnonymous": true,
                     // }
 
-                    waitstep = (int)json["waitstep"];
-                    winchance = (int)json["winchance"];
-                    maxFirewall = (int)json["maxFirewall"];
-                    finishAllFor = (int)json["finishAllFor"];
-                    maxAntivirus = (int)json["maxAntivirus"];
-                    hackIfNotAnonymous = (bool)json["hackIfNotAnonymous"];
+                    
+                    waitstep = getValue(json, "waitstep", -1); //(int)json["waitstep"];
+                    winchance = getValue(json, "winchance", -1); // (int)json["winchance"];
+                    maxFirewall = getValue(json, "maxFirewall", -1); // (int)json["maxFirewall"];
+                    finishAllFor = getValue(json, "finishAllFor", -1); // (int)json["finishAllFor"];
+                    maxAntivirus = getValue(json, "maxAntivirus", -1); //(int)json["maxAntivirus"];
+                    hackIfNotAnonymous = getValue(json, "hackIfNotAnonymous", false); //(bool)json["hackIfNotAnonymous"];
+                }
+
+                T getValue<T>(JObject json, string key, T def)
+                {
+                    var tok = json.GetValue(key);
+                    var value = tok.Value<T>();
+                    return value == null ? def : value;
                 }
 
                 public string username { get { throw new NotSupportedException(); } }

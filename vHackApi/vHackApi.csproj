@@ -43,6 +43,18 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Griffin.Core, Version=1.0.41.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Framework.1.0.41\lib\net45\Griffin.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Griffin.Networking, Version=0.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Networking.0.5.7\lib\net40\Griffin.Networking.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Griffin.Networking.Protocol.Http, Version=0.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Griffin.Networking.Protocol.Http.0.5.2\lib\net40\Griffin.Networking.Protocol.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
     </Reference>
