@@ -14,15 +14,11 @@ namespace vHackApi.Console
 {
     public class vhConsole
     {
-        public static int WaitStep { get; private set; }
+        static int waitStepDef = 500;
+        public static int WaitStep => config == null ? waitStepDef : config.waitstep;
 
         public static IConfig config { get; private set; }
         public static String uHash { get; private set; }
-
-        static vhConsole()
-        {
-            WaitStep = 500;
-        }
 
         public vhConsole(IConfig cfg, String uHash)
         {
@@ -40,7 +36,6 @@ namespace vHackApi.Console
 
             engine = new Tesseract.TesseractEngine(cfg.tessdata, "eng");
 
-            WaitStep = cfg.waitstep;
         }
 
         public async Task<JObject> MyInfo()

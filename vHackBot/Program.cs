@@ -21,13 +21,7 @@ namespace vHackBot
         private static void Main(string[] args)
         {
             var cfg1 = new Config();
-            var cfg2 = new Config();
-            cfg2.proxy = new WebProxy("94.200.103.99", 3128);
-            var cfg3 = new Config();
-            cfg3.proxy = null;
             var t1 = new Thread(() => Run(cfg1));
-            var t2 = new Thread(() => Run(cfg2));
-            var t3 = new Thread(() => Run(cfg3));
             
             ConsoleUtils.OnConsole += (sig) =>
             {
@@ -41,15 +35,8 @@ namespace vHackBot
                 return true;
             };
 
-            //t1.Start();
-            //Thread.Sleep(100);
-            //t2.Start();
-            //Thread.Sleep(100);
-            t3.Start();
-
-            if (t1.IsAlive) t1.Join();
-            if (t2.IsAlive) t2.Join();  
-            if (t3.IsAlive) t3.Join();
+            t1.Start();
+            t1.Join();
         }
 
         private class ConsoleLogger : ILogger
@@ -58,7 +45,7 @@ namespace vHackBot
 
             public void Log(string format, params object[] parms)
             {
-                var msg = string.Format(format, parms);
+                var msg = (parms.Length == 0) ? format : string.Format(format, parms);
                 Console.WriteLine("{0} - {1}", DateTime.Now, msg);
             }
 
@@ -73,7 +60,11 @@ namespace vHackBot
 
             public virtual string password => Properties.Settings.Default.pass;
 
-            public virtual bool hackIfNotAnonymous => Properties.Settings.Default.hackIfNotAnonymous;
+            public virtual bool hackIfNotAnonymous
+            {
+                get { return Properties.Settings.Default.hackIfNotAnonymous; }
+                set { Properties.Settings.Default.hackIfNotAnonymous = value; }
+            }
 
             private ConsoleLogger cl = new ConsoleLogger();
 
@@ -84,15 +75,31 @@ namespace vHackBot
 
             public string tessdata => Properties.Settings.Default.TessdataPath;
 
-            public int waitstep => Properties.Settings.Default.WaitStep;
+            public int waitstep
+            {
+                get { return Properties.Settings.Default.WaitStep; }
+                set { Properties.Settings.Default.WaitStep = value; }
+            }
 
-            public int winchance => Properties.Settings.Default.WinChance;
+            public int winchance
+            {
+                get { return Properties.Settings.Default.WinChance; }
+                set { Properties.Settings.Default.WinChance = value; }
+            }
 
             public string dbConnectionString => Properties.Settings.Default.dbConnString;
 
-            public int maxFirewall => Properties.Settings.Default.maxFirewall;
+            public int maxFirewall
+            {
+                get { return Properties.Settings.Default.maxFirewall; }
+                set { Properties.Settings.Default.maxFirewall = value; }
+            }
 
-            public int maxAntivirus => Properties.Settings.Default.maxAntivirus;
+            public int maxAntivirus
+            {
+                get { return Properties.Settings.Default.maxAntivirus; }
+                set { Properties.Settings.Default.maxAntivirus = value; }
+            }
 
             public TimeSpan hackDevPolling => Properties.Settings.Default.hackDevPolling;
 
@@ -109,47 +116,17 @@ namespace vHackBot
             //public IPersistanceMgr persistanceMgr => DbManager.Instance;
             public IPersistanceMgr persistanceMgr => XmlMgr.Default;
 
-            public IWebProxy proxy { get; set; } = new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort);
+            public IWebProxy proxy { get; set; } = null; // new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort);
 
-            public int finishAllFor => Properties.Settings.Default.finishAllFor;
+            public int finishAllFor
+            {
+                get { return Properties.Settings.Default.finishAllFor; }
+                set { Properties.Settings.Default.finishAllFor = value; }
+            }
 
             public string vhServerHost => Properties.Settings.Default.httpHost;
 
             public int vhServerPort => Properties.Settings.Default.httpPort;
-
-            #endregion IConfig Members
-        }
-
-        private class Config1 : Config
-        {
-            #region IConfig Members
-
-            public override string username
-            {
-                get { return "c4ndym4n"; }
-            }
-
-            public override string password
-            {
-                get { return "rancido"; }
-            }
-
-            #endregion IConfig Members
-        }
-
-        private class Config2 : Config
-        {
-            #region IConfig Members
-
-            public override string username
-            {
-                get { return "wonderboy1"; }
-            }
-
-            public override string password
-            {
-                get { return "rancido"; }
-            }
 
             #endregion IConfig Members
         }
@@ -213,8 +190,22 @@ namespace vHackBot
                 {
                     if (c != null)
                     {
-                        cfg.logger.Log($"New config received from remote client");
-                        // TODO
+                        cfg.logger.Log($"New config received from remote client:\n{c.ToString()}");
+                        if (c.maxAntivirus > 0)
+                            Properties.Settings.Default.maxAntivirus = c.maxAntivirus;
+                        if (c.winchance > 0)
+                            Properties.Settings.Default.WinChance = c.winchance;
+                        if (c.waitstep > 0)
+                            Properties.Settings.Default.WaitStep = c.waitstep;
+                        if (c.maxFirewall > 0)
+                            Properties.Settings.Default.maxFirewall = c.maxFirewall;
+                        if (c.maxAntivirus > 0)
+                            Properties.Settings.Default.maxAntivirus = c.maxAntivirus;
+                        if (c.finishAllFor > 0)
+                            Properties.Settings.Default.finishAllFor = c.finishAllFor;
+
+                        Properties.Settings.Default.hackIfNotAnonymous = c.hackIfNotAnonymous;
+                        Properties.Settings.Default.Save();
                     }
                     else
                         cfg.logger.Log($"Null config received from remote client");
@@ -263,11 +254,24 @@ namespace vHackBot
                     hackIfNotAnonymous = getValue(json, "hackIfNotAnonymous", false); //(bool)json["hackIfNotAnonymous"];
                 }
 
+                public override string ToString()
+                {
+                    return $@"{{
+    waitstep: {waitstep},
+    winchance: {winchance},
+    maxFirewall: {maxFirewall},
+    finishAllFor: {finishAllFor},
+    maxAntivirus: {maxAntivirus},
+    hackIfNotAnonymous: {hackIfNotAnonymous},
+}}";
+                }
+
                 T getValue<T>(JObject json, string key, T def)
                 {
                     var tok = json.GetValue(key);
-                    var value = tok.Value<T>();
-                    return value == null ? def : value;
+                    if (tok == null)
+                        return def;
+                    return tok.Value<T>();
                 }
 
                 public string username { get { throw new NotSupportedException(); } }
