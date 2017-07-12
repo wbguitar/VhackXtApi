@@ -9,45 +9,45 @@
           <Key>
             <PropertyRef Name="Dt" />
           </Key>
-          <Property Name="Dt" Type="datetime" Nullable="false" />
-          <Property Name="IP" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="MoneyOwned" Type="integer" Nullable="false" />
-          <Property Name="MoneyWon" Type="integer" Nullable="false" />
-          <Property Name="RepWon" Type="integer" Nullable="false" />
+          <Property Name="Dt" Nullable="false" Type="datetime" />
+          <Property Name="IP" Nullable="false" MaxLength="2147483647" Type="nvarchar" />
+          <Property Name="MoneyOwned" Nullable="false" Type="integer" />
+          <Property Name="MoneyWon" Nullable="false" Type="integer" />
+          <Property Name="RepWon" Nullable="false" Type="integer" />
         </EntityType>
         <EntityType Name="IPs">
           <Key>
             <PropertyRef Name="IP" />
           </Key>
-          <Property Name="IP" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="LastUpdate" Type="datetime" Nullable="false" />
-          <Property Name="LastAttack" Type="datetime" Nullable="false" />
-          <Property Name="Money" Type="int" Nullable="false" />
-          <Property Name="SDK" Type="integer" Nullable="false" />
-          <Property Name="Antivirus" Type="integer" Nullable="false" />
-          <Property Name="Firewall" Type="integer" Nullable="false" />
-          <Property Name="Spam" Type="integer" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="IPSpoofing" Type="integer" Nullable="false" />
-          <Property Name="Spyware" Type="integer" Nullable="false" />
-          <Property Name="WinChance" Type="integer" Nullable="false" />
-          <Property Name="RepOnSuccess" Type="integer" Nullable="false" />
-          <Property Name="Anonymous" Type="bit" Nullable="false" />
-          <Property Name="Hostname" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="IP" Nullable="false" MaxLength="2147483647" Type="nvarchar" />
+          <Property Name="LastUpdate" Nullable="false" Type="datetime" />
+          <Property Name="LastAttack" Nullable="false" Type="datetime" />
+          <Property Name="Money" Nullable="false" Type="int" />
+          <Property Name="SDK" Nullable="false" Type="integer" />
+          <Property Name="Antivirus" Nullable="false" Type="integer" />
+          <Property Name="Firewall" Nullable="false" Type="integer" />
+          <Property Name="Spam" Nullable="false" Type="integer" />
+          <Property Name="Name" Nullable="false" MaxLength="2147483647" Type="nvarchar" />
+          <Property Name="IPSpoofing" Nullable="false" Type="integer" />
+          <Property Name="Spyware" Nullable="false" Type="integer" />
+          <Property Name="WinChance" Nullable="false" Type="integer" />
+          <Property Name="RepOnSuccess" Nullable="false" Type="integer" />
+          <Property Name="Anonymous" Nullable="false" Type="bit" />
+          <Property Name="Hostname" Nullable="false" MaxLength="2147483647" Type="nvarchar" />
         </EntityType>
         <EntityType Name="Version">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Major" Type="integer" Nullable="false" />
-          <Property Name="Minor" Type="integer" Nullable="false" />
-          <Property Name="Patch" Type="integer" Nullable="false" />
-          <Property Name="Description" Type="nvarchar" MaxLength="2147483647" />
+          <Property Name="Id" Nullable="false" StoreGeneratedPattern="Identity" Type="integer" />
+          <Property Name="Major" Nullable="false" Type="integer" />
+          <Property Name="Minor" Nullable="false" Type="integer" />
+          <Property Name="Patch" Nullable="false" Type="integer" />
+          <Property Name="Description" MaxLength="2147483647" Type="nvarchar" />
         </EntityType>
         <Association Name="FK_Attacks_0_0">
-          <End Role="IPs" Type="Self.IPs" Multiplicity="1" />
-          <End Role="Attacks" Type="Self.Attacks" Multiplicity="*" />
+          <End Type="Self.IPs" Multiplicity="1" Role="IPs" />
+          <End Type="Self.Attacks" Multiplicity="*" Role="Attacks" />
           <ReferentialConstraint>
             <Principal Role="IPs">
               <PropertyRef Name="IP" />
@@ -62,8 +62,8 @@
           <EntitySet Name="IPs" EntityType="Self.IPs" store:Type="Tables" />
           <EntitySet Name="Version" EntityType="Self.Version" store:Type="Tables" />
           <AssociationSet Name="FK_Attacks_0_0" Association="Self.FK_Attacks_0_0">
-            <End Role="IPs" EntitySet="IPs" />
-            <End Role="Attacks" EntitySet="Attacks" />
+            <End EntitySet="IPs" Role="IPs" />
+            <End EntitySet="Attacks" Role="Attacks" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -75,55 +75,55 @@
           <EntitySet Name="Attacks" EntityType="vhackdbModel.Attacks" />
           <EntitySet Name="IPs" EntityType="vhackdbModel.IPs" />
           <AssociationSet Name="FK_Attacks_0_0" Association="vhackdbModel.FK_Attacks_0_0">
-            <End Role="IPs" EntitySet="IPs" />
-            <End Role="Attacks" EntitySet="Attacks" />
+            <End EntitySet="IPs" Role="IPs" />
+            <End EntitySet="Attacks" Role="Attacks" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Version">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Major" Type="Int64" Nullable="false" />
-          <Property Name="Minor" Type="Int64" Nullable="false" />
-          <Property Name="Patch" Type="Int64" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int64" />
+          <Property Name="Major" Nullable="false" Type="Int64" />
+          <Property Name="Minor" Nullable="false" Type="Int64" />
+          <Property Name="Patch" Nullable="false" Type="Int64" />
+          <Property Name="Description" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
         </EntityType>
         <EntityType Name="Attacks">
           <Key>
             <PropertyRef Name="Dt" />
           </Key>
-          <Property Name="Dt" Type="DateTime" Nullable="false" />
-          <Property Name="IP" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-          <Property Name="MoneyOwned" Type="Int64" Nullable="false" />
-          <Property Name="MoneyWon" Type="Int64" Nullable="false" />
-          <Property Name="RepWon" Type="Int64" Nullable="false" />
+          <Property Name="Dt" Nullable="false" Type="DateTime" />
+          <Property Name="IP" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
+          <Property Name="MoneyOwned" Nullable="false" Type="Int64" />
+          <Property Name="MoneyWon" Nullable="false" Type="Int64" />
+          <Property Name="RepWon" Nullable="false" Type="Int64" />
           <NavigationProperty Name="IPs" Relationship="vhackdbModel.FK_Attacks_0_0" FromRole="Attacks" ToRole="IPs" />
         </EntityType>
         <EntityType Name="IPs">
           <Key>
             <PropertyRef Name="IP" />
           </Key>
-          <Property Name="IP" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-          <Property Name="LastUpdate" Type="DateTime" Nullable="false" />
-          <Property Name="LastAttack" Type="DateTime" Nullable="false" />
-          <Property Name="Money" Type="Int32" Nullable="false" />
-          <Property Name="SDK" Type="Int64" Nullable="false" />
-          <Property Name="Antivirus" Type="Int64" Nullable="false" />
-          <Property Name="Firewall" Type="Int64" Nullable="false" />
-          <Property Name="Spam" Type="Int64" Nullable="false" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-          <Property Name="IPSpoofing" Type="Int64" Nullable="false" />
-          <Property Name="Spyware" Type="Int64" Nullable="false" />
-          <Property Name="WinChance" Type="Int64" Nullable="false" />
-          <Property Name="RepOnSuccess" Type="Int64" Nullable="false" />
-          <Property Name="Anonymous" Type="Boolean" Nullable="false" />
-          <Property Name="Hostname" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Name="IP" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
+          <Property Name="LastUpdate" Nullable="false" Type="DateTime" />
+          <Property Name="LastAttack" Nullable="false" Type="DateTime" />
+          <Property Name="Money" Nullable="false" Type="Int32" />
+          <Property Name="SDK" Nullable="false" Type="Int64" />
+          <Property Name="Antivirus" Nullable="false" Type="Int64" />
+          <Property Name="Firewall" Nullable="false" Type="Int64" />
+          <Property Name="Spam" Nullable="false" Type="Int64" />
+          <Property Name="Name" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
+          <Property Name="IPSpoofing" Nullable="false" Type="Int64" />
+          <Property Name="Spyware" Nullable="false" Type="Int64" />
+          <Property Name="WinChance" Nullable="false" Type="Int64" />
+          <Property Name="RepOnSuccess" Nullable="false" Type="Int64" />
+          <Property Name="Anonymous" Nullable="false" Type="Boolean" />
+          <Property Name="Hostname" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
           <NavigationProperty Name="Attacks" Relationship="vhackdbModel.FK_Attacks_0_0" FromRole="IPs" ToRole="Attacks" />
         </EntityType>
         <Association Name="FK_Attacks_0_0">
-          <End Type="vhackdbModel.IPs" Role="IPs" Multiplicity="1" />
-          <End Type="vhackdbModel.Attacks" Role="Attacks" Multiplicity="*" />
+          <End Type="vhackdbModel.IPs" Multiplicity="1" Role="IPs" />
+          <End Type="vhackdbModel.Attacks" Multiplicity="*" Role="Attacks" />
           <ReferentialConstraint>
             <Principal Role="IPs">
               <PropertyRef Name="IP" />
