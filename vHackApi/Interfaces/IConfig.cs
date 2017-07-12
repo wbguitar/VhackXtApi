@@ -20,6 +20,9 @@ namespace vHackApi.Interfaces
         bool safeScan { get; }
         int finishAllFor { get; }
 
+        string vhServerHost { get; }
+        int vhServerPort { get; }
+
         bool hackIfNotAnonymous { get; }
 
         TimeSpan hackDevPolling { get; }

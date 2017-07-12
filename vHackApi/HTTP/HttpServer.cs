@@ -121,7 +121,7 @@ namespace vHackApi.HTTP
 
                 string value = line.Substring(pos, line.Length - pos);
                 System.Console.WriteLine("header: {0}:{1}", name, value);
-                httpHeaders[name] = value;
+                httpHeaders[name.ToLower()] = value;
             }
         }
 
@@ -198,19 +198,20 @@ namespace vHackApi.HTTP
 
     public abstract class HttpServer
     {
-
+        protected string ip;
         protected int port;
         TcpListener listener;
         bool is_active = true;
 
-        public HttpServer(int port)
+        public HttpServer(string ip, int port)
         {
             this.port = port;
+            this.ip = ip;
         }
 
         public void listen()
         {
-            listener = new TcpListener(IPAddress.Loopback, port);
+            listener = new TcpListener(IPAddress.Parse(ip), port);
             listener.Start();
             while (is_active)
             {
@@ -228,8 +229,8 @@ namespace vHackApi.HTTP
 
     public class ExampleHttpServer : HttpServer
     {
-        public ExampleHttpServer(int port)
-            : base(port)
+        public ExampleHttpServer(string ip, int port)
+            : base(ip, port)
         {
         }
         public override void handleGETRequest(HttpProcessor p)
@@ -269,10 +270,10 @@ namespace vHackApi.HTTP
 
         }
 
-        public static int Test(int port = 8080)
+        public static int Test(string ip, int port = 8080)
         {
             HttpServer httpServer;
-            httpServer = new ExampleHttpServer(port);
+            httpServer = new ExampleHttpServer(ip, port);
             Thread thread = new Thread(new ThreadStart(httpServer.listen));
             thread.Start();
             return 0;

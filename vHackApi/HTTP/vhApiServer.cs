@@ -14,7 +14,7 @@ namespace vHackApi.HTTP
     {
         vhAPI api;
         IConfig config;
-        public vhApiServer(IConfig cfg, int port) : base(port)
+        public vhApiServer(IConfig cfg) : base(cfg.vhServerHost, cfg.vhServerPort)
         {
             config = cfg;
 
@@ -71,7 +71,7 @@ namespace vHackApi.HTTP
 
         public IConfigParser ConfigParser { get; set; }
         
-        public override async void handlePOSTRequest(HttpProcessor p, StreamReader inputData)
+        public override void handlePOSTRequest(HttpProcessor p, StreamReader inputData)
         {
             if (p.http_url == "/config")
             {
@@ -85,20 +85,25 @@ namespace vHackApi.HTTP
                         ConfigParser.ParseConfig(cfg);
 
                     p.writeSuccess();
-                    await p.outputStream.WriteLineAsync("OK");
+                    p.outputStream.WriteLine("OK");
                 }
                 catch (Exception exc)
                 {
-                    p.writeFailure();
-                    await p.outputStream.WriteLineAsync($"Error parsing object: {exc.Message}");
-                    await p.outputStream.FlushAsync();
+                    p.writeSuccess();
+                    //await p.outputStream.WriteLineAsync($"Error parsing object: {exc.Message}");
+                    //await p.outputStream.FlushAsync();
+                    p.outputStream.WriteLine($"Error parsing object: {exc.Message}");
+                    p.outputStream.Flush();
+
                 }
             }
             else
             {
-                p.writeFailure();
-                await p.outputStream.WriteLineAsync("Wrong url format");
-                await p.outputStream.FlushAsync();
+                p.writeSuccess();
+                //await p.outputStream.WriteLineAsync("Wrong url format");
+                //await p.outputStream.FlushAsync();
+                p.outputStream.WriteLine("Wrong url format");
+                p.outputStream.Flush();
             }
         }
     }

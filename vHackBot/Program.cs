@@ -113,6 +113,10 @@ namespace vHackBot
 
             public int finishAllFor => Properties.Settings.Default.finishAllFor;
 
+            public string vhServerHost => Properties.Settings.Default.httpHost;
+
+            public int vhServerPort => Properties.Settings.Default.httpPort;
+
             #endregion IConfig Members
         }
 
@@ -204,7 +208,7 @@ namespace vHackBot
                 timers.ForEach(tm => tm.Set(cfg, GlobalConfig.Api));
 
                 // HTTP server
-                var srv = new vhApiServer(cfg, Properties.Settings.Default.httpPort);
+                var srv = new vhApiServer(cfg);
                 var cfgParser = new ConfigParser();
                 srv.ConfigParser = cfgParser;
                 cfgParser.ConfigParsed += (c) =>
@@ -292,6 +296,22 @@ namespace vHackBot
                 public IPersistanceMgr persistanceMgr { get { throw new NotSupportedException(); } }
 
                 public IWebProxy proxy { get { throw new NotSupportedException(); } }
+
+                public string vhServerHost
+                {
+                    get
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+
+                public int vhServerPort
+                {
+                    get
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
             }
             public event Action<IConfig> ConfigParsed = (cfg) => { };
             public event Action<Exception> ParseError = (e) => { };

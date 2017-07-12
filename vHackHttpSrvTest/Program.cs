@@ -13,7 +13,7 @@ namespace vHackHttpSrvTest
     {
         static void Main(string[] args)
         {
-            var srv = new vhApiServer(new vHackBot.Program.Config(), 6666);
+            var srv = new vhApiServer(new vHackBot.Program.Config());
             //var srv = new ExampleHttpServer(6666);
             srv.listen();
         }
