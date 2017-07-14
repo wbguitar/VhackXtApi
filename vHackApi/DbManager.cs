@@ -23,6 +23,7 @@ namespace vHackApi
     [XmlInclude(typeof(Attacks))]
     public partial class IPs: IXmlSerializable
     {
+        public static readonly DateTime MinDateTime = DateTime.Parse("2001/01/01");
         public IPs(JObject jsons) :base()
         {
             try
@@ -48,7 +49,7 @@ namespace vHackApi
 
                 this.LastUpdate = DateTime.Now;
 
-                this.LastAttack = DateTime.Parse("2001/01/01");
+                this.LastAttack = MinDateTime;
 
                 //this.Attacks = new List<Attacks>();
 
@@ -419,7 +420,7 @@ namespace vHackApi
                 return false;
 
             if (found.Attacks == null)
-                found.Attacks = new List<Attacks>();
+                found.Attacks = new HashSet<Attacks>();
 
             lock (semaphore)
             {

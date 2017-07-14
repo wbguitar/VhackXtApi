@@ -82,7 +82,7 @@ namespace vHackApi.Bot
                     var res = await c.AttackIp(ip.IP);
                     if (res == 1) // skipped
                     {
-                        if (ip.LastAttack != DateTime.MinValue)
+                        if (ip.LastAttack != IPs.MinDateTime)
                             ip.LastAttack += TimeSpan.FromMinutes(15); // retries in 15 minutes
                         else
                             ip.LastAttack = DateTime.Now - TimeSpan.FromMinutes(45);

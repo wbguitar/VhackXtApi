@@ -34,40 +34,38 @@ namespace vHackApi
                     var doc = new XDocument(
                         new XElement("IPs",
                             IPs
+                            //.ToArray()
                             .Where(ip => ip!= null)
-                            .Select(ip =>
-                            {
-                                //System.Console.WriteLine(ip.IP);
+                            .Select(ip => {
+                                if (ip.Attacks == null)
+                                    ip.Attacks = new HashSet<Attacks>();
+
+                                System.Console.WriteLine(ip.IP);
+
                                 return new XElement("IP",
-                                    new XAttribute("Anonymous", ip.Anonymous),
-                                    new XAttribute("Antivirus", ip.Antivirus),
-                                    new XAttribute("Firewall", ip.Firewall),
-                                    new XAttribute("Hostname", !string.IsNullOrEmpty(ip.Hostname) ? ip.Hostname : ""),
-                                    new XAttribute("IP", !string.IsNullOrEmpty(ip.IP) ? ip.IP : ""),
-                                    new XAttribute("IPSpoofing", ip.IPSpoofing),
-                                    new XAttribute("LastAttack", ip.LastAttack),
-                                    new XAttribute("LastUpdate", ip.LastUpdate),
-                                    new XAttribute("Money", ip.Money),
-                                    new XAttribute("Name", ip.Name),
-                                    new XAttribute("RepOnSuccess", ip.RepOnSuccess),
-                                    new XAttribute("SDK", ip.SDK),
-                                    new XAttribute("Spam", ip.Spam),
-                                    new XAttribute("Spyware", ip.Spyware),
-                                    new XAttribute("WinChance", ip.WinChance),
-                                    new XElement("Attacks",
-                                        ip.Attacks != null ? ip.Attacks.Where(item => item.IP != null)
-                                        .Select(att =>
-                                            new XElement("Attack",
-                                                new XAttribute("Dt", att.Dt),
-                                                new XAttribute("IP", att.IP),
-                                                new XAttribute("MoneyOwned", att.MoneyOwned),
-                                                new XAttribute("MoneyWon", att.MoneyWon),
-                                                new XAttribute("RepWon", att.RepWon)
-                                            )
-                                        ) : null
-                                    ));
-                            }
-                            )));
+                                        new XAttribute("Anonymous", ip.Anonymous),
+                                        new XAttribute("Antivirus", ip.Antivirus),
+                                        new XAttribute("Firewall", ip.Firewall),
+                                        new XAttribute("Hostname", !string.IsNullOrEmpty(ip.Hostname) ? ip.Hostname : "unknown"),
+                                        new XAttribute("IP", !string.IsNullOrEmpty(ip.IP) ? ip.IP : ""),
+                                        new XAttribute("IPSpoofing", ip.IPSpoofing),
+                                        new XAttribute("LastAttack", ip.LastAttack),
+                                        new XAttribute("LastUpdate", ip.LastUpdate),
+                                        new XAttribute("Money", ip.Money),
+                                        new XAttribute("Name", ip.Name == null ? "" : ip.Name),
+                                        new XAttribute("RepOnSuccess", ip.RepOnSuccess),
+                                        new XAttribute("SDK", ip.SDK),
+                                        new XAttribute("Spam", ip.Spam),
+                                        new XAttribute("Spyware", ip.Spyware),
+                                        new XAttribute("WinChance", ip.WinChance),
+                                        new XElement("Attacks", ip.Attacks
+                                            .Select(att => new XElement("Attack",
+                                                        new XAttribute("Dt", att.Dt == null ? vHackApi.IPs.MinDateTime : att.Dt),
+                                                        new XAttribute("IP", att.IP == null ? "" : att.IP),
+                                                        new XAttribute("MoneyOwned", att.MoneyOwned),
+                                                        new XAttribute("MoneyWon", att.MoneyWon),
+                                                        new XAttribute("RepWon", att.RepWon)))));
+                            })));
 
                     doc.Save(path);
 
@@ -75,6 +73,7 @@ namespace vHackApi
                 }
                 catch (Exception e)
                 {
+                    System.Console.WriteLine(e.ToString());
                     return false;
                 } 
             }
@@ -143,7 +142,10 @@ namespace vHackApi
                     return false;
 
                 if (found.Attacks == null)
-                    found.Attacks = new List<Attacks>();
+                    found.Attacks = new HashSet<Attacks>();
+
+                att.IP = iP;
+                att.IPs = found;
 
                 found.Attacks.Add(att);
                 Update();
