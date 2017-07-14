@@ -40,7 +40,7 @@ namespace vHackApi
                                 if (ip.Attacks == null)
                                     ip.Attacks = new HashSet<Attacks>();
 
-                                System.Console.WriteLine(ip.IP);
+                                //System.Console.WriteLine(ip.IP);
 
                                 return new XElement("IP",
                                         new XAttribute("Anonymous", ip.Anonymous),

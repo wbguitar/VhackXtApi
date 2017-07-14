@@ -158,7 +158,7 @@ namespace vHackApi.HTTP
                 public void Init(IConfig cfg, IConfigParser parser)
                 {
                     config = cfg;
-                    configParser = parser;
+                    configParser = parser; 
 
                     try
                     {
