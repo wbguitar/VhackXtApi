@@ -64,6 +64,10 @@
       <Project>{AD0BD02E-6749-4C62-9740-D6F23EE35966}</Project>
       <Name>vHackApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\vHackBot\vHackBot.csproj">
+      <Project>{46330DAD-7125-4438-B788-D4F4AC09B523}</Project>
+      <Name>vHackBot</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
