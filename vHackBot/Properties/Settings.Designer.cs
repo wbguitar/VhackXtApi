@@ -207,7 +207,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6666")]
+        [global::System.Configuration.DefaultSettingValueAttribute("666")]
         public int httpPort {
             get {
                 return ((int)(this["httpPort"]));

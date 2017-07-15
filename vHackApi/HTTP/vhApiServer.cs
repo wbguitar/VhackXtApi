@@ -181,6 +181,15 @@ namespace vHackApi.HTTP
                     }
                 }
 
+                void setResponse(ref IResponse response, string json)
+                {
+                    response.Body = new MemoryStream();
+                    response.ContentType = "text/json";
+                    var buffer = Encoding.UTF8.GetBytes(json.ToString());
+                    response.Body.Write(buffer, 0, buffer.Length);
+                    response.Body.Position = 0;
+                }
+
                 public IResponse GetResponse(IRequest request)
                 {
                     //var response = request.CreateResponse(HttpStatusCode.OK, "Welcome");
@@ -205,12 +214,29 @@ namespace vHackApi.HTTP
 
                             lock (this)
                             {
-                                response.Body = new MemoryStream();
-                                response.ContentType = "text/json";
-                                var buffer = Encoding.UTF8.GetBytes(jsonInfo.ToString());
-                                response.Body.Write(buffer, 0, buffer.Length);
-                                response.Body.Position = 0; 
+                                //response.Body = new MemoryStream();
+                                //response.ContentType = "text/json";
+                                //var buffer = Encoding.UTF8.GetBytes(jsonInfo.ToString());
+                                //response.Body.Write(buffer, 0, buffer.Length);
+                                //response.Body.Position = 0;
+
+                                setResponse(ref response, jsonInfo.ToString());
                             }
+                        }
+                        else if (path == "/config")
+                        {
+                            response = request.CreateResponse(HttpStatusCode.OK, "GET Config request");
+                            var json = $@"
+{{
+    ""waitstep"": ""{config.waitstep}"",
+    ""winchance"": ""{config.winchance}"",
+    ""maxFirewall"": ""{config.maxFirewall}"",
+    ""finishAllFor"": ""{config.finishAllFor}"",
+    ""maxAntivirus"": ""{config.maxAntivirus}"",
+    ""hackIfNotAnonymous"": ""{config.hackIfNotAnonymous}""
+}}";
+
+                            setResponse(ref response, json);
                         }
                     }
                     else if (request.Method == "POST")
