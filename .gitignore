@@ -289,3 +289,6 @@ __pycache__/
 
 !vHackApi/x86
 !vHackApi/x64
+
+shared
+!shared/*

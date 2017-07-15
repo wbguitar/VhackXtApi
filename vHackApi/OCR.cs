@@ -145,17 +145,31 @@ namespace vHackApi
 
         double calc(int[] arr1, int []arr2)
         {
+            ////var arr1 = i1.ToString().ToCharArray().Select(it => (int)it).ToList();
+            ////var arr2 = i2.ToString().ToCharArray().Select(it => (int)it).ToList();
+            //var sections = Diff.CalculateSections<int>(arr1, arr2);
+
+            //var matches = sections.Where(s => s.IsMatch);
+            //var unmatches = sections.Where(s => !s.IsMatch);
+            //var a = (double)matches.Select(s => s.LengthInCollection1).Sum() * matches.Count();
+            //var b = (double)unmatches.Select(s => s.LengthInCollection1).Sum() * unmatches.Count();
+            ////	Console.WriteLine(a);
+            ////	Console.WriteLine(b);
+            ////	Console.WriteLine(b/a);
+            //return b / a;
+
+
             //var arr1 = i1.ToString().ToCharArray().Select(it => (int)it).ToList();
             //var arr2 = i2.ToString().ToCharArray().Select(it => (int)it).ToList();
-            var sections = Diff.CalculateSections<int>(arr1, arr2);
+            var sections = Diff.Calculate<int>(arr1, arr2);
 
-            var matches = sections.Where(s => s.IsMatch);
-            var unmatches = sections.Where(s => !s.IsMatch);
-            var a = (double)matches.Select(s => s.LengthInCollection1).Sum() * matches.Count();
-            var b = (double)unmatches.Select(s => s.LengthInCollection1).Sum() * unmatches.Count();
-            //	Console.WriteLine(a);
-            //	Console.WriteLine(b);
-            //	Console.WriteLine(b/a);
+            var matches = sections.Where(s => s.Equal);
+            var unmatches = sections.Where(s => !s.Equal);
+            var a = (double)matches.Select(s => s.Length1).Sum() * matches.Count();
+            var b = (double)unmatches.Select(s => s.Length2).Sum() * unmatches.Count();
+            //System.Console.WriteLine(a);
+            //System.Console.WriteLine(b);
+            //System.Console.WriteLine(b / a);
             return b / a;
         }
 
