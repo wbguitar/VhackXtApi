@@ -16,6 +16,9 @@ using Griffin.Networking.Servers;
 using System.Net;
 using Newtonsoft.Json;
 using System.Threading;
+using Antlr3.ST;
+using Antlr3.ST.Language;
+using System.Web.Script.Serialization;
 
 namespace vHackApi.HTTP
 {
@@ -157,6 +160,8 @@ namespace vHackApi.HTTP
 
                 public void Init(IConfig cfg, IConfigParser parser)
                 {
+                   
+
                     config = cfg;
                     configParser = parser; 
 
@@ -220,6 +225,8 @@ namespace vHackApi.HTTP
                                 //response.Body.Write(buffer, 0, buffer.Length);
                                 //response.Body.Position = 0;
 
+                                
+
                                 setResponse(ref response, jsonInfo.ToString());
                             }
                         }
@@ -238,6 +245,27 @@ namespace vHackApi.HTTP
 
                             setResponse(ref response, json);
                         }
+                        else if (path == "/config_form")
+                        {
+                            response = request.CreateResponse(HttpStatusCode.OK, "GET Config Form request");
+                            var htmlTmpl = new StreamReader(File.OpenRead("HTTP/config.html")).ReadToEnd();
+                            //response.Body = File.OpenRead("HTTP/config.html");
+                            var template = new Antlr3.ST.StringTemplate(htmlTmpl, typeof(TemplateLexer));
+                            template.SetAttribute("mainPage", $"http://{config.vhServerHost}:{config.vhServerPort}");
+
+                            template.SetAttribute("waitstep", config.waitstep);
+                            template.SetAttribute("winchance", config.winchance);
+                            template.SetAttribute("maxFirewall", config.maxFirewall);
+                            template.SetAttribute("maxAntivirus", config.maxAntivirus);
+                            template.SetAttribute("finishAllFor", config.finishAllFor);
+                            template.SetAttribute("hackIfNotAnonymous", config.hackIfNotAnonymous ? "checked":"uchecked");
+                            
+
+                            var html = template.ToString();
+                            
+                            setResponse(ref response, html);
+                            response.ContentType = "text/html";
+                        }
                     }
                     else if (request.Method == "POST")
                     {
@@ -248,13 +276,31 @@ namespace vHackApi.HTTP
                             {
                                 using (var rd = new StreamReader(request.Body))
                                 {
-                                    var cfg = JObject.Parse(rd.ReadToEnd());
+                                    var json = rd.ReadToEnd();
+                                    if (request.ContentType == "application/x-www-form-urlencoded")
+                                    {
+                                        var dict = System.Web.HttpUtility.ParseQueryString(json);
+                                        json = new JavaScriptSerializer().Serialize(
+                                                     dict.Keys.Cast<string>()
+                                                         .ToDictionary(k => k, k => dict[k]));
+
+                                       
+                                    }
+
+                                    var cfg = JObject.Parse(json);
+                                    if (cfg["hackIfNotAnonymous"] != null)
+                                    {
+                                        if ((string)cfg["hackIfNotAnonymous"] == "on")
+                                            cfg["hackIfNotAnonymous"] = "true";
+
+                                    }
 
                                     if (configParser != null)
                                         configParser.ParseConfig(cfg);
                                 }
-
+                                
                                 response = request.CreateResponse(HttpStatusCode.OK, "POST config request");
+                                response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}/config_form");
                             }
                             catch (Exception exc)
                             {
@@ -287,14 +333,22 @@ namespace vHackApi.HTTP
 
             public void Listen()
             {
-                Listen(System.Net.IPAddress.Parse(config.vhServerHost), config.vhServerPort);
+                //Listen(System.Net.IPAddress.Parse(config.vhServerHost), config.vhServerPort);
+                Listen(System.Net.IPAddress.Any, config.vhServerPort);
             }
 
             public void Listen(System.Net.IPAddress ip, int port)
             {
-                var ep = new IPEndPoint(ip, port);
-                base.Start(ep);
-                config.logger.Log($"vhServer started listening {ep.ToString()}");
+                try
+                {
+                    var ep = new IPEndPoint(ip, port);
+                    base.Start(ep);
+                    config.logger.Log($"vhServer started listening {ep.ToString()}");
+                }
+                catch (Exception exc)
+                {
+                    config.logger.Log($"Couldn't start vhServer on endpoint {ip.ToString()}:{port}: {exc.Message}");
+                }
             }
 
             

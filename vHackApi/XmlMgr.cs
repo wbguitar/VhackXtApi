@@ -100,7 +100,7 @@ namespace vHackApi
                                 IPSpoofing = (long)ip.Attribute("IPSpoofing"),
                                 LastAttack = (DateTime)ip.Attribute("LastAttack"),
                                 LastUpdate = (DateTime)ip.Attribute("LastUpdate"),
-                                Money = (int)ip.Attribute("Money"),
+                                Money = (long)ip.Attribute("Money"),
                                 Name = (string)ip.Attribute("Name"),
                                 RepOnSuccess = (long)ip.Attribute("RepOnSuccess"),
                                 SDK = (long)ip.Attribute("SDK"),

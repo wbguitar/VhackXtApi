@@ -20,8 +20,18 @@ namespace vHackApi.Bot
             var upd = new Update(cfg);
             hackTimer = new Timer(async (o) =>
             {
-                await api.attackbotnetserver();
-                await upd.removeSpyware();
+                if (!Monitor.TryEnter(this))
+                    return;
+                Monitor.Enter(this);
+                try
+                {
+                    await api.attackbotnetserver();
+                    await upd.removeSpyware();
+                }
+                finally
+                {
+                    Monitor.Exit(this);
+                }
             }
             , null, TimeSpan.Zero, cfg.hackBotnetPolling);
         }

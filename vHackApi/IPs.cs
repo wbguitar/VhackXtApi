@@ -23,7 +23,7 @@ namespace vHackApi
         public string IP { get; set; }
         public System.DateTime LastUpdate { get; set; }
         public System.DateTime LastAttack { get; set; }
-        public int Money { get; set; }
+        public long Money { get; set; }
         public long SDK { get; set; }
         public long Antivirus { get; set; }
         public long Firewall { get; set; }

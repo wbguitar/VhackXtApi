@@ -24,6 +24,27 @@ namespace vHackApi
     public partial class IPs: IXmlSerializable
     {
         public static readonly DateTime MinDateTime = DateTime.Parse("2001/01/01");
+
+        public IPs(IPs other)
+        {
+            this.IP = other.IP;
+            this.Anonymous = other.Anonymous;
+            this.Antivirus = other.Antivirus;
+            this.Attacks = other.Attacks;
+            this.Firewall = other.Firewall;
+            this.Hostname = other.Hostname;
+            this.IPSpoofing = other.IPSpoofing;
+            this.LastAttack = other.LastAttack;
+            this.LastUpdate = other.LastUpdate;
+            this.Money = other.Money;
+            this.Name = other.Name;
+            this.RepOnSuccess = other.RepOnSuccess;
+            this.SDK = other.SDK;
+            this.Spam = other.Spam;
+            this.Spyware = other.Spyware;
+            this.WinChance = other.WinChance;
+        }
+
         public IPs(JObject jsons) :base()
         {
             try
@@ -36,7 +57,7 @@ namespace vHackApi
                 this.SDK = ((string)jsons["sdk"]).Contains('?') ? 0 : (long)jsons["sdk"];
                 this.IPSpoofing = ((string)jsons["ipsp"]).Contains('?') ? 0 : (long)jsons["ipsp"];
                 this.Spyware = ((string)jsons["spyware"]).Contains('?') ? 0 : (long)jsons["spyware"];
-                this.Money = ((string)jsons["money"]).Contains('?') ? 0 : (int)jsons["money"];
+                this.Money = ((string)jsons["money"]).Contains('?') ? 0 : (long)jsons["money"];
                 this.WinChance = ((string)jsons["winchance"]).Contains('?') ? 0 : (long)jsons["winchance"];
 
                 this.Anonymous = (string)jsons["anonymous"] == "YES";
@@ -113,7 +134,7 @@ namespace vHackApi
             IP = reader.GetAttribute("IP");
             IPSpoofing = Int32.Parse(reader.GetAttribute("IPSpoofing"));
             LastUpdate = DateTime.Parse(reader.GetAttribute("LastUpdate"));
-            Money = Int32.Parse(reader.GetAttribute("Money"));
+            Money = Int64.Parse(reader.GetAttribute("Money"));
             RepOnSuccess = Int32.Parse(reader.GetAttribute("RepOnSuccess"));
             SDK = Int32.Parse(reader.GetAttribute("SDK"));
             Spam = Int32.Parse(reader.GetAttribute("Spam"));
@@ -224,6 +245,17 @@ namespace vHackApi
     
     public partial class Attacks : IComparable<Attacks>, IComparable, IXmlSerializable
     {
+        public Attacks() : base() { }
+        public Attacks(Attacks other) : this()
+        {
+            this.IP = other.IP;
+            this.MoneyOwned = other.MoneyOwned;
+            this.MoneyWon = other.MoneyWon;
+            this.RepWon = other.RepWon;
+            this.Dt = other.Dt;
+            this.IPs = new IPs(other.IPs);
+        }
+
         public int CompareTo(object obj)
         {
             try
@@ -385,7 +417,7 @@ namespace vHackApi
                     oldIp.Hostname = newIp.Hostname;
                     oldIp.Anonymous = newIp.Anonymous;
                     oldIp.Antivirus = newIp.Antivirus;
-                    oldIp.Attacks = newIp.Attacks;
+                   
                     oldIp.Firewall = newIp.Firewall;
                     //oldIp.IP = newIp.IP;
                     oldIp.IPSpoofing = newIp.IPSpoofing;
@@ -398,6 +430,22 @@ namespace vHackApi
                     oldIp.Spam = newIp.Spam;
                     oldIp.Spyware = newIp.Spyware;
                     oldIp.WinChance = newIp.WinChance;
+
+                    oldIp.Attacks = new HashSet<Attacks>();
+                    oldIp.Attacks.Clear();
+                    if (newIp.Attacks != null)
+                    {
+                        foreach (var att in newIp.Attacks)
+                        {
+                            var newAtt = new Attacks(att);
+                            oldIp.Attacks.Add(newAtt);
+                        }
+                    }
+                    foreach (var att in oldIp.Attacks)
+                    {
+                        att.IPs.Attacks = oldIp.Attacks;
+                    }
+
                     //oldIp.Attacks = newIp.Attacks;//.Distinct().ToList();
                     oldIp.LastUpdate = DateTime.Now;
                     model.SaveChanges();

@@ -156,6 +156,10 @@ namespace vHackBot
                 //XmlMgr.Default.Save();
                 XmlMgr.Default.Load();
 
+                DbManager.Instance.Initialize(cfg);
+
+
+                Console.WriteLine($"{DateTime.Now}\n{DateTime.Now.ToUniversalTime()}\n{DateTime.UtcNow}");
                 IPSelectorRandom.Default.Init(cfg);
 
                 vhUtils.config = cfg;

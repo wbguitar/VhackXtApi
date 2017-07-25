@@ -32,16 +32,7 @@ namespace vHackApi.Bot
             hackTimer = new Timer(async (o) => await timerCallback(o), new object[] { cfg, api, console }, TimeSpan.Zero, Period);
 
             safeScan = cfg.safeScan;
-        }
 
-        private async Task timerCallback(object state)
-        {
-            var cfg = (state as object[])[0] as IConfig;
-            var api = (state as object[])[1] as vhAPI;
-            var c = (state as object[])[2] as vhConsole;
-
-            if (!Monitor.TryEnter(this))
-                return;
 
             Pause = () =>
             {
@@ -57,9 +48,19 @@ namespace vHackApi.Bot
                 if (hackTimer != null)
                 {
                     cfg.logger.Log("*** RESUMING IP ATTACK");
-                    hackTimer.Change(TimeSpan.Zero, Period); 
+                    hackTimer.Change(TimeSpan.Zero, Period);
                 }
             };
+        }
+
+        private async Task timerCallback(object state)
+        {
+            var cfg = (state as object[])[0] as IConfig;
+            var api = (state as object[])[1] as vhAPI;
+            var c = (state as object[])[2] as vhConsole;
+
+            if (!Monitor.TryEnter(this))
+                return;
 
             try
             {

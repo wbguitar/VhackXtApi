@@ -5,8 +5,8 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="5b556b5ca82346a786384e6a437d21f8" Name="Diagram1" ZoomLevel="86">
-        <EntityTypeShape EntityType="vhackdbModel.Version" PointX="5.75" PointY="3.5" Width="1.5" />
-        <EntityTypeShape EntityType="vhackdbModel.Attacks" PointX="5.375" PointY="0.5" Width="1.5" />
+        <EntityTypeShape EntityType="vhackdbModel.Version" PointX="4.625" PointY="3.625" Width="1.5" />
+        <EntityTypeShape EntityType="vhackdbModel.Attacks" PointX="4.375" PointY="0.875" Width="1.5" />
         <EntityTypeShape EntityType="vhackdbModel.IPs" PointX="0.75" PointY="0.75" Width="1.5" />
         <AssociationConnector Association="vhackdbModel.FK_Attacks_0_0" />
       </Diagram>

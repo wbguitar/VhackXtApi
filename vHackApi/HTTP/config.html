@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>VHack BOT Config</title>
+</head>
+<body>
+    <!--<a href="$post_url$">post url</a>-->
+
+    <form action="/config" method="post">
+        <a href="$mainPage$">back</a><br /><br /><wbr />
+        <table style="width: 300pt">
+            <tr>
+                <td>Waitstep:</td>
+                <td class="in"><input type="number" name="waitstep" value="$waitstep$" /></td>
+            </tr>
+            <tr>
+                <td>Win chance:</td>
+                <td><input type="number" name="winchance" value="$winchance$" /></td>
+            </tr>
+            <tr>
+                <td>Max firewall:</td>
+                <td><input type="number" name="maxFirewall" value="$maxFirewall$" /></td>
+            </tr>
+            <tr>
+                <td>Max antivirus:</td>
+                <td><input type="number" name="maxAntivirus" value="$maxAntivirus$" /></td>
+            </tr>
+            <tr>
+                <td>Finish all for:</td>
+                <td><input type="number" name="finishAllFor" value="$finishAllFor$" /></td>
+            </tr>
+            <tr>
+                <td>Hack if not anonymous: </td>
+                <td><input type="checkbox" name="hackIfNotAnonymous" $hackIfNotAnonymous$/></td>
+            </tr>
+        </table>
+        <br />
+       
+        <input type="submit" value="Submit" />
+    </form>
+</body>
+</html>

@@ -10,7 +10,7 @@ namespace vHackApi.Bot
 {
     public class UpgradeMgr : AHackTimer<UpgradeMgr>
     {
-        private enum Status
+        public enum Status
         {
             Idle,
             Upgrade,
@@ -65,6 +65,8 @@ namespace vHackApi.Bot
                 , null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
         }
 
+        public Status CurStatus { get; private set; }
+
         private Status CurrentStatus(MyInfo info, JObject tasks)
         {
             // if no money or no boost => idle
@@ -76,12 +78,14 @@ namespace vHackApi.Bot
             if (tasksData == null || tasksData.Count < info.RAM) // slots are available to add task => upgrade
             {
                 if (info.Money > 5000) // TODO: can upgrade? should calculate if money > what needs to upgrade 
-                    return Status.Upgrade;
+                    CurStatus = Status.Upgrade;
                 else
-                    return Status.Idle;
+                    CurStatus = Status.Idle;
             }
             else
-                return Status.EndTasks;
+                CurStatus = Status.EndTasks;
+
+            return CurStatus;
         }
 
         int packagesBlock = 10;

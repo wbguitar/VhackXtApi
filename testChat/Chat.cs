@@ -12,7 +12,7 @@ using vHackApi.Interfaces;
 namespace testChat
 {
     [TestClass]
-    public class UnitTest1
+    public class Chat
     {
         [TestMethod]
         public void TestMethod1()
@@ -48,84 +48,84 @@ namespace testChat
             }
 
         }
-        class Config : IConfig 
-        {
-            Logger consoleLogger = new Logger();
+        //class Config : IConfig 
+        //{
+        //    Logger consoleLogger = new Logger();
 
-            public string username => "wonderboy";
+        //    public string username => "wonderboy";
 
-            public string password => "rancido";
+        //    public string password => "rancido";
 
-            public string tessdata => @"C:\Program Files (x86)\tesseract-ocr\tessdata";
+        //    public string tessdata => @"C:\Program Files (x86)\tesseract-ocr\tessdata";
 
-            public int waitstep => 1000;
+        //    public int waitstep => 1000;
 
-            public int winchance => 75;
+        //    public int winchance => 75;
 
-            public Tasks[] updates => null;
+        //    public Tasks[] updates => null;
 
-            public ILogger logger => consoleLogger;
+        //    public ILogger logger => consoleLogger;
 
-            public int maxFirewall
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public int maxFirewall
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public int maxAntivirus
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public int maxAntivirus
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public TimeSpan hackDevPolling
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public TimeSpan hackDevPolling
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public TimeSpan hackBotnetPolling
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public TimeSpan hackBotnetPolling
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public string dbConnectionString
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public string dbConnectionString
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public IIPselector ipSelector
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+        //    public IIPselector ipSelector
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
 
-            public IUpgradeStrategy upgradeStrategy
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-        }
+        //    public IUpgradeStrategy upgradeStrategy
+        //    {
+        //        get
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //    }
+        //}
 
-        static IConfig cfg = new Config();
+        static IConfig cfg = new vHackBot.Program.Config();
         static vHackApi.Api.vhAPI api;
-        static UnitTest1()
+        static Chat()
         {
             api = new vHackApi.Api.vhAPIBuilder()
                .useConfig(cfg)

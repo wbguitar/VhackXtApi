@@ -22,7 +22,7 @@
           <Property Name="IP" Nullable="false" MaxLength="2147483647" Type="nvarchar" />
           <Property Name="LastUpdate" Nullable="false" Type="datetime" />
           <Property Name="LastAttack" Nullable="false" Type="datetime" />
-          <Property Name="Money" Nullable="false" Type="int" />
+          <Property Name="Money" Nullable="false" Type="integer" />
           <Property Name="SDK" Nullable="false" Type="integer" />
           <Property Name="Antivirus" Nullable="false" Type="integer" />
           <Property Name="Firewall" Nullable="false" Type="integer" />
@@ -107,7 +107,7 @@
           <Property Name="IP" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" Type="String" />
           <Property Name="LastUpdate" Nullable="false" Type="DateTime" />
           <Property Name="LastAttack" Nullable="false" Type="DateTime" />
-          <Property Name="Money" Nullable="false" Type="Int32" />
+          <Property Name="Money" Nullable="false" Type="Int64" />
           <Property Name="SDK" Nullable="false" Type="Int64" />
           <Property Name="Antivirus" Nullable="false" Type="Int64" />
           <Property Name="Firewall" Nullable="false" Type="Int64" />

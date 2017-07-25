@@ -23,11 +23,19 @@ namespace vHackApi.Bot
             hackTimer = new Timer(
                 async (o) =>
                 {
+                    if (!Monitor.TryEnter(this))
+                        return;
+                    Monitor.Enter(this);
+
                     try
                     { var s = await console.AttackIp("127.0.0.1"); }
                     catch (Exception e)
                     {
                         cfg.logger.Log(e.ToString());
+                    }
+                    finally
+                    {
+                        Monitor.Exit(this);
                     }
                 }
                 , null, TimeSpan.Zero, cfg.hackDevPolling);

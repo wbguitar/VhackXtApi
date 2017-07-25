@@ -219,7 +219,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.11")]
+        [global::System.Configuration.DefaultSettingValueAttribute("wonderboy.ddns.net")]
         public string httpHost {
             get {
                 return ((string)(this["httpHost"]));
