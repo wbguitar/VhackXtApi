@@ -22,7 +22,7 @@ namespace vHackApi.Bot
             {
                 if (!Monitor.TryEnter(this))
                     return;
-                Monitor.Enter(this);
+                
                 try
                 {
                     await api.attackbotnetserver();

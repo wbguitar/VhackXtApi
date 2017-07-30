@@ -25,7 +25,6 @@ namespace vHackApi.Bot
                 {
                     if (!Monitor.TryEnter(this))
                         return;
-                    Monitor.Enter(this);
 
                     try
                     { var s = await console.AttackIp("127.0.0.1"); }
