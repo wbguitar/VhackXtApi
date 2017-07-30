@@ -52,18 +52,25 @@ namespace vHackApi.Console
                                    "vh_vulnScan.php");
         }
 
-        public async Task<JObject> EnterPassword(string passwd, string target, string uhash = null)
+        public async Task<JObject> EnterPassword(string target, string uhash = null, string sol = null)
         {
             if (string.IsNullOrEmpty(uhash))
                 uhash = vhConsole.uHash;
 
-            var pass = passwd.Split('p');
-            var temp = await vhUtils.JSONRequest("user::::pass::::port::::target::::uhash",
-                                     config.username + "::::" + config.password + "::::" +
-                                         pass[1] + "::::" + target + "::::" + uhash,
-                                     "vh_trTransfer.php", 3);
+            if (!string.IsNullOrEmpty(sol))
+            {
+                var pass = sol.Split('p');
+                return await vhUtils.JSONRequest("user::::pass::::port::::target::::uhash",
+                                         config.username + "::::" + config.password + "::::" +
+                                             pass[1] + "::::" + target + "::::" + uhash,
+                                         "vh_trTransfer.php", 3);
+                
+            }
 
-            return temp;
+            return await vhUtils.JSONRequest("user::::pass::::target::::uhash",
+                                   config.username + "::::" + config.password + "::::" +
+                                       target + "::::" + uhash,
+                                   "vh_trTransfer.php", 3);
         }
 
         public async Task<JObject> CheckCluster(string uhash = null)
@@ -402,15 +409,18 @@ namespace vHackApi.Console
 
             Debug.Assert(dbIp != null);
 
-            var ocr = new OCR(engine);
             try
             {
-                var sol = ocr.getSolution(jsons);
-                if (sol == "p0")
-                {
-                    config.logger.Log("unable to find the password :(");
-                    return -1;
-                }
+                var port = "";
+                // last update: port not requested anymore
+                //var ocr = new OCR(engine);
+
+                //var port = ocr.getSolution(jsons);
+                //if (port == "p0")
+                //{
+                //    config.logger.Log("unable to find the password :(");
+                //    return -1;
+                //}
 
                 var user = (string)jsons["username"];
                 var winchance = ((string)jsons["winchance"]).Contains("?") ? 0 : (int)jsons["winchance"];
@@ -485,7 +495,7 @@ namespace vHackApi.Console
                 }
                 
 
-                JObject pass = await EnterPassword(sol, ip, uhash);
+                JObject pass = await EnterPassword(ip, uhash, port);
                 if (pass == null)
                 {
                     config.logger.Log("Unable to enter password for ip {0}", ip);
@@ -605,10 +615,11 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
                         // is one of the ones already stored we pass away, someone else will
                         // hack him some time, sooner or later
 
-                        //var found = config.persistanceMgr
-                        //    .GetIps()
-                        //    .FirstOrDefault(ip => ip.Hostname == hostname);
-                        IPs found = null;
+                        var found = config.persistanceMgr
+                            .GetIps()
+                            .FirstOrDefault(ip => ip.Hostname == hostname);
+                        //IPs found = null;
+
                         //foreach (var ip in config.persistanceMgr.GetIps())
                         //{
                         //    try

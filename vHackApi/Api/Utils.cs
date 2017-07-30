@@ -22,7 +22,7 @@ namespace vHackApi.Api
          * The url of the current api.<br>
          * As of now it is {@value url}.
          */
-        private static readonly string rootUrl = "https://api.vhack.cc/v/7/";
+        private static readonly string rootUrl = "https://api.vhack.cc/v/8/";
         /**
          * The hashing algorithm that is used to hash data in requests.<br>
          * It now is {@value md5s}.
@@ -84,6 +84,10 @@ namespace vHackApi.Api
 
         static DateTime lastReq = DateTime.Now;
 
+        public class RequestException: Exception
+        {
+            public RequestException(string msg) : base(msg) { }
+        }
         /**
          * Makes a request to the api and returns the result as a JObject Object.
          * Makes a requests to the vHack Api, with the params format, data data and to the file php and returns the result, which is json, as a JObject Object.<br>
@@ -115,14 +119,14 @@ namespace vHackApi.Api
                 }
                 else if (jsonText == "8")
                 {
-                    throw new Exception("Wrong Password/User");
+                    throw new RequestException("Wrong Password/User");
                 }
                 else if (jsonText.Length == 1)
                     return null;
 
                 return JObject.Parse(jsonText);
             }
-            catch (Exception e)
+            catch (RequestException e)
             {
                 Debug.Print(e.StackTrace);
 
