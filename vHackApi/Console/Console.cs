@@ -395,7 +395,8 @@ namespace vHackApi.Console
             var jsons = await ScanIp(ip, 3);
             if (jsons == null)
             {
-                config.logger.Log("Unable to scan ip {0}", ip);
+                config.persistanceMgr.RemoveIp(ip);
+                config.logger.Log("Unable to scan ip {0}, removing", ip);
                 return 1;
             }
 
@@ -411,14 +412,14 @@ namespace vHackApi.Console
 
             try
             {
+                //last update: port not requested anymore
                 var port = "";
-                // last update: port not requested anymore
                 //var ocr = new OCR(engine);
 
                 //var port = ocr.getSolution(jsons);
                 //if (port == "p0")
                 //{
-                //    config.logger.Log("unable to find the password :(");
+                //    config.logger.Log("unable to find the port :(");
                 //    return -1;
                 //}
 
@@ -490,7 +491,7 @@ namespace vHackApi.Console
 
                 if (config.maxAntivirus < Convert.ToInt32(avlevel))
                 {
-                    //config.logger.Log("Antivirus is too hign, skipping");
+                    //config.logger.log("antivirus is too hign, skipping");
                     //return 1;
                 }
                 

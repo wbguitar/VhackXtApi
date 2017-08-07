@@ -206,11 +206,26 @@ namespace vHackApi.HTTP
                     //response.Body.Position = 0;
                     IResponse response = null;
                     var path = request.Uri.LocalPath.ToLower();
+                    var mainPage = $"http://{config.vhServerHost}:{config.vhServerPort}";
                     if (request.Method == "GET")
                     {
                         if (path == "/hack")
                         {
                             response = request.CreateResponse(HttpStatusCode.OK, "Nack");
+                        }
+                        else if (path == "/")
+                        {
+                            response = request.CreateResponse(HttpStatusCode.OK, "Index");
+                            var htmlTmpl = new StreamReader(File.OpenRead("HTML/index.html")).ReadToEnd();
+                            var template = new Antlr3.ST.StringTemplate(htmlTmpl, typeof(TemplateLexer));
+                            
+
+                            template.SetAttribute("config_form", $"{mainPage}/config_form");
+                            template.SetAttribute("iplist", $"{mainPage}/iplist");
+
+                            var html = template.ToString();
+                            setResponse(ref response, html);
+                            response.ContentType = "text/html";
                         }
                         else if (path == "/info")
                         {
@@ -225,7 +240,7 @@ namespace vHackApi.HTTP
                                 //response.Body.Write(buffer, 0, buffer.Length);
                                 //response.Body.Position = 0;
 
-                                
+
 
                                 setResponse(ref response, jsonInfo.ToString());
                             }
@@ -248,24 +263,57 @@ namespace vHackApi.HTTP
                         else if (path == "/config_form")
                         {
                             response = request.CreateResponse(HttpStatusCode.OK, "GET Config Form request");
-                            var htmlTmpl = new StreamReader(File.OpenRead("HTTP/config.html")).ReadToEnd();
-                            //response.Body = File.OpenRead("HTTP/config.html");
+                            var htmlTmpl = new StreamReader(File.OpenRead("HTML/config.html")).ReadToEnd();
+                            //response.Body = File.OpenRead("HTML/config.html");
                             var template = new Antlr3.ST.StringTemplate(htmlTmpl, typeof(TemplateLexer));
-                            template.SetAttribute("mainPage", $"http://{config.vhServerHost}:{config.vhServerPort}");
+                            template.SetAttribute("mainPage", mainPage);
 
                             template.SetAttribute("waitstep", config.waitstep);
                             template.SetAttribute("winchance", config.winchance);
                             template.SetAttribute("maxFirewall", config.maxFirewall);
                             template.SetAttribute("maxAntivirus", config.maxAntivirus);
                             template.SetAttribute("finishAllFor", config.finishAllFor);
-                            template.SetAttribute("hackIfNotAnonymous", config.hackIfNotAnonymous ? "checked":"uchecked");
-                            
+                            template.SetAttribute("hackIfNotAnonymous", config.hackIfNotAnonymous ? "checked" : "uchecked");
 
                             var html = template.ToString();
-                            
+
                             setResponse(ref response, html);
                             response.ContentType = "text/html";
                         }
+                        else if (path == "/iplist")
+                        {
+                            var now = DateTime.Now;
+                            var ips = config.persistanceMgr.GetIps()
+                                .Where(ip => now - ip.LastAttack > TimeSpan.FromHours(1))
+                                .OrderByDescending(ip => ip.Money)
+                                .ThenBy(ip => ip.LastAttack)
+                                .Take(20);
+
+                            var iplistTpl = new Antlr3.ST.StringTemplate(new StreamReader(File.OpenRead("HTML/iplist.html")).ReadToEnd()
+                                , typeof(TemplateLexer));
+                            
+
+                            var sb = new StringBuilder();
+                            var ipTplStr = new StreamReader(File.OpenRead("HTML/iptemplate.html")).ReadToEnd();
+                            foreach (var ip in ips)
+                            {
+                                var ipTpl = new Antlr3.ST.StringTemplate(ipTplStr, typeof(TemplateLexer));
+                                ipTpl.SetAttribute("ip", ip.IP);
+                                ipTpl.SetAttribute("lastUpd", ip.LastUpdate.ToString("ddd dd MMM yyyy   hh:mm:ss"));
+                                ipTpl.SetAttribute("money", string.Format("{0:C}", ip.Money));
+                                var s = ipTpl.ToString();
+                                sb.Append(s);
+                            }
+
+                            var iplist = sb.ToString();
+                            iplistTpl.SetAttribute("iptable", iplist);
+                            iplistTpl.SetAttribute("mainPage", mainPage);
+
+                            response = request.CreateResponse(HttpStatusCode.OK, "GET IP list request");
+                            setResponse(ref response, iplistTpl.ToString());
+                            response.ContentType = "text/html";
+                        }
+                       
                     }
                     else if (request.Method == "POST")
                     {
@@ -284,7 +332,7 @@ namespace vHackApi.HTTP
                                                      dict.Keys.Cast<string>()
                                                          .ToDictionary(k => k, k => dict[k]));
 
-                                       
+
                                     }
 
                                     var cfg = JObject.Parse(json);
@@ -298,13 +346,26 @@ namespace vHackApi.HTTP
                                     if (configParser != null)
                                         configParser.ParseConfig(cfg);
                                 }
-                                
+
                                 response = request.CreateResponse(HttpStatusCode.OK, "POST config request");
                                 response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}/config_form");
                             }
                             catch (Exception exc)
                             {
                                 response = request.CreateResponse(HttpStatusCode.BadRequest, $"Error parsing content: {exc.Message}");
+                            }
+                        }
+                        else if (path == "/attackip")
+                        {
+                            using (var rd = new StreamReader(request.Body))
+                            {
+                                var data = rd.ReadToEnd();
+                                var dict = System.Web.HttpUtility.ParseQueryString(data);
+                                var ip = dict["ip"];
+                                var res = api.getConsole().AttackIp(ip).Result;
+
+                                response = request.CreateResponse(HttpStatusCode.OK, "POST config request");
+                                response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}/iplist");
                             }
                         }
                     }

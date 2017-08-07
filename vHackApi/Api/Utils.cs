@@ -177,7 +177,7 @@ namespace vHackApi.Api
             catch (Exception e)
             {
                 Debug.Print(e.StackTrace);
-                Thread.Sleep(vhConsole.WaitStep);
+                //Thread.Sleep(vhConsole.WaitStep);
             }
 
             if (attempts == 0)

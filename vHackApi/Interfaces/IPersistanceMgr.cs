@@ -10,6 +10,8 @@ namespace vHackApi.Interfaces
 
         IPs AddIp(IPs dbIp);
 
+        bool RemoveIp(string iP);
+
         IPs GetIp(string iP);
 
         IEnumerable<IPs> GetIps();

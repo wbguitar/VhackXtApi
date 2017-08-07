@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,10 @@ namespace vHackApi
             {
                 try
                 {
+                    // make bakup
+                    if (File.Exists(path))
+                        File.Copy(path, path + ".bak", true);
+                    
                     var doc = new XDocument(
                         new XElement("IPs",
                             IPs
@@ -162,6 +167,19 @@ namespace vHackApi
             this.IPs.Add(dbIp);
             Update();
             return dbIp;
+        }
+
+        public bool RemoveIp(string ips)
+        {
+            var found = IPs.FirstOrDefault(ip => ip.IP == ips);
+            if (found == null)
+                return false;
+
+            if (!IPs.Remove(found))
+                return false;
+
+            Save();
+            return true;
         }
 
         public IPs GetIp(string iP)
