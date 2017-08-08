@@ -26,6 +26,11 @@ namespace vHackApi.Interfaces
 
         bool hackIfNotAnonymous { get; }
 
+        bool ipAttackPaused { get; set; }
+        bool ipScannerPaused { get; set; }
+        bool hackTheDevPaused { get; set; }
+        bool hackBotNetPaused { get; set; }
+
         TimeSpan hackDevPolling { get; }
         TimeSpan hackBotnetPolling { get; }
 

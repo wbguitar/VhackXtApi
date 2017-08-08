@@ -128,6 +128,14 @@ namespace vHackBot
 
             public int vhServerPort => Properties.Settings.Default.httpPort;
 
+            public bool ipAttackPaused { get; set; }
+
+            public bool ipScannerPaused { get; set; }
+
+            public bool hackTheDevPaused { get; set; }
+
+            public bool hackBotNetPaused { get; set; }
+
             #endregion IConfig Members
         }
 
@@ -208,6 +216,11 @@ namespace vHackBot
                         if (c.finishAllFor > 0)
                             Properties.Settings.Default.finishAllFor = c.finishAllFor;
 
+                        cfg.hackTheDevPaused = c.hackTheDevPaused;
+                        cfg.hackBotNetPaused = c.hackBotNetPaused;
+                        cfg.ipScannerPaused = c.ipScannerPaused;
+                        cfg.ipAttackPaused = c.ipAttackPaused;
+
                         Properties.Settings.Default.hackIfNotAnonymous = c.hackIfNotAnonymous;
                         Properties.Settings.Default.Save();
                     }
@@ -250,12 +263,18 @@ namespace vHackBot
                     // }
 
                     
-                    waitstep = getValue(json, "waitstep", -1); //(int)json["waitstep"];
-                    winchance = getValue(json, "winchance", -1); // (int)json["winchance"];
-                    maxFirewall = getValue(json, "maxFirewall", -1); // (int)json["maxFirewall"];
-                    finishAllFor = getValue(json, "finishAllFor", -1); // (int)json["finishAllFor"];
-                    maxAntivirus = getValue(json, "maxAntivirus", -1); //(int)json["maxAntivirus"];
-                    hackIfNotAnonymous = getValue(json, "hackIfNotAnonymous", false); //(bool)json["hackIfNotAnonymous"];
+                    waitstep = getValue(json, "waitstep", -1); 
+                    winchance = getValue(json, "winchance", -1);
+                    maxFirewall = getValue(json, "maxFirewall", -1); 
+                    finishAllFor = getValue(json, "finishAllFor", -1); 
+                    maxAntivirus = getValue(json, "maxAntivirus", -1);
+
+                    hackIfNotAnonymous = getValue(json, "hackIfNotAnonymous", false);
+                    ipAttackPaused = getValue(json, "ipAttackPaused", false);
+                    ipScannerPaused = getValue(json, "ipScannerPaused", false);
+                    hackBotNetPaused = getValue(json, "hackBotNetPaused", false);
+                    hackTheDevPaused = getValue(json, "hackTheDevPaused", false);
+
                 }
 
                 public override string ToString()
@@ -267,6 +286,10 @@ namespace vHackBot
     finishAllFor: {finishAllFor},
     maxAntivirus: {maxAntivirus},
     hackIfNotAnonymous: {hackIfNotAnonymous},
+    ipAttackPaused: {ipAttackPaused},
+    ipScannerPaused: {ipScannerPaused},
+    hackBotNetPaused: {hackBotNetPaused},
+    hackTheDevPaused: {hackTheDevPaused},
 }}";
                 }
 
@@ -314,21 +337,17 @@ namespace vHackBot
 
                 public IWebProxy proxy { get { throw new NotSupportedException(); } }
 
-                public string vhServerHost
-                {
-                    get
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
+                public string vhServerHost { get; private set; }
 
-                public int vhServerPort
-                {
-                    get
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
+                public int vhServerPort { get; private set; }
+
+                public bool ipAttackPaused { get; set; }
+
+                public bool ipScannerPaused { get; set; }
+
+                public bool hackTheDevPaused { get; set; }
+
+                public bool hackBotNetPaused { get; set; }
             }
             public event Action<IConfig> ConfigParsed = (cfg) => { };
             public event Action<Exception> ParseError = (e) => { };

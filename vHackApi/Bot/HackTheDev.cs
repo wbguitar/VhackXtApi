@@ -12,6 +12,18 @@ namespace vHackApi.Bot
         
         public override void Set(IConfig cfg, vhAPI api)
         {
+            Pause = () =>
+            {
+                hackTimer.Change(0, Timeout.Infinite);
+                cfg.logger.Log("*** Stopping HackTheDev");
+            };
+
+            Resume = () =>
+            {
+                Set(cfg, api);
+                cfg.logger.Log("*** Resuming HackTheDev");
+            };
+
             if (hackTimer != null)
             {
                 hackTimer.Dispose();

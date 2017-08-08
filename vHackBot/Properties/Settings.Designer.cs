@@ -171,7 +171,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("stevevai")]
+        [global::System.Configuration.DefaultSettingValueAttribute("uonderboi")]
         public string user {
             get {
                 return ((string)(this["user"]));

@@ -39,7 +39,7 @@
       <Value Profile="(Default)">2000</Value>
     </Setting>
     <Setting Name="user" Type="System.String" Scope="User">
-      <Value Profile="(Default)">stevevai</Value>
+      <Value Profile="(Default)">uonderboi</Value>
     </Setting>
     <Setting Name="pass" Type="System.String" Scope="User">
       <Value Profile="(Default)">rancido</Value>

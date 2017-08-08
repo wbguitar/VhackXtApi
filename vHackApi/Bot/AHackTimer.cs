@@ -15,8 +15,11 @@ namespace vHackApi.Bot
         /// </summary>
         protected TimeSpan pause;
 
-        protected Action Pause = () => { };
-        protected Action Resume = () => { };
+        protected Action InternalPause = () => { };
+        protected Action InteranalResume = () => { };
+
+        public Action Pause = () => { };
+        public Action Resume = () => { };
 
         protected Timer hackTimer;
 
@@ -48,10 +51,10 @@ namespace vHackApi.Bot
                     if (DateTime.Now >= nextPause)
                     {
                         pause = SetPauseDuration();
-                        Pause();
+                        InternalPause();
                         Thread.Sleep(pause);
                         nextPause = NextPauseSchedule();
-                        Resume();
+                        InteranalResume();
                     }
 
                 }

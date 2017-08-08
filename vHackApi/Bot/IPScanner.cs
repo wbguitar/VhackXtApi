@@ -13,6 +13,18 @@ namespace vHackApi.Bot
 
         public override void Set(IConfig cfg, vhAPI api)
         {
+            Pause = () =>
+            {
+                hackTimer.Change(0, Timeout.Infinite);
+                cfg.logger.Log("*** Stopping IPScanner");
+            };
+
+            Resume = () =>
+            {
+                Set(cfg, api);
+                cfg.logger.Log("*** Resuming IPScanner");
+            };
+
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
@@ -24,7 +36,7 @@ namespace vHackApi.Bot
 
             Period = TimeSpan.FromMilliseconds(cfg.waitstep);
 
-            Pause = () =>
+            InternalPause = () =>
             {
                 if (hackTimer != null)
                 {
@@ -33,7 +45,7 @@ namespace vHackApi.Bot
                 }
             };
 
-            Resume = () =>
+            InteranalResume = () =>
             {
                 if (hackTimer != null)
                 {

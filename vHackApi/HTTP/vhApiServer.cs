@@ -19,6 +19,7 @@ using System.Threading;
 using Antlr3.ST;
 using Antlr3.ST.Language;
 using System.Web.Script.Serialization;
+using vHackApi.Bot;
 
 namespace vHackApi.HTTP
 {
@@ -256,6 +257,10 @@ namespace vHackApi.HTTP
     ""finishAllFor"": ""{config.finishAllFor}"",
     ""maxAntivirus"": ""{config.maxAntivirus}"",
     ""hackIfNotAnonymous"": ""{config.hackIfNotAnonymous}""
+    ""ipAttackPaused"": ""{config.ipAttackPaused}""
+    ""ipScannerPaused"": ""{config.ipScannerPaused}""
+    ""hackBotNetPaused"": ""{config.hackBotNetPaused}""
+    ""hackTheDevPaused"": ""{config.hackTheDevPaused}""
 }}";
 
                             setResponse(ref response, json);
@@ -274,6 +279,12 @@ namespace vHackApi.HTTP
                             template.SetAttribute("maxAntivirus", config.maxAntivirus);
                             template.SetAttribute("finishAllFor", config.finishAllFor);
                             template.SetAttribute("hackIfNotAnonymous", config.hackIfNotAnonymous ? "checked" : "uchecked");
+
+                            template.SetAttribute("ipAttackPaused", config.ipAttackPaused ? "checked" : "uchecked");
+                            template.SetAttribute("ipScannerPaused", config.ipScannerPaused ? "checked" : "uchecked");
+                            template.SetAttribute("hackBotNetPaused", config.hackBotNetPaused ? "checked" : "uchecked");
+                            template.SetAttribute("hackTheDevPaused", config.hackTheDevPaused ? "checked" : "uchecked");
+
 
                             var html = template.ToString();
 
@@ -340,7 +351,66 @@ namespace vHackApi.HTTP
                                     {
                                         if ((string)cfg["hackIfNotAnonymous"] == "on")
                                             cfg["hackIfNotAnonymous"] = "true";
+                                    }
 
+                                    if (cfg["ipAttackPaused"] != null)
+                                    {
+                                        if ((string)cfg["ipAttackPaused"] == "on")
+                                        {
+                                            cfg["ipAttackPaused"] = "true";
+                                            IPAttack.Instance.Pause();
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        cfg["ipAttackPaused"] = "false";
+                                        IPAttack.Instance.Resume();
+                                    }
+
+                                    if (cfg["ipScannerPaused"] != null)
+                                    {
+                                        if ((string)cfg["ipScannerPaused"] == "on")
+                                        {
+                                            cfg["ipScannerPaused"] = "true";
+                                            IPScanner.Instance.Pause();
+                                        }
+                                       
+                                    }
+                                    else
+                                    {
+                                        cfg["ipScannerPaused"] = "false";
+                                        IPScanner.Instance.Resume();
+                                    }
+
+                                    if (cfg["hackBotNetPaused"] != null)
+                                    {
+                                        if ((string)cfg["hackBotNetPaused"] == "on")
+                                        {
+                                            cfg["hackBotNetPaused"] = "true";
+                                            HackBotNet.Instance.Pause();
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        cfg["hackBotNetPaused"] = "false";
+                                        HackBotNet.Instance.Resume();
+                                    }
+
+                                    if (cfg["hackTheDevPaused"] != null)
+                                    {
+                                        if ((string)cfg["hackTheDevPaused"] == "on")
+                                        {
+                                            cfg["hackTheDevPaused"] = "true";
+                                            HackTheDev.Instance.Pause();
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        cfg["hackTheDevPaused"] = "false";
+                                        HackTheDev.Instance.Resume();
                                     }
 
                                     if (configParser != null)

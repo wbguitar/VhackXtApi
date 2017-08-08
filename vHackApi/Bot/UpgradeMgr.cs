@@ -22,6 +22,19 @@ namespace vHackApi.Bot
 
         public override void Set(IConfig cfg, vhAPI api)
         {
+            Pause = () =>
+            {
+                hackTimer.Change(0, Timeout.Infinite);
+                cfg.logger.Log("*** STOPPING UPGRADE MANAGER");
+            };
+
+            Resume = () =>
+            {
+                Set(cfg, api);
+                cfg.logger.Log("*** RESUMING UPGRADE MANAGER");
+            };
+
+
             if (hackTimer != null)
             {
                 hackTimer.Dispose();
