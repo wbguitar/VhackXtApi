@@ -209,10 +209,10 @@ namespace vHackApi
         DateTime lastUpdate = DateTime.MinValue;
         public void Update()
         {
-            if (DateTime.Now - lastUpdate < TimeSpan.FromMinutes(10)) // saves every 10 minutes
+            if (DateTime.Now - lastUpdate < TimeSpan.FromMinutes(5)) // saves every 5 minutes
                 return;
             Save();
-            //this.Load();
+            lastUpdate = DateTime.Now;
         }
 
         public bool UpdateIp(IPs ip)

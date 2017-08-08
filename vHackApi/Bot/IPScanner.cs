@@ -56,6 +56,10 @@ namespace vHackApi.Bot
 
             hackTimer = new Timer(async (o) =>
             {
+                // if onidle we'll skip attack
+                if (UpgradeMgr.Instance.CurStatus == UpgradeMgr.Status.Idle)
+                    return;
+
                 if (!Monitor.TryEnter(localSemaphore))
                     return;
 

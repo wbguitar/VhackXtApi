@@ -67,6 +67,10 @@ namespace vHackApi.Bot
 
         private async Task timerCallback(object state)
         {
+            // if onidle we'll skip attack
+            if (UpgradeMgr.Instance.CurStatus == UpgradeMgr.Status.Idle)
+                return;
+
             var cfg = (state as object[])[0] as IConfig;
             var api = (state as object[])[1] as vhAPI;
             var c = (state as object[])[2] as vhConsole;
