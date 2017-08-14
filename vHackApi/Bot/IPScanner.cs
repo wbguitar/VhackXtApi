@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Threading;
 using vHackApi.Api;
 using vHackApi.Interfaces;
@@ -10,19 +11,20 @@ namespace vHackApi.Bot
         private IPScanner() { }
 
         IConfig config;
-
+        Update upd;
         public override void Set(IConfig cfg, vhAPI api)
         {
+            upd = new Update(cfg);
             Pause = () =>
             {
                 hackTimer.Change(0, Timeout.Infinite);
-                cfg.logger.Log("*** Stopping IPScanner");
+                cfg.logger.Log("*** STOPPING IP SCANNER");
             };
 
             Resume = () =>
             {
                 Set(cfg, api);
-                cfg.logger.Log("*** Resuming IPScanner");
+                cfg.logger.Log("*** RESUMING IP SCANNER");
             };
 
             if (hackTimer != null)
@@ -54,10 +56,12 @@ namespace vHackApi.Bot
                 }
             };
 
+
+
             hackTimer = new Timer(async (o) =>
             {
-                // if onidle we'll skip attack
-                if (UpgradeMgr.Instance.CurStatus == UpgradeMgr.Status.Idle)
+                // if not on upgrade we'll skip attack
+                if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
                     return;
 
                 if (!Monitor.TryEnter(localSemaphore))
@@ -65,7 +69,39 @@ namespace vHackApi.Bot
 
                 try
                 {
+                    // first make a search for new ips to hack
                     var img = await console.FindHostsAndAttack();
+                    // then looks in the syslog if there's some ips that needs to be pwn3d
+                    if (MyInfo.LastUpdInfo != null)
+                    {
+                        var myIp = MyInfo.LastUpdInfo.IP;
+                        var sysLog = (await upd.getSysLog())["data"] as JArray;
+                        foreach (var log in sysLog)
+                        {
+                            if ((string)log["from"] == myIp)
+                            {
+                                var newIp = (string)log["to"];
+                                if (newIp != "Anonymous")
+                                {
+                                    IPs dbIp = null;
+                                    if (!cfg.persistanceMgr.IpExist(newIp))
+                                    {
+                                        var js = await console.ScanIp(newIp);
+                                        dbIp = new IPs(js);
+                                        cfg.persistanceMgr.AddIp(dbIp);
+                                    }
+                                    else
+                                    {
+                                        dbIp = cfg.persistanceMgr.GetIp(newIp);
+                                    }
+
+                                    // we'll sit and wait 10 minutes before trying to attack, just to not stir up suspicions...
+                                    dbIp.LastAttack = DateTime.Now - TimeSpan.FromMinutes(10);
+                                    cfg.persistanceMgr.UpdateIp(dbIp);
+                                }
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {

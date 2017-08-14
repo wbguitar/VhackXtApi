@@ -71,7 +71,11 @@ namespace vHackApi.Api
         public async Task fetchStats()
         {
 
-            JObject stats1 = await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + userHash, "vh_update.php");
+            JObject stats1 = await vhUtils.JSONRequest("user::::pass::::uhash::::", config.username + "::::" + config.password + "::::" + userHash + ":::::", "vh_update.php");
+
+            //JObject stats1 = await vhUtils.JSONRequest("user::::pass::::gcm::::uhash",
+            //                         config.username + "::::" + config.password + "::::" + "eW7lxzLY9bE:APA91bEO2sZd6aibQerL3Uy-wSp3gM7zLs93Xwoj4zIhnyNO8FLyfcODkIRC1dc7kkDymiWxy_dTQ-bXxUUPIhN6jCUBVvGqoNXkeHhRvEtqAtFuYJbknovB_0gItoXiTev7Lc5LJgP2" + "::::" + userHash,
+            //                         "vh_update.php");
             try
             {
                 Thread.Sleep(vhConsole.WaitStep);

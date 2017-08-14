@@ -127,5 +127,37 @@ namespace vHackApi
             return await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + "userHash_not_needed", "vh_openAllBonus.php");
         }
 
+
+        public async Task<JObject> getSysLog(string userHash = "")
+        {
+            return string.IsNullOrEmpty(userHash) ?
+                await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + "userHash_not_needed", "vh_getSysLog.php") :
+                await vhUtils.JSONRequest("user::::pass::::uhash", config.username + "::::" + config.password + "::::" + userHash, "vh_getSysLog.php");
+        }
+
+        public async Task<JObject> getRanking(string userHash = "")
+        {
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash", $"{config.username}::::{config.password}::::{userHash}", "vh_ranking.php");
+        }
+
+        public async Task<JObject> getMails(string userHash = "")
+        {
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::action", $"{config.username}::::{config.password}::::{userHash}::::list", "vh_mails.php", 3);
+        }
+
+        public async Task<string> readMail(int id, string userHash = "")
+        {
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.StringRequest("user::::pass::::uhash::::action::::mID", $"{config.username}::::{config.password}::::{userHash}::::getmail::::{id}", "vh_mails.php");
+        }
+
     }
 }

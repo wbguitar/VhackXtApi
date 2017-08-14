@@ -16,13 +16,13 @@ namespace vHackApi.Api
     public static class vhUtils
     {
         public static IConfig config { get; set; }
-
+        public static Random rand = new Random((int)(DateTime.Now - DateTime.MinValue).TotalSeconds);
         public static string jsonTextC;
         /**
          * The url of the current api.<br>
          * As of now it is {@value url}.
          */
-        private static readonly string rootUrl = "https://api.vhack.cc/v/9/";
+        private static readonly string rootUrl = "https://api.vhack.cc/v/10/";
         /**
          * The hashing algorithm that is used to hash data in requests.<br>
          * It now is {@value md5s}.
@@ -156,8 +156,9 @@ namespace vHackApi.Api
         {
             try
             {
+                var mul = ((double)rand.Next(1000) / 1000.0)* Math.Pow(-1, rand.Next(1, 3));
                 var elapsed = DateTime.Now - lastReq;
-                if (elapsed.TotalMilliseconds < vhConsole.WaitStep)
+                if (elapsed.TotalMilliseconds < vhConsole.WaitStep * mul)
                     Thread.Sleep(vhConsole.WaitStep - (int)elapsed.TotalMilliseconds);
 
                 var url = vhUtils.generateURL(format, data, php);
@@ -418,7 +419,8 @@ namespace vHackApi.Api
         {
             var split = format.Split(new[] { "::::" }, StringSplitOptions.None);
             var split2 = data.Split(new[] { "::::" }, StringSplitOptions.None);
-            long currentTimeMillis = (long)(DateTime.Now - new DateTime(1970, 01, 01)).TotalMilliseconds;
+            //long currentTimeMillis = (long)(DateTime.Now - new DateTime(1970, 01, 01)).TotalMilliseconds;
+            long currentTimeMillis = (long)(DateTime.Now - new DateTime(1970, 01, 01)).TotalSeconds;
             JObject jSONObject = new JObject();
             //jSONObject.Add("", "");
             for (int i = 0; i < split.Length; i++)
@@ -442,7 +444,7 @@ namespace vHackApi.Api
             {
                 Debug.Print(e2.StackTrace);
             }
-            string jsonString = jSONObject.ToString();
+            string jsonString = jSONObject.ToString().Replace("\n", "").Replace("\r", "").Replace(" ", "");
             //jsonString = jsonString
             //    .Replace(System.Environment.NewLine, "")
             //    .Replace(" ", "");
@@ -454,9 +456,10 @@ namespace vHackApi.Api
             string str5 = split2[0] + hashString(hashString(split2[1]));
             string str6 = hashString(currentTimeMillis + jsonString);
             string a3 = hashString(secret + hashString(hashString(generateUser(a2))));
-            string str9 = generateUser(str5);
+            string str9 = hashString(a3 + generateUser(str5)); //string str9 = generateUser(str5);
             string str7 = generateUser(str6);
-            string str8 = hashString(hashString(a3 + hashString(hashString(str9) + str7)));
+            //string str8 = hashString(hashString(a3 + hashString(hashString(str9) + str7)));
+            string str8 = hashString(hashString(a3 + hashString(hashString(str9) + str7) + str9 + hashString(str7)));
             string retStr = rootUrl + php + "?user=" + a + "&pass=" + str8;
 
             Debug.Print(retStr);

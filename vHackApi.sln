@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vHackChat", "vHackChat\vHac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vHackHttpSrvTest", "vHackHttpSrvTest\vHackHttpSrvTest.csproj", "{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{59F0F23E-F66B-4A7A-9A64-0D3A2AA24114}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B7C8144-47DA-40F0-A844-8CFE2649B0BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59F0F23E-F66B-4A7A-9A64-0D3A2AA24114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59F0F23E-F66B-4A7A-9A64-0D3A2AA24114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59F0F23E-F66B-4A7A-9A64-0D3A2AA24114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59F0F23E-F66B-4A7A-9A64-0D3A2AA24114}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

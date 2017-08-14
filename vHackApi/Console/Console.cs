@@ -619,24 +619,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
                         var found = config.persistanceMgr
                             .GetIps()
                             .FirstOrDefault(ip => ip.Hostname == hostname);
-                        //IPs found = null;
-
-                        //foreach (var ip in config.persistanceMgr.GetIps())
-                        //{
-                        //    try
-                        //    {
-                        //        if (hostname.Equals(ip.Hostname))
-                        //        {
-                        //            found = ip;
-                        //            break;
-                        //        }
-                        //    }
-                        //    catch (Exception e)
-                        //    {
-                        //        throw;
-                        //    }
-                        //}
-
+                       
                         if (found != null)
                             continue; // skips
 

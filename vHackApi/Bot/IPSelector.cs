@@ -44,6 +44,9 @@ namespace vHackApi.Bot
                 .OrderBy(ip => ip.Money)
                 .ThenByDescending(ip => ip.LastAttack);
 
+            if (scannablesASAP.Count() == 0)
+                return null;
+
             // randomly generated index, the lowest are more likely 
             var i = (int)(Math.Pow(r.NextDouble(), 3) * (double)scannablesASAP.Count());
             return scannablesASAP.ElementAt(i);

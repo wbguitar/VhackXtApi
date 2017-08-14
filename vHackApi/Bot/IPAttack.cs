@@ -67,8 +67,8 @@ namespace vHackApi.Bot
 
         private async Task timerCallback(object state)
         {
-            // if onidle we'll skip attack
-            if (UpgradeMgr.Instance.CurStatus == UpgradeMgr.Status.Idle)
+            // if not on upgrade we'll skip attack
+            if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
                 return;
 
             var cfg = (state as object[])[0] as IConfig;
@@ -110,7 +110,7 @@ namespace vHackApi.Bot
             }
             catch (Exception e)
             {
-                cfg.logger.Log("IPScanner error: {0}", e.Message);
+                cfg.logger.Log("IPAttack error: {0}", e.Message);
             }
             finally
             {

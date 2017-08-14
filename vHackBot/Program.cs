@@ -116,7 +116,7 @@ namespace vHackBot
             //public IPersistanceMgr persistanceMgr => DbManager.Instance;
             public IPersistanceMgr persistanceMgr => XmlMgr.Default;
 
-            public IWebProxy proxy { get; set; } = null; // new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort);
+            public IWebProxy proxy { get; set; } = (!string.IsNullOrEmpty(Properties.Settings.Default.proxyAddress) && Properties.Settings.Default.proxyPort != 0) ? new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort) : null;
 
             public int finishAllFor
             {
@@ -167,7 +167,6 @@ namespace vHackBot
                 DbManager.Instance.Initialize(cfg);
 
 
-                Console.WriteLine($"{DateTime.Now}\n{DateTime.Now.ToUniversalTime()}\n{DateTime.UtcNow}");
                 IPSelectorRandom.Default.Init(cfg);
 
                 vhUtils.config = cfg;
@@ -176,6 +175,18 @@ namespace vHackBot
                     .useConfig(cfg);
 
                 vhAPI api = builder.getAPI();
+
+
+
+                var info = MyInfo.Fetch(api.getConsole()).Result;
+                var upd = new Update(cfg);
+                var rnk = upd.getRanking().Result;
+                var mails = upd.getMails().Result;
+                var id = (int)(mails["data"][0]["id"]);
+                var mail = upd.getMail(id).Result;
+
+
+
 
                 GlobalConfig.Init(cfg, api);
 

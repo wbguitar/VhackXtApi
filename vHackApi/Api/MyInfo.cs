@@ -53,6 +53,7 @@ namespace vHackApi.Api
     /// </summary>
     public class MyInfo
     {
+        public static MyInfo LastUpdInfo { get; private set; } = null;
         public JObject Json { get; private set; }
         private MyInfo() { }
 
@@ -64,11 +65,12 @@ namespace vHackApi.Api
             if (info.Json == null)
                 return null;
 
+            LastUpdInfo = info;
             return info;
         }
 
         public long Id => (long)Json["id"];
-        public long IP => (long)Json["ip"];
+        public string IP => (string)Json["ip"];
         public long Money => (long)Json["money"];
         public long Internet => (long)Json["inet"];
         public long HDD => (long)Json["hdd"];
@@ -111,6 +113,5 @@ namespace vHackApi.Api
         public string ActiveSpyware => (string)Json["actspyware"];
         //public string IP => (string)json["tos"];
         //public string IP => (string)json["unreadmsg"];
-
     }
 }

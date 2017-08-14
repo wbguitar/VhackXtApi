@@ -142,6 +142,9 @@ namespace vHackApi.Bot
         private async Task doUpgradePc(MyInfo info, Update upd)
         {
             var bnInfo = await upd.botnetInfo();
+            if (bnInfo == null)
+                return;
+
             long idToUpgrade = 0;
             long minLevel = long.MaxValue;
             for (int i = 0; i < bnInfo.Count; i++)

@@ -135,7 +135,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("185.25.105.255")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string proxyAddress {
             get {
                 return ((string)(this["proxyAddress"]));
@@ -147,7 +147,6 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8080")]
         public int proxyPort {
             get {
                 return ((int)(this["proxyPort"]));
@@ -171,7 +170,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("uonderboi")]
+        [global::System.Configuration.DefaultSettingValueAttribute("michaelmyers")]
         public string user {
             get {
                 return ((string)(this["user"]));
