@@ -227,5 +227,29 @@ namespace vHackBot.Properties {
                 this["httpHost"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:05")]
+        public global::System.TimeSpan ipAttackPolling {
+            get {
+                return ((global::System.TimeSpan)(this["ipAttackPolling"]));
+            }
+            set {
+                this["ipAttackPolling"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:15")]
+        public global::System.TimeSpan ipScannerPolling {
+            get {
+                return ((global::System.TimeSpan)(this["ipScannerPolling"]));
+            }
+            set {
+                this["ipScannerPolling"] = value;
+            }
+        }
     }
 }

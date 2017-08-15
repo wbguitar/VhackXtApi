@@ -36,7 +36,7 @@ namespace vHackApi.Bot
             config = cfg;
             var console = api.getConsole();
 
-            Period = TimeSpan.FromMilliseconds(cfg.waitstep);
+            Period = cfg.ipScannerPolling;
 
             InternalPause = () =>
             {
@@ -62,10 +62,16 @@ namespace vHackApi.Bot
             {
                 // if not on upgrade we'll skip attack
                 if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
+                {
+                    config.logger.Log($"Skipping IP scanner because of status ({UpgradeMgr.Instance.CurStatus})");
                     return;
+                }
 
                 if (!Monitor.TryEnter(localSemaphore))
                     return;
+
+                // wait a random bit
+                Thread.Sleep(rand.Next(0, config.waitstep));
 
                 try
                 {

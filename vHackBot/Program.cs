@@ -105,6 +105,10 @@ namespace vHackBot
 
             public TimeSpan hackBotnetPolling => Properties.Settings.Default.hackBotnetPolling;
 
+            public TimeSpan ipAttackPolling => Properties.Settings.Default.ipAttackPolling;
+
+            public TimeSpan ipScannerPolling => Properties.Settings.Default.ipScannerPolling;
+
             public bool safeScan => Properties.Settings.Default.safeScan;
 
             //public IIPselector ipSelector => IPSelectorASAP.Instance;
@@ -135,6 +139,8 @@ namespace vHackBot
             public bool hackTheDevPaused { get; set; }
 
             public bool hackBotNetPaused { get; set; }
+
+           
 
             #endregion IConfig Members
         }
@@ -175,18 +181,6 @@ namespace vHackBot
                     .useConfig(cfg);
 
                 vhAPI api = builder.getAPI();
-
-
-
-                var info = MyInfo.Fetch(api.getConsole()).Result;
-                var upd = new Update(cfg);
-                var rnk = upd.getRanking().Result;
-                var mails = upd.getMails().Result;
-                var id = (int)(mails["data"][0]["id"]);
-                var mail = upd.getMail(id).Result;
-
-
-
 
                 GlobalConfig.Init(cfg, api);
 
@@ -359,6 +353,10 @@ namespace vHackBot
                 public bool hackTheDevPaused { get; set; }
 
                 public bool hackBotNetPaused { get; set; }
+
+                public TimeSpan ipAttackPolling { get { throw new NotSupportedException(); } }
+
+                public TimeSpan ipScannerPolling { get { throw new NotSupportedException(); } }
             }
             public event Action<IConfig> ConfigParsed = (cfg) => { };
             public event Action<Exception> ParseError = (e) => { };

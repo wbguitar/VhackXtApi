@@ -28,7 +28,7 @@ namespace vHackApi.Bot
         static readonly int aWhileLo = 15;
         static readonly int aWhileHi = 30;
 
-        private static Random r = new Random();
+        protected static Random rand = new Random();
 
         private DateTime nextPause = NextPauseSchedule();
 
@@ -75,13 +75,13 @@ namespace vHackApi.Bot
         private static DateTime NextPauseSchedule()
         {
             //return DateTime.Now + TimeSpan.FromMinutes(r.Next(everyNow, andThen));
-            return DateTime.Now + TimeSpan.FromSeconds(r.Next(everyNow, andThen));
+            return DateTime.Now + TimeSpan.FromSeconds(rand.Next(everyNow, andThen));
         }
 
         private static TimeSpan SetPauseDuration()
         {
             //return TimeSpan.FromMinutes(r.Next(aWhileLo, aWhileHi));
-            return TimeSpan.FromSeconds(r.Next(aWhileLo, aWhileHi));
+            return TimeSpan.FromSeconds(rand.Next(aWhileLo, aWhileHi));
         }
 
         public void Dispose()

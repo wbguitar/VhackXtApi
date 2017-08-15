@@ -37,7 +37,7 @@ namespace vHackApi.Bot
 
             config = cfg;
 
-            Period = TimeSpan.FromSeconds(2);
+            Period = cfg.ipAttackPolling;
 
             var console = api.getConsole();
 
@@ -69,7 +69,10 @@ namespace vHackApi.Bot
         {
             // if not on upgrade we'll skip attack
             if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
+            {
+                config.logger.Log($"Skipping IP attack because of status ({UpgradeMgr.Instance.CurStatus})");
                 return;
+            }
 
             var cfg = (state as object[])[0] as IConfig;
             var api = (state as object[])[1] as vhAPI;
@@ -77,6 +80,9 @@ namespace vHackApi.Bot
 
             if (!Monitor.TryEnter(this))
                 return;
+
+            // wait a random bit
+            Thread.Sleep(rand.Next(0, config.waitstep));
 
             try
             {

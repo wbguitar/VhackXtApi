@@ -34,6 +34,9 @@ namespace vHackApi.Interfaces
         TimeSpan hackDevPolling { get; }
         TimeSpan hackBotnetPolling { get; }
 
+        TimeSpan ipAttackPolling { get; }
+        TimeSpan ipScannerPolling { get; }
+
         string dbConnectionString { get; }
 
         ILogger logger { get; }
