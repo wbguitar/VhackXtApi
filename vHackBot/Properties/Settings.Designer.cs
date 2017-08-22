@@ -123,7 +123,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool safeScan {
             get {
                 return ((bool)(this["safeScan"]));
@@ -158,7 +158,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int finishAllFor {
             get {
                 return ((int)(this["finishAllFor"]));
@@ -170,7 +170,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("michaelmyers")]
+        [global::System.Configuration.DefaultSettingValueAttribute("wbguitar")]
         public string user {
             get {
                 return ((string)(this["user"]));
@@ -230,7 +230,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:05")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
         public global::System.TimeSpan ipAttackPolling {
             get {
                 return ((global::System.TimeSpan)(this["ipAttackPolling"]));
@@ -242,7 +242,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:15")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:20")]
         public global::System.TimeSpan ipScannerPolling {
             get {
                 return ((global::System.TimeSpan)(this["ipScannerPolling"]));

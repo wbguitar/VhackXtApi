@@ -20,8 +20,11 @@ namespace vHackApi.Bot
         private UpgradeMgr()
         { }
 
+        ILogger logger;
         public override void Set(IConfig cfg, vhAPI api)
         {
+            logger = cfg.logger;
+
             Pause = () =>
             {
                 hackTimer.Change(0, Timeout.Infinite);
@@ -78,7 +81,18 @@ namespace vHackApi.Bot
                 , null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
         }
 
-        public Status CurStatus { get; private set; }
+        private Status curStatus;
+
+        public Status CurStatus
+        {
+            get { return curStatus; }
+            set
+            {
+                if (curStatus != value)
+                    logger.Log($"Status changed to {value}");
+                curStatus = value;
+            }
+        }
 
         private Status CurrentStatus(MyInfo info, JObject tasks)
         {

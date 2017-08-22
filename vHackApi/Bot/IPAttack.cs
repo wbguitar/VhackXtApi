@@ -55,7 +55,7 @@ namespace vHackApi.Bot
                 }
             };
 
-            InteranalResume = () =>
+            InternalResume = () =>
             {
                 if (hackTimer != null)
                 {
@@ -69,10 +69,7 @@ namespace vHackApi.Bot
         {
             // if not on upgrade we'll skip attack
             if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
-            {
-                config.logger.Log($"Skipping IP attack because of status ({UpgradeMgr.Instance.CurStatus})");
                 return;
-            }
 
             var cfg = (state as object[])[0] as IConfig;
             var api = (state as object[])[1] as vhAPI;
@@ -82,7 +79,7 @@ namespace vHackApi.Bot
                 return;
 
             // wait a random bit
-            Thread.Sleep(rand.Next(0, config.waitstep));
+            Thread.Sleep(rand.Next(0, (int)Period.TotalSeconds / 2));
 
             try
             {

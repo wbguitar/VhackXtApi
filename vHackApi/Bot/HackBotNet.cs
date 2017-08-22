@@ -23,6 +23,24 @@ namespace vHackApi.Bot
                 cfg.logger.Log("*** Resuming HackBotNet");
             };
 
+            InternalPause = () =>
+            {
+                if (hackTimer != null)
+                {
+                    cfg.logger.Log("*** PAUSING HackBotNet");
+                    hackTimer.Change(TimeSpan.Zero, pause);
+                }
+            };
+
+            InternalResume = () =>
+            {
+                if (hackTimer != null)
+                {
+                    cfg.logger.Log("*** RESUMING HackBotNet");
+                    hackTimer.Change(TimeSpan.Zero, Period);
+                }
+            };
+
             if (hackTimer != null)
             {
                 hackTimer.Dispose();

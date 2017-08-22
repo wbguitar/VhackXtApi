@@ -90,6 +90,15 @@ namespace vHackApi
             {
                 try
                 {
+                    if (!File.Exists(path))
+                    {
+                        using (var file = File.Create(path))
+                        {
+                            var arr = Encoding.ASCII.GetBytes("<IPs/>");
+                            file.Write(arr, 0, arr.Length);
+                        }
+                    }
+
                     var doc = XDocument.Load(path);
                     //this.IPs.Clear();
                     this.IPs = doc.Descendants("IPs")

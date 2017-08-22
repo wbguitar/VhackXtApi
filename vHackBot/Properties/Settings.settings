@@ -27,7 +27,7 @@
       <Value Profile="(Default)">00:01:00</Value>
     </Setting>
     <Setting Name="safeScan" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="proxyAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -36,10 +36,10 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="finishAllFor" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2000</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="user" Type="System.String" Scope="User">
-      <Value Profile="(Default)">michaelmyers</Value>
+      <Value Profile="(Default)">wbguitar</Value>
     </Setting>
     <Setting Name="pass" Type="System.String" Scope="User">
       <Value Profile="(Default)">rancido</Value>
@@ -54,10 +54,10 @@
       <Value Profile="(Default)">wonderboy.ddns.net</Value>
     </Setting>
     <Setting Name="ipAttackPolling" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:00:05</Value>
+      <Value Profile="(Default)">00:01:00</Value>
     </Setting>
     <Setting Name="ipScannerPolling" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:00:15</Value>
+      <Value Profile="(Default)">00:00:20</Value>
     </Setting>
   </Settings>
 </SettingsFile>

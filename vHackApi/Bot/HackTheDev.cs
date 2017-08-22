@@ -15,13 +15,31 @@ namespace vHackApi.Bot
             Pause = () =>
             {
                 hackTimer.Change(0, Timeout.Infinite);
-                cfg.logger.Log("*** Stopping HackTheDev");
+                cfg.logger.Log("*** Pausing HackTheDev");
             };
 
             Resume = () =>
             {
                 Set(cfg, api);
                 cfg.logger.Log("*** Resuming HackTheDev");
+            };
+
+            InternalPause = () =>
+            {
+                if (hackTimer != null)
+                {
+                    cfg.logger.Log("*** PAUSING HackTheDev");
+                    hackTimer.Change(TimeSpan.Zero, pause);
+                }
+            };
+
+            InternalResume = () =>
+            {
+                if (hackTimer != null)
+                {
+                    cfg.logger.Log("*** RESUMING HackTheDev");
+                    hackTimer.Change(TimeSpan.Zero, Period);
+                }
             };
 
             if (hackTimer != null)

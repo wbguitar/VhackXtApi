@@ -15,18 +15,32 @@ namespace vHackApi.Bot
         /// </summary>
         protected TimeSpan pause;
 
+        /// <summary>
+        /// Pause action fired from internal bot logic
+        /// </summary>
         protected Action InternalPause = () => { };
-        protected Action InteranalResume = () => { };
 
+        /// <summary>
+        /// Resume action fired from internal bot logic
+        /// </summary>
+        protected Action InternalResume = () => { };
+
+        /// <summary>
+        /// Pause action fired from http client command
+        /// </summary>
         public Action Pause = () => { };
+
+        /// <summary>
+        /// Resume action fired from http client command
+        /// </summary>
         public Action Resume = () => { };
 
         protected Timer hackTimer;
 
-        static readonly int everyNow = 10;
-        static readonly int andThen = 30;
-        static readonly int aWhileLo = 15;
-        static readonly int aWhileHi = 30;
+        static readonly int everyNow = (int)TimeSpan.FromMinutes(10).TotalSeconds;
+        static readonly int andThen = (int)TimeSpan.FromMinutes(60).TotalSeconds;
+        static readonly int aWhileLo = (int)TimeSpan.FromMinutes(5).TotalSeconds;
+        static readonly int aWhileHi = (int)TimeSpan.FromMinutes(20).TotalSeconds;
 
         protected static Random rand = new Random();
 
@@ -54,7 +68,7 @@ namespace vHackApi.Bot
                         InternalPause();
                         Thread.Sleep(pause);
                         nextPause = NextPauseSchedule();
-                        InteranalResume();
+                        InternalResume();
                     }
 
                 }
