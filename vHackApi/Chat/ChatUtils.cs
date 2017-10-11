@@ -1,15 +1,181 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using vHackApi.Api;
 using vHackApi.Console;
+using vHackApi.Interfaces;
 using WB.Commons.Net.Bin;
 using WB.Commons.Net.Bin.Interfaces;
 using WB.IIIParty.Commons.Protocol;
+using System.Linq;
+using System.Web.UI;
 
 namespace vHackApi.Chat
 {
+    public class vhChat: IDisposable
+    {
+        public enum Rule
+        {
+            None,
+            Me,
+            User,
+            Mod,
+            Admin,
+            Vip,
+            Bot
+        }
+
+        private vhAPI _api;
+        private IConfig _cfg;
+
+        private readonly Encoding _encoding = Encoding.ASCII;
+
+        public vhChat(IConfig cfg, vhAPI api)
+        {
+            _api = api;
+            _cfg = cfg;
+        }
+
+        public event Action<Rule, string, string, string> PrivateMessage = (rule, email, nick, msg) => { };
+        public event Action<string> MessageReceived = (msg) => { };
+        private Action<string> _sendMessage = (s) => { };
+        public void SendChat(string msg)
+        {
+            _sendMessage(msg);
+        }
+
+        
+
+        public void Run()
+        {
+            var sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            //sock.Connect("51.255.93.109", 7531);
+            sock.Connect(_cfg.chatIp, _cfg.chatPort);
+
+            String str2 = "v[" + _cfg.chatUser;
+            var myId = _api.getStats(Stats.id).Result;
+            //String str2 = "v[" + api.getUsername();
+            var msg = ("NICK " + str2 + "\r\n");
+            msg += ("USER " + myId + " 0 * : vHack XT@Android\r\n");
+
+            sock.Send(_encoding.GetBytes(msg));
+
+            var vhackxy = "#vHackXT";
+
+            var procLine = new Action<string>((readLine) =>
+            {
+                
+                if (readLine.ToLower().StartsWith("ping "))
+                {
+                    String str3 = "PONG " + readLine.Substring(5) + "\r\n";
+
+                    sock.Send(_encoding.GetBytes(str3));
+                }
+                if (readLine.Contains(":(channel is full) transfering you to #"))
+                {
+
+                }
+                if (readLine.Contains(" 433 *"))
+                {
+                    var str = "NICK " + str2 + "_" + "\r\n";
+                    sock.Send(_encoding.GetBytes(str));
+                }
+                if (readLine.Contains("376"))
+                {
+                    var str = "PRIVMSG vHackXTGuard :.join " + _api.getStats(Stats.id).Result + " " +
+                              _api.getStats(Stats.hash).Result +
+                              "\r\n";
+                    sock.Send(_encoding.GetBytes(str));
+                }
+                if (readLine.Contains("PRIVMSG " + vhackxy + " :"))
+                {
+                    //System.Console.WriteLine(readLine);
+
+                    
+                    var m = Regex.Match(readLine, @"\:([^\!]*)\!([^\@]*)\@([^ ]*) PRIVMSG \#vHackXT \:([^\n]*)");
+                    if (m.Success)
+                    {
+                        var nick = m.Groups[1].Value;
+                        var id = m.Groups[2].Value;
+                        var email = m.Groups[3].Value;
+                        var rule = Rule.User;
+                        if (email.Contains("mod.vhack.biz"))
+                            rule = Rule.Mod;
+                        else if (email.Contains("bot.vhack.biz"))
+                            rule = Rule.Bot;
+                        else if (email.Contains("admin.vhack.biz"))
+                            rule = Rule.Admin;
+                        else if (email.Contains("vip.vhack.biz"))
+                            rule = Rule.Vip;
+
+                        var pmsg = m.Groups.Cast<Group>().Last().Value;
+                        var m1 = Regex.Match(pmsg, @"(\p{Cs})");
+                        PrivateMessage(rule, $"{id}@{email}", nick, pmsg);
+                    }
+                    else
+                    {
+                        PrivateMessage(Rule.None, null, null, readLine);
+                    }
+                }
+            });
+
+            _sendMessage = (s) =>
+            {
+                sock.Send(_encoding.GetBytes("PRIVMSG " + vhackxy + " :" + s + "\r\n"));
+                PrivateMessage(Rule.Me, myId, _cfg.chatUser, s);
+            };
+
+            Task.Run(() =>
+            {
+                while (run)
+                {
+                    try
+                    {
+                        var bytes = new byte[1024];
+                        var count = sock.Receive(bytes);
+
+                        // conversion to get unicode chars (emoji and special chars)
+                        var ubytes = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, bytes);
+                        var lines = Encoding.Unicode.GetString(ubytes);
+
+                       
+                        foreach (var l in lines.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                        {
+                            var line = l.Replace("\0", "").Trim();
+                            if (string.IsNullOrEmpty(line))
+                                continue;
+
+                            try
+                            {
+                                MessageReceived(line);
+                                procLine(line);
+                            }
+                            catch (Exception exc)
+                            {
+                                _cfg.logger.Log("Error parsing chat lines: {0}", exc.ToString());
+                            }
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        _cfg.logger.Log("Error in chat client: {0}", exc.ToString());
+                    }
+                }
+            });
+        }
+
+        private bool run = true;
+
+        public void Dispose()
+        {
+            run = false;
+        }
+    }
+
     public class ChatUtils
     {
         public static String m9147c(String str)
@@ -31,11 +197,11 @@ namespace vHackApi.Chat
             return str3;
         }
 
-        public static String vhackxy { get; private set; } = "#vHackXT";
+        public static String Vhackxy { get; private set; } = "#vHackXT";
         //static BufferedWriter bufferedWriter;
         public static Client Client { get; private set; }
 
-        public static void sendChatMessage(String message)
+        public static void SendChatMessage(String message)
         {
             try
             {
@@ -44,7 +210,7 @@ namespace vHackApi.Chat
                 //bufferedWriter.write("PRIVMSG " + vhackxy + " :" + message + "\r\n");
                 //bufferedWriter.flush();
 
-                Client.Send("PRIVMSG " + vhackxy + " :" + message + "\r\n");
+                Client.Send("PRIVMSG " + Vhackxy + " :" + message + "\r\n");
 
             }
             catch (IOException e)
@@ -54,15 +220,16 @@ namespace vHackApi.Chat
             }
         }
 
-        static Thread threadA;
-        public static void connectToChat(vhAPI api)
+        static Thread _threadA;
+        public static void ConnectToChat(vhAPI api)
         {
-            threadA = new Thread(() =>
+            _threadA = new Thread(() =>
             {
                 try
                 {
 
-                    Client = new Client("chat.vhackxt.com", 7531);
+                    Client = new Client("51.255.93.109", 7531);
+                   
 
                     //bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                     //BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -92,9 +259,10 @@ namespace vHackApi.Chat
                     Client.Connect();
                     Client.WaitConnect();
 
+
                     // handshake message
                     var id = api.getStats(Stats.id).Result;
-                    var msg = string.Format("NICK {0}\r\nUSER {1} 0 * : vHack XT@Android\r\n", str2, id);
+                    var msg = $"NICK {str2}\r\nUSER {id} 0 * : vHack XT@Android\r\n";
                     Client.Send(msg);
 
                     var t = new Thread(() =>
@@ -106,6 +274,8 @@ namespace vHackApi.Chat
                         }
                     });
                     t.Start();
+
+
                 }
                 catch (System.Net.WebException e)
                 {
@@ -118,14 +288,92 @@ namespace vHackApi.Chat
                     vhConsole.config.logger.Log(e.StackTrace);
                 }
             });
-            threadA.Start();
-            threadA.Join();
+            _threadA.Start();
+            _threadA.Join();
         }
 
         private static void Client_OnResponse(Client.State s)
         {
             
         }
+
+        private static int counter = 1;
+        public static void RunChat(vhAPI api)
+        {
+            var sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            //sock.Connect("chat.vhackxt.com", 7531); // ip: 85.25.237.247
+            sock.Connect("51.255.93.109", 7531);
+
+
+            String str2 = "v[" + "wonderboy"; //api.getUsername();
+            //String str2 = "v[" + api.getUsername();
+            var msg = ("NICK " + str2 + "\r\n");
+            msg += ("USER " + api.getStats(Stats.id).Result + " 0 * : vHack XT@Android\r\n");
+
+            sock.Send(Encoding.ASCII.GetBytes(msg));
+
+            var vhackxy = "#vHackXT";
+
+            var procLine = new Action<string>((readLine) =>
+            {
+                if (readLine.ToLower().StartsWith("ping "))
+                {
+                    String str3 = "PONG " + readLine.Substring(5) + "\r\n";
+                    System.Console.WriteLine($"{counter++} {str3}");
+                    sock.Send(Encoding.ASCII.GetBytes(str3));
+                }
+                if (readLine.Contains(":(channel is full) transfering you to #"))
+                {
+                    
+                }
+                if (readLine.Contains(" 433 *"))
+                {
+                    var str = "NICK " + str2 + "_" + "\r\n";
+                    sock.Send(Encoding.ASCII.GetBytes(str));
+                    System.Console.WriteLine($"{counter++} {str}");
+                }
+                if (readLine.Contains("376"))
+                {
+                    var str = "PRIVMSG vHackXTGuard :.join " + api.getStats(Stats.id).Result + " " + api.getStats(Stats.hash).Result +
+                              "\r\n";
+                    sock.Send(Encoding.ASCII.GetBytes(str));
+                    System.Console.WriteLine($"{counter++} {str}");
+                }
+                if (readLine.Contains("PRIVMSG " + vhackxy + " :"))
+                {
+                    System.Console.WriteLine(readLine);
+
+                    var m = Regex.Match(readLine, @"\:v\[(\w*)!(\d*)@([\d|\w]*\.)*IP PRIVMSG \#vHackXT \:(.*)");
+                    if (m.Success)
+                    {
+                        var nick = m.Groups[1].Value;
+                        var id = m.Groups[2].Value;
+                        var pmsg = m.Groups[4].Value;
+                        PrivateMessage(Convert.ToInt16(id), nick, pmsg);
+                    }
+                }
+            });
+
+            while (true)
+            {
+                var bytes = new byte[1024];
+                var count = sock.Receive(bytes);
+                var lines = Encoding.ASCII.GetString(bytes, 0, count);
+
+                foreach (var line in lines.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                {
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    System.Console.ForegroundColor = ConsoleColor.Green;
+                    System.Console.WriteLine(line.Trim());
+                    System.Console.ForegroundColor = ConsoleColor.Blue;
+                    procLine(line.Trim());
+                }
+            }
+        }
+
+        public static event Action<int, string, string> PrivateMessage = (i, nick, msg) => { };
 
         static async void procLine(string readLine, String str2, vhAPI api)
         {
@@ -136,7 +384,7 @@ namespace vHackApi.Chat
             }
             if (readLine.Contains(":(channel is full) transfering you to #"))
             {
-                vhackxy = readLine
+                Vhackxy = readLine
                         .Substring(readLine
                             .IndexOf(":(channel is full) transfering you to", 1))
                             .Replace(":(channel is full) transfering you to ", "")
@@ -157,7 +405,7 @@ namespace vHackApi.Chat
                 //bufferedWriter.flush();
                 //bufferedWriter.flush();
             }
-            if (readLine.Contains("PRIVMSG " + vhackxy + " :"))
+            if (readLine.Contains("PRIVMSG " + Vhackxy + " :"))
             {
                 //Chat chat = new Chat();
                 //chat.chatMessage(readLine);
@@ -185,7 +433,7 @@ namespace vHackApi.Chat
                 //String str2 = "v[" + api.getUsername();
                 //String str2 = "v[" + api.getUsername() + "]";
                 String str2 = api.getUsername();
-
+                
                 msg = ("NICK " + str2 + "\r\n");
                 msg += ("USER " + api.getStats(Stats.id).Result + " 0 * : vHack XT@Android\r\n");
             }
@@ -361,7 +609,7 @@ namespace vHackApi.Chat
                 ci = null;
             }
 
-            ci = new ClientImpl("85.25.237.247", "7531");
+            ci = new ClientImpl("51.255.93.109", "7531");
 
             ci.OnConnect += () => ci.SendMessage(new vHackApi.Chat.Reqs.Join(api));
 

@@ -88,13 +88,17 @@ namespace vHackApi.Bot
 
         private static DateTime NextPauseSchedule()
         {
-            //return DateTime.Now + TimeSpan.FromMinutes(r.Next(everyNow, andThen));
+            //if (vhUtils.IsContestRunning())
+            //    return DateTime.Now + TimeSpan.FromHours(2);
+
             return DateTime.Now + TimeSpan.FromSeconds(rand.Next(everyNow, andThen));
         }
 
         private static TimeSpan SetPauseDuration()
         {
-            //return TimeSpan.FromMinutes(r.Next(aWhileLo, aWhileHi));
+            if (vhUtils.IsContestRunning())
+                return TimeSpan.FromSeconds(rand.Next(30, 60));
+
             return TimeSpan.FromSeconds(rand.Next(aWhileLo, aWhileHi));
         }
 
@@ -104,7 +108,7 @@ namespace vHackApi.Bot
             {
                 hackTimer.Dispose();
             }
-
+            
             if (tTimeForAPause != null && tTimeForAPause.IsAlive)
                 tTimeForAPause.Abort();
         }

@@ -164,70 +164,81 @@ namespace vHackApi.Api
 
         }
 
-        public async Task<JObject> botnetserverinfo()
-        {
-            return await vhUtils.JSONRequest("user::::pass::::uhash",
-                 config.username + "::::" + config.password + "::::" + "userHash_not_needed",
-                 "vh_botnetInfo.php");
-        }
+        //public async Task<JObject> botnetserverinfo()
+        //{
+        //    return await vhUtils.JSONRequest("user::::pass::::uhash",
+        //         config.username + "::::" + config.password + "::::" + "userHash_not_needed",
+        //         "vh_botnetInfo.php");
+        //}
 
-        public async Task<JObject> botnetInfo(string userHash)
-        {
-            return await vhUtils.JSONRequest("user::::pass::::uhash", 
-                config.username + "::::" + config.password + "::::" + userHash,
-                "vh_botnetInfo.php"); ;
-        }
+        //public async Task<JObject> botnetInfo(string userHash)
+        //{
+        //    /*
+        //     * {"count":"2","energy":"195","pieces":"40","money":"1350047","nref":"0","data":
+        //     * [
+        //     * {"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"},
+        //     * {"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"}
+        //     * ],
+        //     * "strength":24}
+        //     */
+        //    return await vhUtils.JSONRequest("user::::pass::::uhash", 
+        //        config.username + "::::" + config.password + "::::" + userHash,
+        //        "vh_botnetInfo.php"); ;
+        //}
 
-        public async Task<JObject> upgradeComputer(string userHash, int i)
-        {
-            /*
-             * Supplied with a bot net computer ID, upgrade the computer.
-             *  :param id: bot net computer id
-             *  :return: str
-             *  containing: 
-             *  "money":"3479746","old":"13","costs":"4100000","lvl":"41","mm":"7579746","new":"42","strength":"42"}
-             */
+        //public async Task<JObject> upgradeComputer(string userHash, int i)
+        //{
+        //    /*
+        //     * Supplied with a bot net computer ID, upgrade the computer.
+        //     *  :param id: bot net computer id
+        //     *  :return: str
+        //     *  containing: 
+        //     *  "money":"3479746","old":"13","costs":"4100000","lvl":"41","mm":"7579746","new":"42","strength":"42"}
+        //     */
 
-            return await vhUtils.JSONRequest("user::::pass::::uhash::::bID",
-                              config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + i.ToString(),
-                              "vh_upgradeBotnet.php"); ;
-        }
+        //    return await vhUtils.JSONRequest("user::::pass::::uhash::::bID",
+        //                      config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + i.ToString(),
+        //                      "vh_upgradeBotnet.php");
+        //}
 
-        public async Task attackbotnetserver(string userhash = null)
-        {
-            if (string.IsNullOrEmpty(userhash))
-                userhash = vhConsole.uHash;
 
-            JObject response = null;
-            var bnInfo = await botnetInfo(userhash);
-            if (bnInfo == null)
-            {
-                config.logger.Log("Unable to fetch botnet info");
-                return;
-            }
 
-            JToken value = null;
-            var count = (int)bnInfo["count"];
-            //if (count >= 1 && (int)bnInfo["canAtt1"] == 1)
-            if (bnInfo.TryGetValue("canAtt1", out value) && (int)value == 1)
-                response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
-                    config.username + "::::" + config.password + "::::" + userhash + "::::" + "1",
-                    "vh_attackCompany.php");
+        //public async Task attackbotnetserver(string userhash = null)
+        //{
+        //    // TODO: SHOULD BE REIMPLEMENTED IN V.12
+        //    if (string.IsNullOrEmpty(userhash))
+        //        userhash = vhConsole.uHash;
 
-            //if (count >= 2 && (int)bnInfo["canAtt2"] == 1)
-            if (bnInfo.TryGetValue("canAtt2", out value) && (int)value == 1)
-                response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
-                    config.username + "::::" + config.password + "::::" + userhash + "::::" + "2",
-                    "vh_attackCompany2.php");
+        //    JObject response = null;
+        //    var bnInfo = await botnetInfo(userhash);
+        //    if (bnInfo == null)
+        //    {
+        //        config.logger.Log("Unable to fetch botnet info");
+        //        return;
+        //    }
 
-            //if (count >= 3 && (int)bnInfo["canAtt3"] == 1)
-            if (bnInfo.TryGetValue("canAtt3", out value) && (int)value == 1)
-                response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
-                    config.username + "::::" + config.password + "::::" + userhash + "::::" + "3",
-                    "vh_attackCompany3.php");
-            //temp = Utils.JSONRequest("user::::pass::::uhash::::cID",
-            //                          config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + "4",
-            //                             "vh_attackCompany4.php");
-        }
+        //    JToken value = null;
+        //    var count = (int)bnInfo["count"];
+        //    //if (count >= 1 && (int)bnInfo["canAtt1"] == 1)
+        //    if (bnInfo.TryGetValue("canAtt1", out value) && (int)value == 1)
+        //        response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
+        //            config.username + "::::" + config.password + "::::" + userhash + "::::" + "1",
+        //            "vh_attackCompany.php");
+
+        //    //if (count >= 2 && (int)bnInfo["canAtt2"] == 1)
+        //    if (bnInfo.TryGetValue("canAtt2", out value) && (int)value == 1)
+        //        response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
+        //            config.username + "::::" + config.password + "::::" + userhash + "::::" + "2",
+        //            "vh_attackCompany2.php");
+
+        //    //if (count >= 3 && (int)bnInfo["canAtt3"] == 1)
+        //    if (bnInfo.TryGetValue("canAtt3", out value) && (int)value == 1)
+        //        response = await vhUtils.JSONRequest("user::::pass::::uhash::::cID",
+        //            config.username + "::::" + config.password + "::::" + userhash + "::::" + "3",
+        //            "vh_attackCompany3.php");
+        //    //temp = Utils.JSONRequest("user::::pass::::uhash::::cID",
+        //    //                          config.username + "::::" + config.password + "::::" + "userHash_not_needed" + "::::" + "4",
+        //    //                             "vh_attackCompany4.php");
+        //}
     }
 }

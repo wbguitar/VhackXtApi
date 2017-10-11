@@ -155,6 +155,7 @@ namespace vHackApi.Bot
 
         private async Task doUpgradePc(MyInfo info, Update upd)
         {
+            
             var bnInfo = await upd.botnetInfo();
             if (bnInfo == null)
                 return;
@@ -187,6 +188,9 @@ namespace vHackApi.Bot
 
         private async Task doPackages(MyInfo info, Update upd, IConfig cfg)
         {
+            return;
+
+            // TODO: SHOULD BE REIMPLEMENTED IN V.12
             if (info.Packages < packagesBlock)
                 return;
 

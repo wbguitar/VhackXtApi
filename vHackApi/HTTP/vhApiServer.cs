@@ -241,8 +241,6 @@ namespace vHackApi.HTTP
                                 //response.Body.Write(buffer, 0, buffer.Length);
                                 //response.Body.Position = 0;
 
-
-
                                 setResponse(ref response, jsonInfo.ToString());
                             }
                         }
@@ -311,7 +309,7 @@ namespace vHackApi.HTTP
                                 var ipTpl = new Antlr3.ST.StringTemplate(ipTplStr, typeof(TemplateLexer));
                                 ipTpl.SetAttribute("ip", ip.IP);
                                 ipTpl.SetAttribute("lastUpd", ip.LastUpdate.ToString("ddd dd MMM yyyy   hh:mm:ss"));
-                                ipTpl.SetAttribute("money", string.Format("{0:C}", ip.Money));
+                                ipTpl.SetAttribute("money", $"{ip.Money:C}");
                                 var s = ipTpl.ToString();
                                 sb.Append(s);
                             }
@@ -342,8 +340,6 @@ namespace vHackApi.HTTP
                                         json = new JavaScriptSerializer().Serialize(
                                                      dict.Keys.Cast<string>()
                                                          .ToDictionary(k => k, k => dict[k]));
-
-
                                     }
 
                                     var cfg = JObject.Parse(json);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using vHackApi.Api;
+using vHackApi.Chat;
 using vHackApi.Console;
 using vHackApi.Interfaces;
 
@@ -9,9 +10,13 @@ namespace vHackApi.Bot
     public class HackTheDev : AHackTimer<HackTheDev>
     {
         private HackTheDev() { }
-        
+        private vhChat _chat;
+        public vhChat Chat => _chat;
+
         public override void Set(IConfig cfg, vhAPI api)
         {
+            
+
             Pause = () =>
             {
                 hackTimer.Change(0, Timeout.Infinite);
@@ -50,14 +55,22 @@ namespace vHackApi.Bot
 
             var console = api.getConsole();
 
+            var lastAttackTm = DateTime.MinValue;
             hackTimer = new Timer(
                 async (o) =>
                 {
+                    if (DateTime.Now - lastAttackTm <= TimeSpan.FromHours(1))
+                        return;
+
                     if (!Monitor.TryEnter(this))
                         return;
 
                     try
-                    { var s = await console.AttackIp("127.0.0.1"); }
+                    {
+                        var s = await console.AttackIp("127.0.0.1");
+                        if (s == 0)
+                            lastAttackTm = DateTime.Now;
+                    }
                     catch (Exception e)
                     {
                         cfg.logger.Log(e.ToString());
@@ -68,6 +81,26 @@ namespace vHackApi.Bot
                     }
                 }
                 , null, TimeSpan.Zero, cfg.hackDevPolling);
+
+            _chat = new vhChat(cfg, api);
+            _chat.PrivateMessage += async (rule, email, nick, msg) =>
+            {
+                System.Console.ForegroundColor = ConsoleColor.Blue;
+                //cfg.logger.Log($"{DateTime.Now} {nick}({rule}): {msg}");
+                cfg.logger.Log($"VHCHAT - {nick}[{email}]({rule}): {msg}");
+                System.Console.ResetColor();
+                
+                // if message from bot try to hack the dev (maybe it has been reset)
+                if (nick == "vHackXTBot")
+                {
+                    var s = await console.AttackIp("127.0.0.1");
+                    if (s == 0)
+                        lastAttackTm = DateTime.Now;
+                }
+
+            };
+
+            _chat.Run();
         }
     }
 }

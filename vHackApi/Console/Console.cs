@@ -637,10 +637,16 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             return 0;
         }
 
-        public async Task<JObject> GetImg(string uhash)
+        public enum GetImgBy
+        {
+            Score = 0,
+            Reputation = 1,
+        }
+        public async Task<JObject> GetImg(string uhash, GetImgBy by = GetImgBy.Score)
         {
             return await vhUtils.JSONRequest("user::::pass::::uhash::::by",
-                                         config.username + "::::" + config.password + "::::" + uhash + "::::" + r.Next(9000, 10000),
+                                         config.username + "::::" + config.password + "::::" 
+                                         + uhash + "::::" + (int)by,//r.Next(9000, 10000),
                                          "vh_getImg.php");
         }
     }

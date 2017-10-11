@@ -22,7 +22,7 @@ namespace vHackApi.Api
          * The url of the current api.<br>
          * As of now it is {@value url}.
          */
-        private static readonly string rootUrl = "https://api.vhack.cc/v/10/";
+        private static readonly string rootUrl = "https://api.vhack.cc/v/13/";
         /**
          * The hashing algorithm that is used to hash data in requests.<br>
          * It now is {@value md5s}.

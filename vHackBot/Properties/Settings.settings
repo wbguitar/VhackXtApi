@@ -9,22 +9,22 @@
       <Value Profile="(Default)">1500</Value>
     </Setting>
     <Setting Name="WinChance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">65</Value>
+      <Value Profile="(Default)">70</Value>
     </Setting>
     <Setting Name="dbConnString" Type="System.String" Scope="User">
       <Value Profile="(Default)">metadata=res://*/vHackDbModel.csdl|res://*/vHackDbModel.ssdl|res://*/vHackDbModel.msl;provider=System.Data.SQLite.EF6;provider connection string='data source=.\vhackdb.db'</Value>
     </Setting>
     <Setting Name="maxFirewall" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">15000</Value>
+      <Value Profile="(Default)">1500</Value>
     </Setting>
     <Setting Name="maxAntivirus" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">15000</Value>
+      <Value Profile="(Default)">1500</Value>
     </Setting>
     <Setting Name="hackDevPolling" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:01:00</Value>
+      <Value Profile="(Default)">00:03:00</Value>
     </Setting>
     <Setting Name="hackBotnetPolling" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:01:00</Value>
+      <Value Profile="(Default)">01:00:00</Value>
     </Setting>
     <Setting Name="safeScan" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -39,7 +39,7 @@
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="user" Type="System.String" Scope="User">
-      <Value Profile="(Default)">wbguitar</Value>
+      <Value Profile="(Default)">phigone</Value>
     </Setting>
     <Setting Name="pass" Type="System.String" Scope="User">
       <Value Profile="(Default)">rancido</Value>
@@ -58,6 +58,15 @@
     </Setting>
     <Setting Name="ipScannerPolling" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:20</Value>
+    </Setting>
+    <Setting Name="chatUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)">phigone1</Value>
+    </Setting>
+    <Setting Name="chatIp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">51.255.93.109</Value>
+    </Setting>
+    <Setting Name="chatPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">7531</Value>
     </Setting>
   </Settings>
 </SettingsFile>

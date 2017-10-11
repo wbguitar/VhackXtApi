@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace vHackBot
         {
             var cfg1 = new Config();
             var t1 = new Thread(() => Run(cfg1));
-            
+
             ConsoleUtils.OnConsole += (sig) =>
             {
                 if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
@@ -52,6 +53,23 @@ namespace vHackBot
             #endregion ILogger Members
         }
 
+        private class Log4netLogger : ILogger
+        {
+            private log4net.ILog logger = log4net.LogManager.GetLogger(typeof(Program));
+
+            public Log4netLogger()
+            {
+                log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));
+            }
+            public void Log(string format, params object[] parms)
+            {
+                if (parms == null || parms.Length == 0)
+                    logger.Info(format);
+                else
+                    logger.InfoFormat(format, parms);
+            }
+        }
+
         public class Config : IConfig
         {
             #region IConfig Members
@@ -67,10 +85,10 @@ namespace vHackBot
             }
 
             private ConsoleLogger cl = new ConsoleLogger();
-
+            private Log4netLogger l4logger = new Log4netLogger();
             public ILogger logger
             {
-                get { return cl; }
+                get { return l4logger; }
             }
 
             public string tessdata => Properties.Settings.Default.TessdataPath;
@@ -140,7 +158,9 @@ namespace vHackBot
 
             public bool hackBotNetPaused { get; set; }
 
-           
+            public string chatIp => Properties.Settings.Default.chatIp;
+            public int chatPort => Properties.Settings.Default.chatPort;
+            public string chatUser => Properties.Settings.Default.chatUser;
 
             #endregion IConfig Members
         }
@@ -187,6 +207,8 @@ namespace vHackBot
 
                 ProportionalUpgradeStrategy.Default.Init(cfg, api);
 
+
+               
                 // sets and starts timers
                 var timers = new List<IHackTimer>
                 {
@@ -197,9 +219,24 @@ namespace vHackBot
                     UpgradeMgr.Instance,
                 };
 
+
                 // sets the timers
                 //timers.ForEach(tm => tm.Set(GlobalConfig.Config, GlobalConfig.Api));
-                timers.ForEach(tm => tm.Set(cfg, GlobalConfig.Api));
+                timers.ForEach(tm => tm.Set(cfg, api));
+
+
+                log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));
+                //var logger = log4net.LogManager.GetLogger(typeof(Program)).Logger.Repository.GetAppenders()
+                //    .FirstOrDefault(app => app.Name == "RollingChat");
+                var logger = log4net.LogManager.GetLogger("ChatLogger");
+                HackTheDev.Instance.Chat.MessageReceived += (s) =>
+                {
+                    if (string.IsNullOrEmpty(s))
+                        return;
+
+                    logger.Info(s.Trim());
+                };
+
 
                 // HTTP server
                 var cfgParser = new ConfigParser();
@@ -331,6 +368,9 @@ namespace vHackBot
                 public TimeSpan hackBotnetPolling { get { throw new NotSupportedException(); } }
 
                 public string dbConnectionString { get { throw new NotSupportedException(); } }
+                public string chatIp { get { throw new NotSupportedException(); } }
+                public int chatPort { get { throw new NotSupportedException(); } }
+                public string chatUser { get { throw new NotSupportedException(); } }
 
                 public ILogger logger { get { throw new NotSupportedException(); } }
 

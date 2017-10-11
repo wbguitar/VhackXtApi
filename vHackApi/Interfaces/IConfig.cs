@@ -39,6 +39,10 @@ namespace vHackApi.Interfaces
 
         string dbConnectionString { get; }
 
+        string chatIp { get; }
+        int chatPort { get; }
+        string chatUser { get; }
+
         ILogger logger { get; }
 
         IIPselector ipSelector { get; }

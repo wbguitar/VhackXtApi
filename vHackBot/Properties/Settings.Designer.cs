@@ -49,7 +49,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("65")]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
         public int WinChance {
             get {
                 return ((int)(this["WinChance"]));
@@ -75,7 +75,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("15000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1500")]
         public int maxFirewall {
             get {
                 return ((int)(this["maxFirewall"]));
@@ -87,7 +87,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("15000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1500")]
         public int maxAntivirus {
             get {
                 return ((int)(this["maxAntivirus"]));
@@ -99,7 +99,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:03:00")]
         public global::System.TimeSpan hackDevPolling {
             get {
                 return ((global::System.TimeSpan)(this["hackDevPolling"]));
@@ -111,7 +111,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("01:00:00")]
         public global::System.TimeSpan hackBotnetPolling {
             get {
                 return ((global::System.TimeSpan)(this["hackBotnetPolling"]));
@@ -170,7 +170,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("wbguitar")]
+        [global::System.Configuration.DefaultSettingValueAttribute("phigone")]
         public string user {
             get {
                 return ((string)(this["user"]));
@@ -249,6 +249,42 @@ namespace vHackBot.Properties {
             }
             set {
                 this["ipScannerPolling"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("phigone1")]
+        public string chatUser {
+            get {
+                return ((string)(this["chatUser"]));
+            }
+            set {
+                this["chatUser"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("51.255.93.109")]
+        public string chatIp {
+            get {
+                return ((string)(this["chatIp"]));
+            }
+            set {
+                this["chatIp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7531")]
+        public int chatPort {
+            get {
+                return ((int)(this["chatPort"]));
+            }
+            set {
+                this["chatPort"] = value;
             }
         }
     }
