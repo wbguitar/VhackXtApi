@@ -76,7 +76,7 @@ namespace vHackApi
 
 
             }
-            catch (Exception)
+            catch (Exception exc)
             {
 
             }

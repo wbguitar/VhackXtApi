@@ -272,6 +272,17 @@ namespace vHackApi.Console
             }
             else
             {
+                if (vhUtils.IsContestRunning())
+                {
+                    // FOR TESTING PURPOSE
+                    var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VHACK");
+                    var filename = Path.Combine(root
+                        , "FBI_WATCHED_" + hostname + "_" + Path.GetRandomFileName() + ".png");
+                    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+
+                    config.logger.Log($"******\n\tATTACKING {hostname};\n\t{text}\n\t{filename}\n*******");
+                }
+
                 var firewall = text.Split(':');
                 if (firewall.Length > 2)
                 {
@@ -286,6 +297,7 @@ namespace vHackApi.Console
                         if (scan == null)
                         {
                             config.logger.Log("Unable to scan host {0}", hostname);
+                            config.logger.Log("********* BLOCKED BY FBI!!! **********");
                             return -1;
                         }
 

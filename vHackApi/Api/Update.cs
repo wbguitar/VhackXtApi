@@ -103,21 +103,46 @@ namespace vHackApi
 
         #region BOTNET
 
-        public async Task<JArray> botnetInfo()
+        public async Task<JObject> botnetInfo()
         {
             /*
-             * {"c2":"0","count":"3","energy":"187","pieces":"24","money":"440820118","nref":"0","data":
-             * [
-             * {"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"3","av":"4","smash":"15","mwk":"2","strength":"72"},
-             * {"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"4","av":"2","smash":"14","mwk":"1","strength":"63"},
-             * {"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_003","fw":"3","av":"1","smash":"14","mwk":"1","strength":"57"}
-             * ],
-             * "strength":192}
+             *
+ Result: {{
+  "c2": "0",
+  "count": "3",		// count PCs
+  "energy": "175",
+  "pieces": "24",	// on 100 we can build pc
+  "money": "434752700",	
+  "nref": "0",
+  "data": [
+    {
+      "running": "0",
+      "wto": "0",	// one of  fw/av/smash/mwk if running == 1
+      "left": "0",
+      "hostname": "WbBotnetPc001",
+      "fw": "3",	// firewall
+      "av": "4",	// antivirus
+      "smash": "18",	// smash
+      "mwk": "2",		// malware kit
+      "strength": "81"	// PC strength
+    },
+	],
+	
+	...
+	
+  "strength": 219		// total strenght
+}}
+    Status: RanToCompletion	// ???
+
              */
-            var temp = await vhUtils.JSONRequest("user::::pass::::uhash",
+            //var temp = await vhUtils.JSONRequest("user::::pass::::uhash",
+            //    config.username + "::::" + config.password + "::::" + "userHash_not_needed",
+            //    "vh_botnetInfo.php");
+            //return (JArray)temp["data"];
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash",
                 config.username + "::::" + config.password + "::::" + "userHash_not_needed",
                 "vh_botnetInfo.php");
-            return (JArray)temp["data"];
         }
 
 
@@ -214,6 +239,15 @@ namespace vHackApi
         /// <returns></returns>
         public async Task<JObject> openFreeBonus(string userHash)
         {
+            /*
+             {
+  "type": "1",
+  "win": "1538000",
+  "lvl": "0",
+  "bleft": "3",
+  "netcoins": "34"
+}
+             */
             return await vhUtils.JSONRequest("user::::pass::::uhash",
                 $"{config.username}::::{config.password}::::{userHash}",
                 "vh_openFreeBonus.php");

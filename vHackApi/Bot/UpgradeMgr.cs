@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi.Api;
+using vHackApi.Console;
 using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
@@ -115,7 +118,8 @@ namespace vHackApi.Bot
             return CurStatus;
         }
 
-        int packagesBlock = 10;
+        int packagesBlock = 5;
+        int goldPackagesBlock = 2;
         private async Task doBoost(MyInfo info, Update upd, IConfig cfg, JObject tasks)
         {
             //var res = await upd.getTasks();
@@ -130,6 +134,7 @@ namespace vHackApi.Bot
                 {
                     // not enough netcoins -> try with packages
                     await doPackages(info, upd, cfg);
+                    await doGoldPackages(info, upd, cfg);
                 }
                 else
                 {
@@ -142,9 +147,12 @@ namespace vHackApi.Bot
                 cfg.logger.Log("{0} money needed to end tasks, continue", finishAllFor);
                 await upd.useBooster();
             }
-            else if (info.Packages > packagesBlock)
+            else 
             {
-                await doPackages(info, upd, cfg);
+                if (info.Packages > packagesBlock)
+                    await doPackages(info, upd, cfg);
+                if (info.GoldPackages > goldPackagesBlock)
+                    await doGoldPackages(info, upd, cfg);
             }
             //else
             {
@@ -157,50 +165,108 @@ namespace vHackApi.Bot
         {
             
             var bnInfo = await upd.botnetInfo();
+            var career = await upd.getCareerStatus(vhConsole.uHash);
             if (bnInfo == null)
                 return;
 
-            long idToUpgrade = 0;
-            long minLevel = long.MaxValue;
-            for (int i = 0; i < bnInfo.Count; i++)
+            // OLD
+            //// we'll select the pc with the minor level and price to be upgraded
+            //long idToUpgrade = 0;
+            //long minLevel = long.MaxValue;
+            //for (int i = 0; i < bnInfo.Count; i++)
+            //{
+            //    var it = bnInfo[i];
+            //    var price = (long)it["bPRICE"];
+            //    var level = (long)it["bLVL"];
+            //    var id = (long)it["bID"];
+
+            //    if (level == 100)
+            //        continue; // max level reached
+
+            //    if (price > info.Money)
+            //        continue;
+
+            //    if (minLevel > level)
+            //    {
+            //        minLevel = level;
+            //        idToUpgrade = id;
+            //    }                
+            //}
+
+            //if (idToUpgrade > 0)
+            //    await upd.upgradeBotnet(idToUpgrade.ToString());
+
+            var count = (int) bnInfo["count"];
+            var energy = (int)bnInfo["energy"];
+            var pieces = (int)bnInfo["pieces"];
+            if (pieces > 100)
             {
-                var it = bnInfo[i];
-                var price = (long)it["bPRICE"];
-                var level = (long)it["bLVL"];
-                var id = (long)it["bID"];
-
-                if (level == 100)
-                    continue; // max level reached
-
-                if (price > info.Money)
-                    continue;
-
-                if (minLevel > level)
-                {
-                    minLevel = level;
-                    idToUpgrade = id;
-                }                
+                upd.buildPC(vhConsole.uHash, $"BotnetPC_{count.ToString("D3")}");
             }
 
-            if (idToUpgrade > 0)
-                await upd.upgradeBotnet(idToUpgrade.ToString());
+            for (int i = 0; i < bnInfo.Count; i++)
+            {
+                var it = bnInfo["data"][i];
+                var running = (long)it["running"];
+
+                if (running == 0)
+                {
+                    var dict = new Dictionary<Update.OfWhat, long>();
+
+                    dict[Update.OfWhat.fw] = (long)it["fw"];
+                    dict[Update.OfWhat.av] = (long)it["av"];
+                    dict[Update.OfWhat.smash] = (long)it["smash"];
+                    dict[Update.OfWhat.mwk] = (long)it["mwk"];
+
+                    // update the minor value
+                    var whatToUpdate = dict.OrderBy(pair => pair.Value).First().Key;
+                    //var whatToUpdate = Update.OfWhat.smash;
+                    var hostname = (string) it["hostname"];
+                    var uhash = "userHash_not_needed";
+                    //var uhash = vhConsole.uHash;
+                    try
+                    {
+                        // TODO: server answer is badly formatted, but it goes anyway
+                        await upd.upgradePC(uhash, hostname, whatToUpdate);
+                    }
+                    catch (Exception) { }
+                }
+            }
+
+            // TODO: DO ATTACK (we must know the minimum levels, but they are encoded in the client)
         }
 
         private async Task doPackages(MyInfo info, Update upd, IConfig cfg)
         {
-            return;
-
             // TODO: SHOULD BE REIMPLEMENTED IN V.12
             if (info.Packages < packagesBlock)
                 return;
 
             for (int i = 0; i < packagesBlock; i++)
             {
-                var pack = await upd.openPackage(info.UHash);
+                //var pack = await upd.openPackage(info.UHash);
+                var pack = await upd.openFreeBonus(info.UHash);
                 if (pack != null)
                 {
                     var package = PackageResults.FromType((int)pack["type"]);
                     cfg.logger.Log("Opened package {0}", package);
+                }
+            }
+        }
+
+        private async Task doGoldPackages(MyInfo info, Update upd, IConfig cfg)
+        {
+            if (info.GoldPackages < packagesBlock)
+                return;
+
+            for (int i = 0; i < packagesBlock; i++)
+            {
+                //var pack = await upd.openPackage(info.UHash);
+                var pack = await upd.openGoldBox(info.UHash);
+                if (pack != null)
+                {
+                    var package = GoldPackageResults.FromType((int)pack["type"]);
+                    cfg.logger.Log("Opened gold package {0}", package);
                 }
             }
         }

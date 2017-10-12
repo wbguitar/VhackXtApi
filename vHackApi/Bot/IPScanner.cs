@@ -90,6 +90,12 @@ namespace vHackApi.Bot
                                     if (!cfg.persistanceMgr.IpExist(newIp))
                                     {
                                         var js = await console.ScanIp(newIp);
+
+                                        if (js == null)
+                                        {
+                                            cfg.logger.Log("********* BLOCKED BY FBI!!! **********");
+                                            return;
+                                        }
                                         dbIp = new IPs(js);
                                         cfg.persistanceMgr.AddIp(dbIp);
                                     }

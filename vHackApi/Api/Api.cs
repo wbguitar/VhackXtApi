@@ -16,6 +16,8 @@ namespace vHackApi.Api
     {
         IConfig config;
         protected string userHash;
+        public string UserHash => userHash;
+
         private JObject stats = null;
 
         vhConsole console;

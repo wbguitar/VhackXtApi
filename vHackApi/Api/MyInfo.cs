@@ -100,6 +100,7 @@ namespace vHackApi.Api
         public long Rank => (long)Json["rank"];
         //public string IP => (string)json["event"];
         public long Packages => (long)Json["bonus"];
+        public long GoldPackages => (long)Json["bonus2"];
         //public string IP => (string)json["mystery"];
         //public string IP => (string)json["vipleft"];
         public string Hash => (string)Json["hash"];

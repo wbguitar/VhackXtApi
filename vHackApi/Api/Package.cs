@@ -47,6 +47,30 @@ namespace vHackApi.Api
         public override string ToString() => this.toString; //this.GetType().Name;
     }
 
+    public class GoldPackageResults
+    {
+        static readonly GoldPackageResults Pieces = new GoldPackageResults("pieces");
+        static readonly GoldPackageResults Energy = new GoldPackageResults("energy");
+        static readonly GoldPackageResults Boosters = new GoldPackageResults("boosters");
+
+        private static GoldPackageResults[] packs = new GoldPackageResults[]
+        {
+            Pieces,
+            Energy,
+            Boosters,
+        };
+
+        String toString;
+        private GoldPackageResults(String toString) { this.toString = toString; }
+
+        public static GoldPackageResults FromType(int type)
+        {
+            return (type >= 0 && type < packs.Length) ? packs[type] : null;
+        }
+
+        //public override string ToString() => toString;
+        public override string ToString() => this.toString; //this.GetType().Name;
+    }
 
     public class PackageResult
     {
@@ -54,6 +78,18 @@ namespace vHackApi.Api
         public int Amount { get; private set; }
 
         public PackageResult(PackageResults type, int amount)
+        {
+            Type = type;
+            Amount = amount;
+        }
+    }
+
+    public class GoldPackageResult
+    {
+        public GoldPackageResult Type { get; private set; }
+        public int Amount { get; private set; }
+
+        public GoldPackageResult(GoldPackageResult type, int amount)
         {
             Type = type;
             Amount = amount;

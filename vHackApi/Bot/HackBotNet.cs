@@ -55,7 +55,8 @@ namespace vHackApi.Bot
                 
                 try
                 {
-                    await api.attackbotnetserver();
+                    //await api.attackbotnetserver();
+                    // TODO: BOTNET 
                     await upd.removeSpyware();
                 }
                 finally

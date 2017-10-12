@@ -201,14 +201,19 @@ namespace vHackBot
                     .useConfig(cfg);
 
                 vhAPI api = builder.getAPI();
+                var upd = new vHackApi.Update(cfg);
+                var info = upd.botnetInfo();
 
-                GlobalConfig.Init(cfg, api);
+                //var career = upd.getCareerStatus(api.UserHash);
+                
 
+                //GlobalConfig.Init(cfg, api);
 
+                var mi = api.getConsole().MyInfo();
                 ProportionalUpgradeStrategy.Default.Init(cfg, api);
 
 
-               
+
                 // sets and starts timers
                 var timers = new List<IHackTimer>
                 {
