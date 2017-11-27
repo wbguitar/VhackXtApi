@@ -33,6 +33,7 @@ namespace vHackApi.Chat
         private IConfig _cfg;
 
         private readonly Encoding _encoding = Encoding.ASCII;
+        private static readonly object _semaphore = new object();
 
         public vhChat(IConfig cfg, vhAPI api)
         {
@@ -133,36 +134,39 @@ namespace vHackApi.Chat
             {
                 while (run)
                 {
-                    try
+                    lock (_semaphore)
                     {
-                        var bytes = new byte[1024];
-                        var count = sock.Receive(bytes);
-
-                        // conversion to get unicode chars (emoji and special chars)
-                        var ubytes = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, bytes);
-                        var lines = Encoding.Unicode.GetString(ubytes);
-
-                       
-                        foreach (var l in lines.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                        try
                         {
-                            var line = l.Replace("\0", "").Trim();
-                            if (string.IsNullOrEmpty(line))
-                                continue;
+                            var bytes = new byte[1024];
+                            var count = sock.Receive(bytes);
 
-                            try
+                            // conversion to get unicode chars (emoji and special chars)
+                            var ubytes = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, bytes);
+                            var lines = Encoding.Unicode.GetString(ubytes);
+
+
+                            foreach (var l in lines.Split(new[] { "\r\n" }, StringSplitOptions.None))
                             {
-                                MessageReceived(line);
-                                procLine(line);
-                            }
-                            catch (Exception exc)
-                            {
-                                _cfg.logger.Log("Error parsing chat lines: {0}", exc.ToString());
+                                var line = l.Replace("\0", "").Trim();
+                                if (string.IsNullOrEmpty(line))
+                                    continue;
+
+                                try
+                                {
+                                    MessageReceived(line);
+                                    procLine(line);
+                                }
+                                catch (Exception exc)
+                                {
+                                    _cfg.logger.Log("Error parsing chat lines: {0}", exc.ToString());
+                                }
                             }
                         }
-                    }
-                    catch (Exception exc)
-                    {
-                        _cfg.logger.Log("Error in chat client: {0}", exc.ToString());
+                        catch (Exception exc)
+                        {
+                            _cfg.logger.Log("Error in chat client: {0}", exc.ToString());
+                        } 
                     }
                 }
             });

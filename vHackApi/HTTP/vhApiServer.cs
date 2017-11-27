@@ -259,6 +259,7 @@ namespace vHackApi.HTTP
     ""ipScannerPaused"": ""{config.ipScannerPaused}""
     ""hackBotNetPaused"": ""{config.hackBotNetPaused}""
     ""hackTheDevPaused"": ""{config.hackTheDevPaused}""
+    ""getImgBy"": ""{config.getImgBy}""
 }}";
 
                             setResponse(ref response, json);
@@ -283,6 +284,8 @@ namespace vHackApi.HTTP
                             template.SetAttribute("hackBotNetPaused", config.hackBotNetPaused ? "checked" : "uchecked");
                             template.SetAttribute("hackTheDevPaused", config.hackTheDevPaused ? "checked" : "uchecked");
 
+                            template.SetAttribute("getImgByScore", config.getImgBy == 0 ? "selected" : "");
+                            template.SetAttribute("getImgByReputation", config.getImgBy == 1 ? "selected" : "");
 
                             var html = template.ToString();
 
@@ -408,6 +411,12 @@ namespace vHackApi.HTTP
                                         cfg["hackTheDevPaused"] = "false";
                                         HackTheDev.Instance.Resume();
                                     }
+                                    
+                                    if (cfg["getImgBy"] != null)
+                                    {
+                                         var val = (int) cfg["getImgBy"];// 0 = score, 1 = reputation
+
+                                    }
 
                                     if (configParser != null)
                                         configParser.ParseConfig(cfg);
@@ -428,7 +437,15 @@ namespace vHackApi.HTTP
                                 var data = rd.ReadToEnd();
                                 var dict = System.Web.HttpUtility.ParseQueryString(data);
                                 var ip = dict["ip"];
-                                var res = api.getConsole().AttackIp(ip).Result;
+                                var action = dict["action"];
+                                if (action == "attack")
+                                {
+                                    var res = api.getConsole().AttackIp(ip).Result;
+                                }
+                                else if (action == "remove")
+                                {
+                                    config.persistanceMgr.RemoveIp(ip);
+                                }
 
                                 response = request.CreateResponse(HttpStatusCode.OK, "POST config request");
                                 response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}/iplist");

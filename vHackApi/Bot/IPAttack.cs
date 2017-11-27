@@ -2,12 +2,27 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Griffin.Logging.Loggers;
 using vHackApi.Api;
 using vHackApi.Console;
 using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
+    
+    public static class Log
+    {
+        class FakeLogger : ILogger
+        {
+            public void Log(string format, params object[] parms)
+            {
+
+            }
+        }
+
+        public static ILogger ContestLogger { get; set; } = new FakeLogger();
+    }
+
     public class IPAttack : AHackTimer<IPAttack>
     {
         private IPAttack()
@@ -79,17 +94,17 @@ namespace vHackApi.Bot
                 return;
 
             // wait a random bit
-            Thread.Sleep(rand.Next(0, (int)Period.TotalSeconds / 2));
+            Thread.Sleep(rand.Next(0, (int)Period.TotalSeconds / 5)*1000);
 
             try
             {
-                //// during contests better run as an IP scanner, so that can find ips 
-                //// that are watched by FBI
-                //if (vhUtils.IsContestRunning())
-                //{
-                //    var res = await c.FindHostsAndAttack();
-                //    return;
-                //}
+                // during contests better run as an IP scanner, so that can find ips 
+                // that are watched by FBI
+                if (vhUtils.IsContestRunning())
+                {
+                    var res = await c.FindHostsAndAttack();
+                    return;
+                }
 
                 cfg.persistanceMgr.Update();
                 var ip = cfg.ipSelector.NextHackabletIp(cfg.persistanceMgr);

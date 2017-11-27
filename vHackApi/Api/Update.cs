@@ -103,6 +103,39 @@ namespace vHackApi
 
         #region BOTNET
 
+        public async Task<JObject> hotspotInfo()
+        {
+            /*
+             * 
+{"myhotspot":"0","top1owner":"brilletjuh","top1since":"25 min.","top1host":"XT-H007VH","top1strength":"21000","top2owner":"DarKhAn","top2since":"16 min.","top2host":"XT-H008VH","top2strength":"21000","top3owner":"Nemessis","top3since":"0 min.","top3host":"XT-H003VH","top3strength":"21000",
+"data":[
+    {"host":"XT-H002VH","owner":"ZeroCools","since":"40 min.","strength":"21000"},
+    {"host":"XT-H001VH","owner":"TLaemmer92","since":"21 min.","strength":"21000"},
+    {"host":"XT-H004VH","owner":"Bugadao","since":"12 min.","strength":"21000"},
+    {"host":"XT-H005VH","owner":"TrioHla","since":"5 min.","strength":"21000"},
+    {"host":"XT-H006VH","owner":"AB9191","since":"0 min.","strength":"21000"}],
+"energy":"19","strength":"21000"}
+             */
+            return await vhUtils.JSONRequest("user::::pass::::uhash",
+                config.username + "::::" + config.password + "::::" + "userHash_not_needed",
+                "vh_hotspotInfo.php");
+        }
+
+        public async Task<JObject> startHijack(string userHash, string hotspot)
+        {
+            /*
+             * {"result":"0","lps":"501","lps2":"201"}
+             */
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::target",
+                config.username + "::::" + config.password + "::::" + userHash + "::::" + hotspot ,
+                "vh_startHijack.php");
+
+            long currentTimeMillis = (long)(DateTime.Now - new DateTime(1970, 01, 01)).TotalMilliseconds;// (long)(((double)
+            return await vhUtils.JSONRequest("target::::time::::user::::pass::::uhash",
+                hotspot + "::::" +currentTimeMillis +"::::" + config.username + "::::" + config.password + "::::" + userHash,
+                "vh_startHijack.php");
+        }
+
         public async Task<JObject> botnetInfo()
         {
             /*
@@ -126,10 +159,10 @@ namespace vHackApi
       "mwk": "2",		// malware kit
       "strength": "81"	// PC strength
     },
-	],
-	
-	...
-	
+    ],
+    
+    ...
+    
   "strength": 219		// total strenght
 }}
     Status: RanToCompletion	// ???
@@ -152,7 +185,8 @@ namespace vHackApi
             mwk,
             fw,
             av,
-            smash
+            smash,
+            none,
         }
 
         public async Task<JObject> upgradePC(string userHash, string hostname, OfWhat ofWhat)
@@ -175,7 +209,13 @@ namespace vHackApi
         public async Task<JObject> buildPC(string userHash, string hostname)
         {
             /*
-             {"result":"5","count":"2","energy":"195","pieces":"40","money":"1350047","nref":"0","data":[{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"},{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"}],"strength":24}{"result":"5","count":"2","energy":"195","pieces":"40","money":"1350047","nref":"0","data":[{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"},{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"}],"strength":24}
+{"result":"5","count":"2","energy":"195","pieces":"40","money":"1350047","nref":"0","data":
+[
+{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"},
+{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"}
+],
+"strength":24}
+{"result":"5","count":"2","energy":"195","pieces":"40","money":"1350047","nref":"0","data":[{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"},{"running":"0","wto":"0","left":"0","hostname":"WbBotnetPc_001","fw":"1","av":"1","smash":"1","mwk":"1","strength":"12"}],"strength":24}
              */
             return await vhUtils.JSONRequest("user::::pass::::uhash::::hostname",
                 $"{config.username}::::{config.password}::::{userHash}::::{hostname}",
@@ -203,9 +243,18 @@ namespace vHackApi
         /// <returns></returns>
         public async Task<JObject> startLevel(string userHash, int level)
         {
+            var startLevel = level / 10;
+            level /= startLevel;
             return await vhUtils.JSONRequest("user::::pass::::uhash::::lvl",
                 $"{config.username}::::{config.password}::::{userHash}::::{level}",
-                "vh_startLevel.php");
+                $"vh_startLevel{startLevel}.php");
+        }
+
+        public async Task<JObject> startLevel2(string userHash, int level)
+        {
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::lvl",
+                $"{config.username}::::{config.password}::::{userHash}::::{level}",
+                "vh_startLevel2.php");
         }
 
         //public async Task<JObject> upgradeBotnet(string ID)

@@ -24,9 +24,12 @@ namespace vHackApi.Bot
         { }
 
         ILogger logger;
+        private vhAPI _api;
+        
         public override void Set(IConfig cfg, vhAPI api)
         {
             logger = cfg.logger;
+            _api = api;
 
             Pause = () =>
             {
@@ -61,6 +64,9 @@ namespace vHackApi.Bot
                         var info = await MyInfo.Fetch(console);
                         var tasks = await upd.getTasks();
 
+                        // upgrade botnet PCs anyway
+                        await doUpgradePc(info, upd);
+
                         var curStatus = CurrentStatus(info, tasks);
 
                         if (curStatus == Status.Idle)
@@ -78,6 +84,8 @@ namespace vHackApi.Bot
                     }
                     finally
                     {
+
+                        
                         Monitor.Exit(localSemaphore);
                     }
                 }
@@ -147,7 +155,7 @@ namespace vHackApi.Bot
                 cfg.logger.Log("{0} money needed to end tasks, continue", finishAllFor);
                 await upd.useBooster();
             }
-            else 
+            //else 
             {
                 if (info.Packages > packagesBlock)
                     await doPackages(info, upd, cfg);
@@ -156,84 +164,269 @@ namespace vHackApi.Bot
             }
             //else
             {
-                // upgrade botnet PCs anyway
-                await doUpgradePc(info, upd);
+                
             }
+        }
+
+        private int[] _levelsTable = new int[]
+        {
+            18,
+            220,
+            580,
+            800,
+            1120,
+            1310,
+            1640,
+            1940,
+            2222,
+            2600,
+            2800,
+            3200, // 3 en
+            3750, // 4 en
+            4150, // 4 en
+            4700, // 4 en
+
+        };
+
+        enum UpgradePCStatus
+        {
+            UpgradePC,
+            Attack,
+            FillEnergy,
+        };
+        const int upgrPrice = 2000000;  // price for upgrading 1 PC
+        const int maxEnergy = 25;       //
+        const int pcOrAttack = 16;      // energy limit to choose between upgrade PC or attack
+        const int maxLevel = 250;
+
+        private UpgradePCStatus current = UpgradePCStatus.FillEnergy;
+
+        bool isFullyUpgraded(JObject bnInfo)
+        {
+            var data = bnInfo["data"];
+            var count = (int)bnInfo["count"];
+            for (int i = 0; i < count; i++)
+            {
+                var it = bnInfo["data"][i];
+                var running = (long)it["running"];
+                if (running != 0 ||
+                    (long)it["smash"] < maxLevel ||
+                    (long)it["mwk"] < maxLevel ||
+                    (long)it["av"] < maxLevel ||
+                    (long)it["av"] < maxLevel)
+                    return false;
+            }
+            return true;
+        }
+
+        UpgradePCStatus getUpgrade(int energy, long money)
+        {
+            if (current == UpgradePCStatus.FillEnergy &&
+                energy < maxEnergy)
+                return UpgradePCStatus.FillEnergy;
+
+            if (current == UpgradePCStatus.FillEnergy &&
+                energy >= maxEnergy)
+            {
+                current = UpgradePCStatus.UpgradePC;
+                return current;
+            }
+
+            if (energy >= pcOrAttack)
+            {
+                // if not enough money we go with attack
+                if (money <= upgrPrice)
+                    current = UpgradePCStatus.Attack;
+                else
+                    current = UpgradePCStatus.UpgradePC;
+                return current;
+            }
+
+            if (6 < energy && energy < pcOrAttack)
+            {
+                current = UpgradePCStatus.Attack;
+                return current;
+            }
+
+            current = UpgradePCStatus.FillEnergy;
+            return current;
         }
 
         private async Task doUpgradePc(MyInfo info, Update upd)
         {
-            
             var bnInfo = await upd.botnetInfo();
             var career = await upd.getCareerStatus(vhConsole.uHash);
             if (bnInfo == null)
                 return;
 
-            // OLD
-            //// we'll select the pc with the minor level and price to be upgraded
-            //long idToUpgrade = 0;
-            //long minLevel = long.MaxValue;
-            //for (int i = 0; i < bnInfo.Count; i++)
-            //{
-            //    var it = bnInfo[i];
-            //    var price = (long)it["bPRICE"];
-            //    var level = (long)it["bLVL"];
-            //    var id = (long)it["bID"];
-
-            //    if (level == 100)
-            //        continue; // max level reached
-
-            //    if (price > info.Money)
-            //        continue;
-
-            //    if (minLevel > level)
-            //    {
-            //        minLevel = level;
-            //        idToUpgrade = id;
-            //    }                
-            //}
-
-            //if (idToUpgrade > 0)
-            //    await upd.upgradeBotnet(idToUpgrade.ToString());
-
             var count = (int) bnInfo["count"];
-            var energy = (int)bnInfo["energy"];
-            var pieces = (int)bnInfo["pieces"];
-            if (pieces > 100)
-            {
-                upd.buildPC(vhConsole.uHash, $"BotnetPC_{count.ToString("D3")}");
-            }
+            var energy = (int) bnInfo["energy"];
+            var pieces = (int) bnInfo["pieces"];
+            var nextlvl = (int) career["nextlevel"];
 
-            for (int i = 0; i < bnInfo.Count; i++)
+            if (pieces >= 30)
             {
-                var it = bnInfo["data"][i];
-                var running = (long)it["running"];
-
-                if (running == 0)
+                var pcName = $"BotnetPC_{count:D3}";
+                JObject buildResult = null;
+                try
                 {
-                    var dict = new Dictionary<Update.OfWhat, long>();
-
-                    dict[Update.OfWhat.fw] = (long)it["fw"];
-                    dict[Update.OfWhat.av] = (long)it["av"];
-                    dict[Update.OfWhat.smash] = (long)it["smash"];
-                    dict[Update.OfWhat.mwk] = (long)it["mwk"];
-
-                    // update the minor value
-                    var whatToUpdate = dict.OrderBy(pair => pair.Value).First().Key;
-                    //var whatToUpdate = Update.OfWhat.smash;
-                    var hostname = (string) it["hostname"];
-                    var uhash = "userHash_not_needed";
-                    //var uhash = vhConsole.uHash;
-                    try
-                    {
-                        // TODO: server answer is badly formatted, but it goes anyway
-                        await upd.upgradePC(uhash, hostname, whatToUpdate);
-                    }
-                    catch (Exception) { }
+                    buildResult = await upd.buildPC(vhConsole.uHash, pcName);
+                }
+                catch (Exception e)
+                {
                 }
             }
 
-            // TODO: DO ATTACK (we must know the minimum levels, but they are encoded in the client)
+            var money = info.Money;
+            var upgrade = getUpgrade(energy, info.Money);
+            var upgradedCount = -1;
+            if (upgrade == UpgradePCStatus.UpgradePC)
+            {
+                upgradedCount = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    var it = bnInfo["data"][i];
+                    var running = (long) it["running"];
+
+                    if (running == 0)
+                    {
+                        //var dict = new Dictionary<Update.OfWhat, long>();
+
+                        //dict[Update.OfWhat.fw] = (long)it["fw"];
+                        //dict[Update.OfWhat.av] = (long)it["av"];
+                        //dict[Update.OfWhat.smash] = (long)it["smash"];
+                        //dict[Update.OfWhat.mwk] = (long)it["mwk"];
+
+                        //// update the minor value
+                        //var whatToUpdate = dict.OrderBy(pair => pair.Value).First().Key;
+
+
+
+
+
+                        //// strategy 1: update ONLY what's requested by current chapter
+                        //var whatToUpdate = Update.OfWhat.smash; // first chapter smash
+                        //if (nextlvl < 21)
+                        //    whatToUpdate = Update.OfWhat.mwk; // 2nd malware kit
+                        //else if (nextlvl < 31)
+                        //    whatToUpdate = Update.OfWhat.fw;
+                        //else if (nextlvl < 41)
+                        //    whatToUpdate = Update.OfWhat.av;
+
+                        var whatToUpdate = Update.OfWhat.smash; // first chapter smash
+                        if (nextlvl > 10)
+                            whatToUpdate = Update.OfWhat.mwk; // 2nd malware kit
+
+                        if ((long) it[whatToUpdate.ToString()] == 250)
+                        {
+                            var bak = whatToUpdate;
+                            //// strategy 2: update in order of chapter's request priority
+                            //whatToUpdate = Update.OfWhat.smash;
+                            //if ((long)it["smash"] == maxLevel) // && bak != Update.OfWhat.mwk)
+                            //    whatToUpdate = Update.OfWhat.mwk;
+                            //else if ((long)it["mwk"] == maxLevel) // && bak != Update.OfWhat.av)
+                            //    whatToUpdate = Update.OfWhat.av;
+                            //else if ((long)it["av"] == maxLevel) // && bak != Update.OfWhat.fw)
+                            //    whatToUpdate = Update.OfWhat.fw;
+                            //else if ((long)it["fw"] == maxLevel)
+                            //    continue;
+
+                            // strategy 2: update in order of chapter's request priority
+                            whatToUpdate = Update.OfWhat.none;
+                            if ((long) it["smash"] < maxLevel) // && bak != Update.OfWhat.mwk)
+                                whatToUpdate = Update.OfWhat.smash;
+                            else if ((long) it["mwk"] < maxLevel) // && bak != Update.OfWhat.av)
+                                whatToUpdate = Update.OfWhat.mwk;
+                            else if ((long) it["av"] < maxLevel) // && bak != Update.OfWhat.fw)
+                                whatToUpdate = Update.OfWhat.av;
+                            else if ((long) it["fw"] < maxLevel)
+                                whatToUpdate = Update.OfWhat.fw;
+                        }
+
+                        var hostname = (string) it["hostname"];
+                        logger.Log("Upgrading {0} {1}", hostname, whatToUpdate);
+                        if (whatToUpdate != Update.OfWhat.none)
+                        {
+
+                            var uhash = "userHash_not_needed";
+                            //var uhash = vhConsole.uHash;
+                            try
+                            {
+                                // TODO: try-catch cause server answer is badly formatted, but it works anyway
+                                var res = await upd.upgradePC(uhash, hostname, whatToUpdate);
+                            }
+                            catch (Exception)
+                            {
+                            }
+                            upgradedCount++;
+                        }
+                    }
+                    else
+                        upgradedCount++; // we count also running updates
+                }
+            }
+
+            // update what to upgrade
+            if (upgradedCount == 0) // if no pc has been upgraded we jump right to the attack; if -1 then we are on attack or on fill energy
+                upgrade = UpgradePCStatus.Attack;
+            //else
+            //{
+            //    // update values and see if we need to attack
+            //    info = await MyInfo.Fetch(_api.getConsole());
+            //    bnInfo = await upd.botnetInfo();
+            //    energy = (int) bnInfo["energy"];
+            //    money = info.Money;
+            //    upgrade = getUpgrade(energy, money);
+            //}
+
+
+            if (upgrade == UpgradePCStatus.Attack)
+            {
+                if (nextlvl <= _levelsTable.Length)
+                {
+                    // if we have enough strenght we try to attack next level
+                    var minV = _levelsTable[nextlvl - 1];
+                    var strength = (int)bnInfo["strength"];
+                    // TODO: bypassed for now
+                    //if (strength > minV * 1.35)
+                    //{
+                    //    var startRes = await upd.startLevel("userHash_not_needed", nextlvl);
+                    //}
+                }
+
+                // attack the last level of last chapter (earn much money)
+                var lvlToSmash = nextlvl - nextlvl % 10; // TODO: WHY WITH 20 DOESN'T WORK?
+                //var lvlToSmash = 10;
+               
+                var smashResult = await upd.startLevel(info.UHash, lvlToSmash);
+                logger.Log("Attacking botnet level {0}, result {1}", lvlToSmash, smashResult["result"]);
+            }
+
+
+            // HIJACK!!
+            var hsinfo = await upd.hotspotInfo();
+            var mystrength = (long)bnInfo["strength"];
+            if ((int) hsinfo["myhotspot"] == 0) // no hotspot owned
+            {
+                var arr = (JArray) hsinfo["data"];
+                for (int i = 0; i < arr.Count; i++)
+                {
+                    var host = (string) arr[i]["host"];
+                    var strength = (long)arr[i]["strength"];
+                    if (mystrength >= strength)
+                    {
+                        // lets hijack this sucker!!!11
+                        var hjres = await upd.startHijack(vhConsole.uHash, host);
+                        if ((int) hjres["result"] == 0)
+                        {
+                            logger.Log("Succesfully hijacked host {0}", host);
+                            break;
+                        }
+                        else
+                            logger.Log("Unable hijack host {0}", host);
+                    }
+                }
+            }
         }
 
         private async Task doPackages(MyInfo info, Update upd, IConfig cfg)

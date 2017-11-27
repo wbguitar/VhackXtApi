@@ -31,6 +31,8 @@ namespace vHackApi.Interfaces
         bool hackTheDevPaused { get; set; }
         bool hackBotNetPaused { get; set; }
 
+        int getImgBy { get; set; } // 0 = score, 1 = reputation
+
         TimeSpan hackDevPolling { get; }
         TimeSpan hackBotnetPolling { get; }
 

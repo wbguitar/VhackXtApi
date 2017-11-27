@@ -122,7 +122,8 @@ namespace vHackApi
                                 Spyware = (long)ip.Attribute("Spyware"),
                                 WinChance = (long)ip.Attribute("WinChance"),
                                 Hostname = (string)ip.Attribute("Hostname"),
-                                Attacks = ip.Element("Attacks").Descendants()
+                                Attacks = ip.Element("Attacks")
+                                .Descendants()
                                 .Select(att =>
                                 new Attacks()
                                 {
@@ -227,6 +228,9 @@ namespace vHackApi
         public bool UpdateIp(IPs ip)
         {
             var idx = IPs.FindIndex(it => it.IP == ip.IP);
+            if (idx < 0)
+                return false;
+
             var oldip = IPs[idx];
             var res = ip.CopyProperties(ref oldip);
             if (res)

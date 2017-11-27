@@ -9,6 +9,7 @@ using Tesseract;
 using vHackApi.Api;
 using vHackApi.Interfaces;
 using System.Linq;
+using vHackApi.Bot;
 
 namespace vHackApi.Console
 {
@@ -211,6 +212,7 @@ namespace vHackApi.Console
                     //var filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.GetRandomFileName() + "_FBI.png");
                     //subimgFwall.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
                     config.logger.Log("Host {0} is watched by FBI!! skipping", hostname);
+                    Log.ContestLogger.Log("Skip watched by FBI: {0}", hostname);
                     return 1;
                 }
                 else
@@ -268,20 +270,23 @@ namespace vHackApi.Console
                 //}
 
                 config.logger.Log("Host {0} is watched by FBI!! skipping", hostname);
+                Log.ContestLogger.Log("Skip watched by FBI: {0}", hostname);
                 return 1;
             }
             else
             {
-                if (vhUtils.IsContestRunning())
-                {
-                    // FOR TESTING PURPOSE
-                    var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VHACK");
-                    var filename = Path.Combine(root
-                        , "FBI_WATCHED_" + hostname + "_" + Path.GetRandomFileName() + ".png");
-                    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                //if (vhUtils.IsContestRunning())
+                //{
+                //    // FOR TESTING PURPOSE
+                //    var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VHACK");
+                //    if (!Directory.Exists(root))
+                //        Directory.CreateDirectory(root);
+                //    var filename = Path.Combine(root
+                //        , "FBI_WATCHED_" + hostname + "_" + Path.GetRandomFileName() + ".png");
+                //    image.image.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
 
-                    config.logger.Log($"******\n\tATTACKING {hostname};\n\t{text}\n\t{filename}\n*******");
-                }
+                //    config.logger.Log($"******\n\tATTACKING {hostname};\n\t{text}\n\t{filename}\n*******");
+                //}
 
                 var firewall = text.Split(':');
                 if (firewall.Length > 2)
@@ -298,6 +303,7 @@ namespace vHackApi.Console
                         {
                             config.logger.Log("Unable to scan host {0}", hostname);
                             config.logger.Log("********* BLOCKED BY FBI!!! **********");
+                            Log.ContestLogger.Log("ScanHost {0} error BLOCKED BY FBI!!!", hostname);
                             return -1;
                         }
 
@@ -312,6 +318,7 @@ namespace vHackApi.Console
 
                             try
                             {
+                                // look if already in list and in case update hostname
                                 var ips = config.persistanceMgr.GetIp(ip);
                                 if (ips != null && ips.Hostname == "unknown")
                                 {
@@ -615,7 +622,8 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             //}
             //else
             {
-                var temp = await GetImg(vhConsole.uHash);
+                var getImgBy = (GetImgBy) config.getImgBy;
+                var temp = await GetImg(vhConsole.uHash, getImgBy);
                 var data = (JArray)temp["data"];
 
                 foreach (var d in data)
@@ -654,6 +662,7 @@ YourWinChance: {8} Anonymous:{9} username: {10} saving: {11}"
             Score = 0,
             Reputation = 1,
         }
+
         public async Task<JObject> GetImg(string uhash, GetImgBy by = GetImgBy.Score)
         {
             return await vhUtils.JSONRequest("user::::pass::::uhash::::by",

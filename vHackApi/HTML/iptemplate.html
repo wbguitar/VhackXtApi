@@ -9,13 +9,14 @@
             </style>
             <table>
                 <tr>
-                    <td style="width: 300px; border: 1px solid black">
+                    <td style="width: 300px; border: 1px solid black; border-radius: 5px; padding: 5px">
                         <label style="font-size: larger"><strong>$ip$</strong></label> 
                         <label style="font-style: italic; font-size: smaller">$lastUpd$</label><br />
                         <label style="font-size: smaller">$money$</label>
                     </td>
                     <td>
-                        <input type="submit" value="attack" style="margin-left: 20px" />
+                        <input type="submit" value="attack" name="action" style="margin-left: 20px" />
+                        <input type="submit" value="remove" name="action"  style="margin-left: 0px"/>
                         <input type="text" name="ip" value="$ip$" style="visibility: hidden" />
                     </td>
                 </tr>

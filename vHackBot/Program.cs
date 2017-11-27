@@ -1,9 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using vHackApi;
@@ -11,7 +9,6 @@ using vHackApi.Api;
 using vHackApi.Bot;
 using vHackApi.Console;
 using vHackApi.Interfaces;
-using System.Net;
 using vHackApi.HTTP.Griffin;
 using static vHackApi.HTTP.vhApiServer;
 
@@ -38,131 +35,6 @@ namespace vHackBot
 
             t1.Start();
             t1.Join();
-        }
-
-        private class ConsoleLogger : ILogger
-        {
-            #region ILogger Members
-
-            public void Log(string format, params object[] parms)
-            {
-                var msg = (parms.Length == 0) ? format : string.Format(format, parms);
-                Console.WriteLine("{0} - {1}", DateTime.Now, msg);
-            }
-
-            #endregion ILogger Members
-        }
-
-        private class Log4netLogger : ILogger
-        {
-            private log4net.ILog logger = log4net.LogManager.GetLogger(typeof(Program));
-
-            public Log4netLogger()
-            {
-                log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));
-            }
-            public void Log(string format, params object[] parms)
-            {
-                if (parms == null || parms.Length == 0)
-                    logger.Info(format);
-                else
-                    logger.InfoFormat(format, parms);
-            }
-        }
-
-        public class Config : IConfig
-        {
-            #region IConfig Members
-
-            public virtual string username => Properties.Settings.Default.user;
-
-            public virtual string password => Properties.Settings.Default.pass;
-
-            public virtual bool hackIfNotAnonymous
-            {
-                get { return Properties.Settings.Default.hackIfNotAnonymous; }
-                set { Properties.Settings.Default.hackIfNotAnonymous = value; }
-            }
-
-            private ConsoleLogger cl = new ConsoleLogger();
-            private Log4netLogger l4logger = new Log4netLogger();
-            public ILogger logger
-            {
-                get { return l4logger; }
-            }
-
-            public string tessdata => Properties.Settings.Default.TessdataPath;
-
-            public int waitstep
-            {
-                get { return Properties.Settings.Default.WaitStep; }
-                set { Properties.Settings.Default.WaitStep = value; }
-            }
-
-            public int winchance
-            {
-                get { return Properties.Settings.Default.WinChance; }
-                set { Properties.Settings.Default.WinChance = value; }
-            }
-
-            public string dbConnectionString => Properties.Settings.Default.dbConnString;
-
-            public int maxFirewall
-            {
-                get { return Properties.Settings.Default.maxFirewall; }
-                set { Properties.Settings.Default.maxFirewall = value; }
-            }
-
-            public int maxAntivirus
-            {
-                get { return Properties.Settings.Default.maxAntivirus; }
-                set { Properties.Settings.Default.maxAntivirus = value; }
-            }
-
-            public TimeSpan hackDevPolling => Properties.Settings.Default.hackDevPolling;
-
-            public TimeSpan hackBotnetPolling => Properties.Settings.Default.hackBotnetPolling;
-
-            public TimeSpan ipAttackPolling => Properties.Settings.Default.ipAttackPolling;
-
-            public TimeSpan ipScannerPolling => Properties.Settings.Default.ipScannerPolling;
-
-            public bool safeScan => Properties.Settings.Default.safeScan;
-
-            //public IIPselector ipSelector => IPSelectorASAP.Instance;
-            public IIPselector ipSelector => IPSelectorRandom.Default;
-
-            public IUpgradeStrategy upgradeStrategy => ProportionalUpgradeStrategy.Default;
-            //public IUpgradeStrategy upgradeStrategy => StatisticalUpgradeStrategy.Ston.Default;
-
-            //public IPersistanceMgr persistanceMgr => DbManager.Instance;
-            public IPersistanceMgr persistanceMgr => XmlMgr.Default;
-
-            public IWebProxy proxy { get; set; } = (!string.IsNullOrEmpty(Properties.Settings.Default.proxyAddress) && Properties.Settings.Default.proxyPort != 0) ? new WebProxy(Properties.Settings.Default.proxyAddress, Properties.Settings.Default.proxyPort) : null;
-
-            public int finishAllFor
-            {
-                get { return Properties.Settings.Default.finishAllFor; }
-                set { Properties.Settings.Default.finishAllFor = value; }
-            }
-
-            public string vhServerHost => Properties.Settings.Default.httpHost;
-
-            public int vhServerPort => Properties.Settings.Default.httpPort;
-
-            public bool ipAttackPaused { get; set; }
-
-            public bool ipScannerPaused { get; set; }
-
-            public bool hackTheDevPaused { get; set; }
-
-            public bool hackBotNetPaused { get; set; }
-
-            public string chatIp => Properties.Settings.Default.chatIp;
-            public int chatPort => Properties.Settings.Default.chatPort;
-            public string chatUser => Properties.Settings.Default.chatUser;
-
-            #endregion IConfig Members
         }
 
         private static List<Timer> timers = new List<Timer>();
@@ -192,7 +64,6 @@ namespace vHackBot
 
                 DbManager.Instance.Initialize(cfg);
 
-
                 IPSelectorRandom.Default.Init(cfg);
 
                 vhUtils.config = cfg;
@@ -209,7 +80,6 @@ namespace vHackBot
 
                 //GlobalConfig.Init(cfg, api);
 
-                var mi = api.getConsole().MyInfo();
                 ProportionalUpgradeStrategy.Default.Init(cfg, api);
 
 
@@ -231,6 +101,9 @@ namespace vHackBot
 
 
                 log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));
+
+                vHackApi.Bot.Log.ContestLogger = new ContestLogger();
+                vHackApi.Bot.Log.ContestLogger.Log("**** START");
                 //var logger = log4net.LogManager.GetLogger(typeof(Program)).Logger.Repository.GetAppenders()
                 //    .FirstOrDefault(app => app.Name == "RollingChat");
                 var logger = log4net.LogManager.GetLogger("ChatLogger");
@@ -268,6 +141,8 @@ namespace vHackBot
                         cfg.ipScannerPaused = c.ipScannerPaused;
                         cfg.ipAttackPaused = c.ipAttackPaused;
 
+                        cfg.getImgBy = c.getImgBy;
+
                         Properties.Settings.Default.hackIfNotAnonymous = c.hackIfNotAnonymous;
                         Properties.Settings.Default.Save();
                     }
@@ -292,164 +167,5 @@ namespace vHackBot
                 cfg.logger.Log(e.ToString());
             }
         }
-
-        class ConfigParser : IConfigParser
-        {
-            public class Config : IConfig
-            {
-                public Config() { }
-                public Config(JObject json)
-                {
-                    // {
-                    //     "waitstep": 2000,
-                    //     "winchance": 75,
-                    //     "maxFirewall": 15000,
-                    //     "finishAllFor": 2000,
-                    //     "maxAntivirus": 15000,
-                    //     "hackIfNotAnonymous": true,
-                    // }
-
-                    
-                    waitstep = getValue(json, "waitstep", -1); 
-                    winchance = getValue(json, "winchance", -1);
-                    maxFirewall = getValue(json, "maxFirewall", -1); 
-                    finishAllFor = getValue(json, "finishAllFor", -1); 
-                    maxAntivirus = getValue(json, "maxAntivirus", -1);
-
-                    hackIfNotAnonymous = getValue(json, "hackIfNotAnonymous", false);
-                    ipAttackPaused = getValue(json, "ipAttackPaused", false);
-                    ipScannerPaused = getValue(json, "ipScannerPaused", false);
-                    hackBotNetPaused = getValue(json, "hackBotNetPaused", false);
-                    hackTheDevPaused = getValue(json, "hackTheDevPaused", false);
-
-                }
-
-                public override string ToString()
-                {
-                    return $@"{{
-    waitstep: {waitstep},
-    winchance: {winchance},
-    maxFirewall: {maxFirewall},
-    finishAllFor: {finishAllFor},
-    maxAntivirus: {maxAntivirus},
-    hackIfNotAnonymous: {hackIfNotAnonymous},
-    ipAttackPaused: {ipAttackPaused},
-    ipScannerPaused: {ipScannerPaused},
-    hackBotNetPaused: {hackBotNetPaused},
-    hackTheDevPaused: {hackTheDevPaused},
-}}";
-                }
-
-                T getValue<T>(JObject json, string key, T def)
-                {
-                    var tok = json.GetValue(key);
-                    if (tok == null)
-                        return def;
-                    return tok.Value<T>();
-                }
-
-                public string username { get { throw new NotSupportedException(); } }
-
-                public string password { get { throw new NotSupportedException(); } }
-
-                public string tessdata => null;
-
-                public int waitstep { get; private set; }
-
-                public int winchance { get; private set; }
-
-                public int maxFirewall { get; private set; }
-
-                public int maxAntivirus { get; private set; }
-
-                public bool safeScan { get { throw new NotSupportedException(); } }
-
-                public int finishAllFor { get; private set; }
-
-                public bool hackIfNotAnonymous { get; private set; }
-
-                public TimeSpan hackDevPolling { get { throw new NotSupportedException(); } }
-
-                public TimeSpan hackBotnetPolling { get { throw new NotSupportedException(); } }
-
-                public string dbConnectionString { get { throw new NotSupportedException(); } }
-                public string chatIp { get { throw new NotSupportedException(); } }
-                public int chatPort { get { throw new NotSupportedException(); } }
-                public string chatUser { get { throw new NotSupportedException(); } }
-
-                public ILogger logger { get { throw new NotSupportedException(); } }
-
-                public IIPselector ipSelector { get { throw new NotSupportedException(); } }
-
-                public IUpgradeStrategy upgradeStrategy { get { throw new NotSupportedException(); } }
-
-                public IPersistanceMgr persistanceMgr { get { throw new NotSupportedException(); } }
-
-                public IWebProxy proxy { get { throw new NotSupportedException(); } }
-
-                public string vhServerHost { get; private set; }
-
-                public int vhServerPort { get; private set; }
-
-                public bool ipAttackPaused { get; set; }
-
-                public bool ipScannerPaused { get; set; }
-
-                public bool hackTheDevPaused { get; set; }
-
-                public bool hackBotNetPaused { get; set; }
-
-                public TimeSpan ipAttackPolling { get { throw new NotSupportedException(); } }
-
-                public TimeSpan ipScannerPolling { get { throw new NotSupportedException(); } }
-            }
-            public event Action<IConfig> ConfigParsed = (cfg) => { };
-            public event Action<Exception> ParseError = (e) => { };
-
-            public void ParseConfig(JObject config)
-            {
-                try
-                {
-                    var cfg = new Config(config);
-                    ConfigParsed(cfg);
-                }
-                catch (Exception e)
-                {
-                    ParseError(e);
-                }
-            }
-        }
-    }
-
-    public class ConsoleUtils
-    {
-        [DllImport("Kernel32")]
-        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
-
-        public delegate bool EventHandler(CtrlType sig);
-        static EventHandler _handler;
-
-        public enum CtrlType
-        {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT = 1,
-            CTRL_CLOSE_EVENT = 2,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT = 6
-        }
-
-        public static event EventHandler OnConsole
-        {
-            add
-            {
-                SetConsoleCtrlHandler(value, true);
-            }
-
-            remove
-            {
-                SetConsoleCtrlHandler(value, false);
-            }
-        }
-        
     }
 }

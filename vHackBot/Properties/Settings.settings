@@ -54,7 +54,7 @@
       <Value Profile="(Default)">wonderboy.ddns.net</Value>
     </Setting>
     <Setting Name="ipAttackPolling" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:01:00</Value>
+      <Value Profile="(Default)">00:00:20</Value>
     </Setting>
     <Setting Name="ipScannerPolling" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:20</Value>
@@ -67,6 +67,9 @@
     </Setting>
     <Setting Name="chatPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7531</Value>
+    </Setting>
+    <Setting Name="getImgBy" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

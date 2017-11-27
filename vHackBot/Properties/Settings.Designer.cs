@@ -230,7 +230,7 @@ namespace vHackBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:20")]
         public global::System.TimeSpan ipAttackPolling {
             get {
                 return ((global::System.TimeSpan)(this["ipAttackPolling"]));
@@ -285,6 +285,18 @@ namespace vHackBot.Properties {
             }
             set {
                 this["chatPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int getImgBy {
+            get {
+                return ((int)(this["getImgBy"]));
+            }
+            set {
+                this["getImgBy"] = value;
             }
         }
     }

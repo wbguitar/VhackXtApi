@@ -6,56 +6,103 @@
     <title>VHack BOT Config</title>
 </head>
 <body>
-    <!--<a href="$post_url$">post url</a>-->
+    
+<!--<a href="$post_url$">post url</a>-->
 
-    <form action="/config" method="post">
-        <a href="$mainPage$">back</a><br /><br /><wbr />
-        <table style="width: 300pt">
-            <tr>
-                <td>Waitstep:</td>
-                <td class="in"><input type="number" name="waitstep" value="$waitstep$" /></td>
-            </tr>
-            <tr>
-                <td>Win chance:</td>
-                <td><input type="number" name="winchance" value="$winchance$" /></td>
-            </tr>
-            <tr>
-                <td>Max firewall:</td>
-                <td><input type="number" name="maxFirewall" value="$maxFirewall$" /></td>
-            </tr>
-            <tr>
-                <td>Max antivirus:</td>
-                <td><input type="number" name="maxAntivirus" value="$maxAntivirus$" /></td>
-            </tr>
-            <tr>
-                <td>Finish all for:</td>
-                <td><input type="number" name="finishAllFor" value="$finishAllFor$" /></td>
-            </tr>
-            <tr>
-                <td>Hack if not anonymous: </td>
-                <td><input type="checkbox" name="hackIfNotAnonymous" $hackIfNotAnonymous$/></td>
-            </tr>
+<form action="/config" method="post">
+    <a href="$mainPage$">back</a><br/><br/><wbr/>
+    <table style="width: 300pt">
+        <tr>
+            <td>Waitstep:</td>
+            <td class="in"><input type="number" name="waitstep" value="$waitstep$"/></td>
+        </tr>
+        <tr>
+            <td>Win chance:</td>
+            <td><input type="number" name="winchance" value="$winchance$"/></td>
+        </tr>
+        <tr>
+            <td>Max firewall:</td>
+            <td><input type="number" name="maxFirewall" value="$maxFirewall$"/></td>
+        </tr>
+        <tr>
+            <td>Max antivirus:</td>
+            <td><input type="number" name="maxAntivirus" value="$maxAntivirus$"/></td>
+        </tr>
+        <tr>
+            <td>Finish all for:</td>
+            <td><input type="number" name="finishAllFor" value="$finishAllFor$"/></td>
+        </tr>
+        <tr>
+            <td>Hack if not anonymous: </td>
+            <td><input type="checkbox" name="hackIfNotAnonymous" $hackIfNotAnonymous$/></td>
+        </tr>
 
-            <tr>
-                <td>IP Attack paused: </td>
-                <td><input type="checkbox" name="ipAttackPaused" $ipAttackPaused$/></td>
-            </tr>
-            <tr>
-                <td>IP Scanner paused: </td>
-                <td><input type="checkbox" name="ipScannerPaused" $ipScannerPaused$/></td>
-            </tr>
-            <tr>
-                <td>Hack botnet paused: </td>
-                <td><input type="checkbox" name="hackBotNetPaused" $hackBotNetPaused$/></td>
-            </tr>
-            <tr>
-                <td>Hack the Dev paused: </td>
-                <td><input type="checkbox" name="hackTheDevPaused" $hackTheDevPaused$/></td>
-            </tr>
-        </table>
-        <br />
-       
-        <input type="submit" value="Submit" />
-    </form>
+        <tr>
+            <td>IP Attack paused: </td>
+            <td><input type="checkbox" name="ipAttackPaused" $ipAttackPaused$/></td>
+        </tr>
+        <tr>
+            <td>IP Scanner paused: </td>
+            <td><input type="checkbox" name="ipScannerPaused" $ipScannerPaused$/></td>
+        </tr>
+        <tr>
+            <td>Hack botnet paused: </td>
+            <td><input type="checkbox" name="hackBotNetPaused" $hackBotNetPaused$/></td>
+        </tr>
+        <tr>
+            <td>Hack the Dev paused: </td>
+            <td><input type="checkbox" name="hackTheDevPaused" $hackTheDevPaused$/></td>
+        </tr>
+        <tr>
+            <td>Get img by: </td>
+            <td>
+                <select name="getImgBy" value="$getImgBy$">
+                    <option value="0" $getImgByScore$>Score</option>
+                    <option value="1" $getImgByReputation$>Reputation</option>
+                </select>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>PC or Attack</td>
+            <td>
+                <label style="font-size: xx-small; font-family: verdana">PC</label>
+                <progress id="progressBar" value="22" max="100">
+                    
+
+                </progress><label style="font-size: xx-small; font-family: verdana">Attack</label>
+            </td>
+        </tr>
+
+    </table>
+    <br/>
+
+    <input type="submit" value="Submit"/>
+</form>
+<script type="text/javascript">
+
+    var prog = document.getElementById('progressBar');
+    var rect = prog.getBoundingClientRect();
+    var func = function (e) {
+        if (e.type === 'mousemove' && 1 !== e.buttons)
+            return;
+
+        console.log(e.type);
+        
+        console.log((e.clientX - rect.x) / rect.width + ' ' + (e.clientY - rect.y) / rect.height);
+        prog.value = Math.round((e.clientX - rect.x + 1) / rect.width * 100);
+    };
+    prog.addEventListener('mousemove', func);
+    prog.addEventListener('click', func);
+
+        // self executing function here
+        (function () {
+            // your page initialization code here
+            // the DOM will be available here
+
+        })();
+
+</script>
 </body>
 </html>

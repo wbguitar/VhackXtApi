@@ -6,6 +6,7 @@ using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
+
     public class IPScanner : AHackTimer<IPScanner>
     {
         private IPScanner() { }
@@ -60,6 +61,10 @@ namespace vHackApi.Bot
 
             hackTimer = new Timer(async (o) =>
             {
+                //// TEST: skip during contest
+                //if (vhUtils.IsContestRunning())
+                //    return;
+
                 // if not on upgrade we'll skip attack
                 if (!vhUtils.IsContestRunning() && UpgradeMgr.Instance.CurStatus != UpgradeMgr.Status.Upgrade)
                     return;
@@ -68,14 +73,17 @@ namespace vHackApi.Bot
                     return;
 
                 // wait a random bit
-                Thread.Sleep(rand.Next(0, (int)Period.TotalSeconds / 2));
+                Thread.Sleep(rand.Next(0, (int)Period.TotalSeconds / 5)*1000);
 
                 try
                 {
                     // first make a search for new ips to hack
                     var img = await console.FindHostsAndAttack();
+
                     // then looks in the syslog if there's some ips that needs to be pwn3d
-                    if (MyInfo.LastUpdInfo != null)
+                    if (MyInfo.LastUpdInfo != null
+                        // if contest running we don't attack syslog cause we don't know if they're watched
+                        && !vhUtils.IsContestRunning())
                     {
                         var myIp = MyInfo.LastUpdInfo.IP;
                         var sysLog = (await upd.getSysLog())["data"] as JArray;
@@ -94,6 +102,7 @@ namespace vHackApi.Bot
                                         if (js == null)
                                         {
                                             cfg.logger.Log("********* BLOCKED BY FBI!!! **********");
+                                            Log.ContestLogger.Log("ScanIp {0} error: BLOCKED BY FBI!!! ", newIp);
                                             return;
                                         }
                                         dbIp = new IPs(js);
