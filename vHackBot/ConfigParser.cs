@@ -34,6 +34,8 @@ namespace vHackBot
                 hackBotNetPaused = getValue(json, "hackBotNetPaused", false);
                 hackTheDevPaused = getValue(json, "hackTheDevPaused", false);
 
+                pcOrAttack = getValue(json, "pcOrAttack", 13);
+
                 getImgBy = getValue(json, "getImgBy", 0);
             }
 
@@ -62,6 +64,8 @@ namespace vHackBot
                 return tok.Value<T>();
             }
 
+            public string rootUrl { get { throw new NotSupportedException(); } }
+
             public string username { get { throw new NotSupportedException(); } }
 
             public string password { get { throw new NotSupportedException(); } }
@@ -82,6 +86,7 @@ namespace vHackBot
 
             public bool hackIfNotAnonymous { get; private set; }
 
+            public int pcOrAttack { get; set; }
             public int getImgBy { get; set; }
 
             public TimeSpan hackDevPolling { get { throw new NotSupportedException(); } }

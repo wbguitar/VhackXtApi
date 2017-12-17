@@ -299,5 +299,29 @@ namespace vHackBot.Properties {
                 this["getImgBy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://api.vhack.cc/v/14/")]
+        public string rootUrl {
+            get {
+                return ((string)(this["rootUrl"]));
+            }
+            set {
+                this["rootUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13")]
+        public int pcOrAttack {
+            get {
+                return ((int)(this["pcOrAttack"]));
+            }
+            set {
+                this["pcOrAttack"] = value;
+            }
+        }
     }
 }

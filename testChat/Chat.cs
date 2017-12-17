@@ -123,7 +123,7 @@ namespace testChat
         //    }
         //}
 
-        static IConfig cfg = new vHackBot.Program.Config();
+        static IConfig cfg = new vHackBot.Config();
         static vHackApi.Api.vhAPI api;
         static Chat()
         {

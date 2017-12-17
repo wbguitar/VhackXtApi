@@ -10,6 +10,8 @@ namespace vHackBot
     {
         #region IConfig Members
 
+        public string rootUrl => Properties.Settings.Default.rootUrl;
+
         public virtual string username => Properties.Settings.Default.user;
 
         public virtual string password => Properties.Settings.Default.pass;
@@ -54,6 +56,13 @@ namespace vHackBot
             get { return Properties.Settings.Default.maxAntivirus; }
             set { Properties.Settings.Default.maxAntivirus = value; }
         }
+
+        public int pcOrAttack
+        {
+            get { return Properties.Settings.Default.pcOrAttack; }
+            set { Properties.Settings.Default.pcOrAttack = value; }
+        }
+
 
         public int getImgBy
         {

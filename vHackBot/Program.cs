@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Topshelf;
 using vHackApi;
 using vHackApi.Api;
 using vHackApi.Bot;
@@ -16,28 +17,98 @@ namespace vHackBot
 {
     public class Program
     {
-        private static void Main(string[] args)
+        public class Runnable: IDisposable
         {
-            var cfg1 = new Config();
-            var t1 = new Thread(() => Run(cfg1));
-
-            ConsoleUtils.OnConsole += (sig) =>
+            private Thread t1;
+            public void Start()
             {
-                if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
-                    sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
+                var cfg1 = new Config();
+                t1 = new Thread(() => Run(cfg1));
+
+                ConsoleUtils.OnConsole += (sig) =>
                 {
-                    timers.ForEach(tm => tm.Dispose());
-                    return false;
+                    if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
+                        sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
+                    {
+                        Dispose();
+                        return false;
+                    }
+
+                    return true;
+                };
+
+                t1.Start();
+                //t1.Join();
+            }
+
+            public void Stop()
+            {
+                Dispose();
+            }
+
+            public void Dispose()
+            {
+                lock (this)
+                {
+                    if (timers != null)
+                    {
+                        for (var index = 0; index < timers.Count; index++)
+                        {
+                            var timer = timers[index];
+                            timer.Dispose();
+                            timers[index] = null;
+                        }
+
+                        timers = null;
+                    }
+
+                    if (t1 != null)
+                    {
+                        t1.Abort();
+                        t1 = null;
+                    } 
                 }
-
-                return true;
-            };
-
-            t1.Start();
-            t1.Join();
+            }
         }
 
-        private static List<Timer> timers = new List<Timer>();
+        private static void Main(string[] args)
+        {
+            //var cfg1 = new Config();
+            //var t1 = new Thread(() => Run(cfg1));
+
+            //ConsoleUtils.OnConsole += (sig) =>
+            //{
+            //    if (sig == ConsoleUtils.CtrlType.CTRL_CLOSE_EVENT ||
+            //        sig == ConsoleUtils.CtrlType.CTRL_C_EVENT)
+            //    {
+            //        timers.ForEach(tm => tm.Dispose());
+            //        return false;
+            //    }
+
+            //    return true;
+            //};
+
+            //t1.Start();
+            //t1.Join();
+
+
+            var exit = HostFactory.Run(x =>                                 //1
+            {
+                x.Service<Runnable>(s =>                        //2
+                {
+                    s.ConstructUsing(name => new Runnable());     //3
+                    s.WhenStarted(tc => tc.Start());              //4
+                    s.WhenStopped(tc => tc.Stop());               //5
+                   });
+                x.RunAsLocalSystem();                            //6
+
+                x.SetDescription("Vhack service host");        //7
+                x.SetDisplayName("VhackSvc");                       //8
+                x.SetServiceName("VhackSvc");                       //9
+            });
+        }
+
+        private static List<IHackTimer> timers;
 
         private static void Run(IConfig cfg)
         {
@@ -85,7 +156,7 @@ namespace vHackBot
 
 
                 // sets and starts timers
-                var timers = new List<IHackTimer>
+                timers = new List<IHackTimer>
                 {
                     HackTheDev.Instance,
                     IPScanner.Instance,
@@ -98,7 +169,6 @@ namespace vHackBot
                 // sets the timers
                 //timers.ForEach(tm => tm.Set(GlobalConfig.Config, GlobalConfig.Api));
                 timers.ForEach(tm => tm.Set(cfg, api));
-
 
                 log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));
 
@@ -135,6 +205,8 @@ namespace vHackBot
                             Properties.Settings.Default.maxAntivirus = c.maxAntivirus;
                         if (c.finishAllFor > 0)
                             Properties.Settings.Default.finishAllFor = c.finishAllFor;
+                        if (c.pcOrAttack > 0)
+                            Properties.Settings.Default.pcOrAttack = c.pcOrAttack;
 
                         cfg.hackTheDevPaused = c.hackTheDevPaused;
                         cfg.hackBotNetPaused = c.hackBotNetPaused;
@@ -149,6 +221,7 @@ namespace vHackBot
                     else
                         cfg.logger.Log($"Null config received from remote client");
                 };
+
                 cfgParser.ParseError += (e) =>
                 {
                     cfg.logger.Log($"Error parsing config from remote client: {e.Message}");
@@ -158,9 +231,10 @@ namespace vHackBot
 
                 new Thread(() => srv.Listen()).Start();
 
+
                 // wait for exit
                 Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
-                
+
             }
             catch (Exception e)
             {

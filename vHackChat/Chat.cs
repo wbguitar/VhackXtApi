@@ -22,7 +22,7 @@ namespace vHackChat
             textBoxLog.BackColor = Color.Black;
             textBoxLog.Text = textBoxWrite.Text = "";
 
-            var cfg = new vHackBot.Program.Config();
+            var cfg = new vHackBot.Config();
             
             var api = new vHackApi.Api.vhAPI(cfg);
             //vHackApi.Chat.ChatTest.Test(api);

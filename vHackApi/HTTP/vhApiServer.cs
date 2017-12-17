@@ -287,6 +287,8 @@ namespace vHackApi.HTTP
                             template.SetAttribute("getImgByScore", config.getImgBy == 0 ? "selected" : "");
                             template.SetAttribute("getImgByReputation", config.getImgBy == 1 ? "selected" : "");
 
+                            template.SetAttribute("pcOrAttack", config.pcOrAttack);
+
                             var html = template.ToString();
 
                             setResponse(ref response, html);
@@ -418,6 +420,11 @@ namespace vHackApi.HTTP
 
                                     }
 
+                                    if (cfg["pcOrAttack"] != null)
+                                    {
+                                        config.pcOrAttack = (int) cfg["pcOrAttack"];
+                                    }
+
                                     if (configParser != null)
                                         configParser.ParseConfig(cfg);
                                 }
@@ -463,8 +470,6 @@ namespace vHackApi.HTTP
 
                     return response;
                 }
-
-
             }
 
             IConfig config;
@@ -494,8 +499,6 @@ namespace vHackApi.HTTP
                     config.logger.Log($"Couldn't start vhServer on endpoint {ip.ToString()}:{port}: {exc.Message}");
                 }
             }
-
-            
         }
     }
 }

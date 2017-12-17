@@ -5,13 +5,14 @@
     <meta charset="utf-8" />
     <title>VHack BOT Config</title>
 </head>
-<body>
     
+<body>
 <!--<a href="$post_url$">post url</a>-->
 
 <form action="/config" method="post">
     <a href="$mainPage$">back</a><br/><br/><wbr/>
     <table style="width: 300pt">
+        
         <tr>
             <td>Waitstep:</td>
             <td class="in"><input type="number" name="waitstep" value="$waitstep$"/></td>
@@ -68,10 +69,10 @@
             <td>PC or Attack</td>
             <td>
                 <label style="font-size: xx-small; font-family: verdana">PC</label>
-                <progress id="progressBar" value="22" max="100">
-                    
-
-                </progress><label style="font-size: xx-small; font-family: verdana">Attack</label>
+                <progress id="progress" value="$pcOrAttack$" max="25"></progress>
+                <label style="font-size: xx-small; font-family: verdana">Attack</label>
+                <br/>
+                <input type="number" style="visibility: hidden;height: 0px" name="pcOrAttack" id="pcOrAttack"/>
             </td>
         </tr>
 
@@ -82,7 +83,9 @@
 </form>
 <script type="text/javascript">
 
-    var prog = document.getElementById('progressBar');
+    var prog = document.getElementById('progress');
+    var max = prog.getAttribute("max");
+    var input = document.getElementById('pcOrAttack');
     var rect = prog.getBoundingClientRect();
     var func = function (e) {
         if (e.type === 'mousemove' && 1 !== e.buttons)
@@ -91,7 +94,7 @@
         console.log(e.type);
         
         console.log((e.clientX - rect.x) / rect.width + ' ' + (e.clientY - rect.y) / rect.height);
-        prog.value = Math.round((e.clientX - rect.x + 1) / rect.width * 100);
+        input.value = prog.value = Math.round((e.clientX - rect.x + 1) / rect.width * max);
     };
     prog.addEventListener('mousemove', func);
     prog.addEventListener('click', func);

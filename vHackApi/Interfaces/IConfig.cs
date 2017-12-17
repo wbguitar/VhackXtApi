@@ -11,6 +11,7 @@ namespace vHackApi.Interfaces
 {
     public interface IConfig
     {
+        string rootUrl { get; }
         string username { get; }
         string password { get; }
         string tessdata { get; }
@@ -30,6 +31,8 @@ namespace vHackApi.Interfaces
         bool ipScannerPaused { get; set; }
         bool hackTheDevPaused { get; set; }
         bool hackBotNetPaused { get; set; }
+        int pcOrAttack { get; set; }
+
 
         int getImgBy { get; set; } // 0 = score, 1 = reputation
 
@@ -44,6 +47,7 @@ namespace vHackApi.Interfaces
         string chatIp { get; }
         int chatPort { get; }
         string chatUser { get; }
+
 
         ILogger logger { get; }
 

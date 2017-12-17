@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -196,7 +197,7 @@ namespace vHackApi.Bot
         };
         const int upgrPrice = 2000000;  // price for upgrading 1 PC
         const int maxEnergy = 25;       //
-        const int pcOrAttack = 16;      // energy limit to choose between upgrade PC or attack
+        //const int pcOrAttack = 16;      // energy limit to choose between upgrade PC or attack
         const int maxLevel = 250;
 
         private UpgradePCStatus current = UpgradePCStatus.FillEnergy;
@@ -232,7 +233,7 @@ namespace vHackApi.Bot
                 return current;
             }
 
-            if (energy >= pcOrAttack)
+            if (energy >= vhConsole.config.pcOrAttack)
             {
                 // if not enough money we go with attack
                 if (money <= upgrPrice)
@@ -242,7 +243,7 @@ namespace vHackApi.Bot
                 return current;
             }
 
-            if (6 < energy && energy < pcOrAttack)
+            if (6 < energy && energy < vhConsole.config.pcOrAttack)
             {
                 current = UpgradePCStatus.Attack;
                 return current;

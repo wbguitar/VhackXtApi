@@ -25,7 +25,7 @@ namespace vHackChat
             #endregion
         }
 
-        static IConfig cfg = new vHackBot.Program.Config();
+        static IConfig cfg = new vHackBot.Config();
         [STAThread]
         static void Main(string[] args)
         {

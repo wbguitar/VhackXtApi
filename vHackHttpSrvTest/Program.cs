@@ -15,7 +15,7 @@ namespace vHackHttpSrvTest
     {
         static void Main(string[] args)
         {
-            var cfg = new vHackBot.Program.Config();
+            var cfg = new vHackBot.Config();
 
             //var srv = new vhApiServer(cfg);
             ////var srv = new ExampleHttpServer(6666);

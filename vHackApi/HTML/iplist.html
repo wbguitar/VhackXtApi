@@ -8,42 +8,49 @@
 <body>
     <!--<a href="$post_url$">post url</a>-->
 
-<!--    <form action="/config" method="post">
+    <!--    <form action="/config" method="post">
         
        
-        <input type="submit" value="Submit" />
-    </form>-->
+    <input type="submit" value="Submit" />
+</form>-->
     <style>
-        *
-        {
-            vertical-align: center
+        * {
+            vertical-align: center;
         }
     </style>
 
-    <a href="$mainPage$">back</a><br /><br /><wbr />
+    <a href="$mainPage$">back</a><br />
+    <br />
+    <wbr />
     <fieldset>
         <legend>asdf</legend>
-        <table>
-            $iptable$
-        </table>
+        <div style="margin: 20px">
+            <table>
+                $iptable$
+            </table>
+        </div>
     </fieldset>
+
     <fieldset>
         <legend>Handle IPs</legend>
-        <label>Add</label><br />
-        <input required pattern="([0-9]{1,3}\.){3}[0-9]{1,3}" type="text" name="ipAdd" style="width: 100pt"/>
-        <input style="margin-left: 20px" type="submit" value="Add"/>
-        <table>
-            <tr>
-                <td>
+        <div style="margin: 20px">
+            <!--<label>Add</label>-->
+            <input required pattern="([0-9]{1,3}\.){3}[0-9]{1,3}" type="text" name="ipAdd" style="width: 100pt" />
+            <input style="margin-left: 20px;" type="submit" value="Add" />
+            <!-- <table>
+                <tr>
+                    <td>
                     
-                </td>
-                <td>
+                    </td>
+                    <td>
                     
-                </td>
-                <td>
-                </td>
-            </tr>
-        </table>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </table>-->
+        </div>
+
     </fieldset>
     <br />
 </body>
