@@ -106,6 +106,7 @@ namespace vHackApi.Bot
             }
         }
 
+        private int maxTasksCount = 30;
         private Status CurrentStatus(MyInfo info, JObject tasks)
         {
             // if no money or no boost => idle
@@ -114,7 +115,7 @@ namespace vHackApi.Bot
             //    return Status.Idle;
 
             var tasksData = (JArray)tasks["data"];
-            if (tasksData == null || tasksData.Count < info.RAM) // slots are available to add task => upgrade
+            if (tasksData == null || tasksData.Count < maxTasksCount)// info.RAM) // slots are available to add task => upgrade
             {
                 if (info.Money > 5000) // TODO: can upgrade? should calculate if money > what needs to upgrade 
                     CurStatus = Status.Upgrade;
@@ -242,7 +243,7 @@ namespace vHackApi.Bot
                     current = UpgradePCStatus.UpgradePC;
                 return current;
             }
-
+                
             if (6 < energy && energy < vhConsole.config.pcOrAttack)
             {
                 current = UpgradePCStatus.Attack;
@@ -284,7 +285,7 @@ namespace vHackApi.Bot
             if (upgrade == UpgradePCStatus.UpgradePC)
             {
                 upgradedCount = 0;
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < count && energy > 0; i++)
                 {
                     var it = bnInfo["data"][i];
                     var running = (long) it["running"];
@@ -318,7 +319,20 @@ namespace vHackApi.Bot
                         if (nextlvl > 10)
                             whatToUpdate = Update.OfWhat.mwk; // 2nd malware kit
 
-                        if ((long) it[whatToUpdate.ToString()] == 250)
+                        int maxUpdate = 250;
+                        if ((int)it["stars"] == 1)
+                            maxUpdate = 25;
+                        else if ((int)it["stars"] == 2)
+                            maxUpdate = 30;
+                        else if ((int)it["stars"] == 3)
+                            maxUpdate = 35;
+                        else if ((int)it["stars"] == 4)
+                            maxUpdate = 40; // TODO: update with correct max
+                        else if ((int)it["stars"] == 5)
+                            maxUpdate = 250; // TODO: update with correct max
+
+
+                        if ((long) it[whatToUpdate.ToString()] == maxUpdate)
                         {
                             var bak = whatToUpdate;
                             //// strategy 2: update in order of chapter's request priority
@@ -334,13 +348,13 @@ namespace vHackApi.Bot
 
                             // strategy 2: update in order of chapter's request priority
                             whatToUpdate = Update.OfWhat.none;
-                            if ((long) it["smash"] < maxLevel) // && bak != Update.OfWhat.mwk)
+                            if ((long) it["smash"] < maxUpdate) // && bak != Update.OfWhat.mwk)
                                 whatToUpdate = Update.OfWhat.smash;
-                            else if ((long) it["mwk"] < maxLevel) // && bak != Update.OfWhat.av)
+                            else if ((long) it["mwk"] < maxUpdate) // && bak != Update.OfWhat.av)
                                 whatToUpdate = Update.OfWhat.mwk;
-                            else if ((long) it["av"] < maxLevel) // && bak != Update.OfWhat.fw)
+                            else if ((long) it["av"] < maxUpdate) // && bak != Update.OfWhat.fw)
                                 whatToUpdate = Update.OfWhat.av;
-                            else if ((long) it["fw"] < maxLevel)
+                            else if ((long) it["fw"] < maxUpdate)
                                 whatToUpdate = Update.OfWhat.fw;
                         }
 
@@ -349,12 +363,14 @@ namespace vHackApi.Bot
                         if (whatToUpdate != Update.OfWhat.none)
                         {
 
-                            var uhash = "userHash_not_needed";
-                            //var uhash = vhConsole.uHash;
+                            //var uhash = "userHash_not_needed";
+                            var uhash = vhConsole.uHash;
                             try
                             {
                                 // TODO: try-catch cause server answer is badly formatted, but it works anyway
                                 var res = await upd.upgradePC(uhash, hostname, whatToUpdate);
+                                if ((int) res["result"] == 0)
+                                    energy--;
                             }
                             catch (Exception)
                             {
@@ -381,7 +397,7 @@ namespace vHackApi.Bot
             //}
 
 
-            if (upgrade == UpgradePCStatus.Attack)
+             if (upgrade == UpgradePCStatus.Attack)
             {
                 if (nextlvl <= _levelsTable.Length)
                 {
@@ -428,6 +444,40 @@ namespace vHackApi.Bot
                     }
                 }
             }
+
+
+            // ARENA
+            var ai = await upd.getArenaInfo();
+            var attacks = (int) ai["attleft"];
+            if (attacks > 0)
+            {
+                var reputation = (long) ai["arenarep"];
+                var rank = (long) ai["arank"];
+                //var reputation = ai["arenarep"];
+                //var reputation = ai["arenarep"];
+                var data = (JArray) ai["data"];
+                foreach (var t in data)
+                {
+                    var usr = (JObject) t;
+                    var rep = (long) usr["elo"];
+                    var target = (int) usr["target"];
+                    var score = (long) usr["score"];
+                    var username = (string) usr["username"];
+
+                    if (reputation > rep && mystrength > score)
+                    {
+                        var res = await upd.ArenaAttack(target);
+                        attacks = (int)res["attleft"];
+                        reputation = (int)res["arenarep"];
+                    }
+
+                    if (attacks == 0)
+                        break;
+                }
+
+                
+            }
+
         }
 
         private async Task doPackages(MyInfo info, Update upd, IConfig cfg)
@@ -440,8 +490,8 @@ namespace vHackApi.Bot
             {
                 //var pack = await upd.openPackage(info.UHash);
                 var pack = await upd.openFreeBonus(info.UHash);
-                if (pack != null)
-                {
+                if (pack != null && pack["type"] != null)
+                { 
                     var package = PackageResults.FromType((int)pack["type"]);
                     cfg.logger.Log("Opened package {0}", package);
                 }
@@ -472,16 +522,19 @@ namespace vHackApi.Bot
                 tasksData = new JArray();
 
             // if full do nothing
-            if (info.RAM == tasksData.Count)
+            //if (info.RAM == tasksData.Count)
+            if (maxTasksCount == tasksData.Count)
                 return;
 
-            for (int i = 0; i < info.RAM - tasksData.Count; i++)
+            //for (int i = 0; i < info.RAM - tasksData.Count; i++)
+            for (int i = 0; i < maxTasksCount - tasksData.Count; i++)
             {
                 var task = cfg.upgradeStrategy.NextTaskToUpgrade();
                 var temp = await upd.startTask(task);
                 var started = (int)temp["result"];
                 if (started == 0)
-                    cfg.logger.Log("Added task {0}, {1} slots available", task, info.RAM - tasksData.Count - i - 1); // ok TODO
+                    //cfg.logger.Log("Added task {0}, {1} slots available", task, info.RAM - tasksData.Count - i - 1); // ok TODO
+                    cfg.logger.Log("Added task {0}, {1} slots available", task, maxTasksCount - tasksData.Count - i - 1); // ok
                 else if (started == 3)
                     cfg.logger.Log("No slot are available to upgrade"); // full
                 else if (started == 1) // no money

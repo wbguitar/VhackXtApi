@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Topshelf;
 using vHackApi;
 using vHackApi.Api;
@@ -71,10 +72,12 @@ namespace vHackBot
             }
         }
 
+        static Runnable runnable = null;
         private static void Main(string[] args)
         {
-            //var cfg1 = new Config();
-            //var t1 = new Thread(() => Run(cfg1));
+#if MONO
+            var cfg1 = new Config();
+            var t1 = new Thread(() => Run(cfg1));
 
             //ConsoleUtils.OnConsole += (sig) =>
             //{
@@ -88,15 +91,20 @@ namespace vHackBot
             //    return true;
             //};
 
-            //t1.Start();
+            t1.Start();
             //t1.Join();
-
-
+            Thread.Sleep(Timeout.Infinite);
+#else
+            
             var exit = HostFactory.Run(x =>                                 //1
             {
                 x.Service<Runnable>(s =>                        //2
                 {
-                    s.ConstructUsing(name => new Runnable());     //3
+                    s.ConstructUsing(name =>
+                    {
+                        runnable = new Runnable();
+                        return runnable;
+                    });     //3
                     s.WhenStarted(tc => tc.Start());              //4
                     s.WhenStopped(tc => tc.Stop());               //5
                    });
@@ -106,9 +114,12 @@ namespace vHackBot
                 x.SetDisplayName("VhackSvc");                       //8
                 x.SetServiceName("VhackSvc");                       //9
             });
+#endif
+
         }
 
         private static List<IHackTimer> timers;
+        private static Thread serverThread;
 
         private static void Run(IConfig cfg)
         {
@@ -139,6 +150,9 @@ namespace vHackBot
 
                 vhUtils.config = cfg;
 
+                var logger = log4net.LogManager.GetLogger("BogLogger");
+                logger.InfoFormat("\n\n    *****   STARTING APPLICATION    *****\n\n");
+
                 var builder = new vhAPIBuilder()
                     .useConfig(cfg);
 
@@ -149,11 +163,20 @@ namespace vHackBot
                 //var career = upd.getCareerStatus(api.UserHash);
                 
 
+
                 //GlobalConfig.Init(cfg, api);
 
                 ProportionalUpgradeStrategy.Default.Init(cfg, api);
 
-
+                //var mails = upd.getMails().Result["data"] as JArray;
+                //foreach (var ja in mails)
+                //{
+                //    if ((int) ja["read"] == 0)
+                //    {
+                //        var id = (int) ja["id"];
+                //        var read = upd.readMail(id);
+                //    }
+                //}
 
                 // sets and starts timers
                 timers = new List<IHackTimer>
@@ -163,6 +186,7 @@ namespace vHackBot
                     HackBotNet.Instance,
                     IPAttack.Instance,
                     UpgradeMgr.Instance,
+                    DailyTimer.Instance,
                 };
 
 
@@ -176,14 +200,31 @@ namespace vHackBot
                 vHackApi.Bot.Log.ContestLogger.Log("**** START");
                 //var logger = log4net.LogManager.GetLogger(typeof(Program)).Logger.Repository.GetAppenders()
                 //    .FirstOrDefault(app => app.Name == "RollingChat");
-                var logger = log4net.LogManager.GetLogger("ChatLogger");
+                var chatLogger = log4net.LogManager.GetLogger("ChatLogger");
                 HackTheDev.Instance.Chat.MessageReceived += (s) =>
                 {
                     if (string.IsNullOrEmpty(s))
                         return;
 
-                    logger.Info(s.Trim());
+                    chatLogger.Info(s.Trim());
                 };
+
+                // UNHANDLED EXCEPTIONS
+                AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                {
+                    var exc = e.ExceptionObject as Exception;
+                    logger.ErrorFormat("\n\n    *****   UNHANDELED EXCEPTION    *****\n\n");
+                    do
+                    {
+                        logger.ErrorFormat(exc.ToString());
+                        
+                    } while ((exc = exc.InnerException) != null);
+                    logger.InfoFormat("\n\n    *****   CLOSING APPLICATION    *****\n\n");
+                    runnable.Dispose();
+                    //Environment.Exit(0);
+                };
+
+
 
 
                 // HTTP server
@@ -228,12 +269,11 @@ namespace vHackBot
                 };
 
                 var srv = new vhApiServer(cfg, cfgParser);
+                serverThread = new Thread(() => srv.Listen());
+                serverThread.Start();
 
-                new Thread(() => srv.Listen()).Start();
-
-
-                // wait for exit
-                Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
+                //// wait for exit
+                //Thread.Sleep(Timeout.Infinite); // TODO: waits for CTRL + C
 
             }
             catch (Exception e)

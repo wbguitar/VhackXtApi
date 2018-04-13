@@ -74,12 +74,56 @@ namespace vHackApi.Console
                                    "vh_trTransfer.php", 3);
         }
 
+        /// <summary>
+        /// Gets all cluster informations (messages + users + status)
+        /// </summary>
+        /// <param name="uhash"></param>
+        /// <returns></returns>
         public async Task<JObject> CheckCluster(string uhash = null)
         {
             uhash = string.IsNullOrEmpty(uhash) ? "userHash_not_needed" : uhash;
             return await vhUtils.JSONRequest("user::::pass::::uhash",
                                      config.username + "::::" + config.password + "::::" + uhash,
                                      "vh_ClusterData.php");
+        }
+        
+        /// <summary>
+        /// Gets cluster status informations
+        /// </summary>
+        /// <param name="uhash"></param>
+        /// <returns></returns>
+        public async Task<JObject> ClusterSystem(string uhash = null)
+        {
+            long currentTimeMillis = vhUtils.CurrentTimeMsecs;
+
+            uhash = string.IsNullOrEmpty(uhash) ? "userHash_not_needed" : uhash;
+            return await vhUtils.JSONRequest("::::time::::user::::pass::::uhash", 
+                "::::" + currentTimeMillis + "::::" +
+                config.username + "::::" + config.password + "::::" + uhash,
+                "vh_clusterSystem.php");
+        }
+
+        public enum UpgradeCluster
+        {
+            Network = 1,
+            Protection = 2,
+        }
+        /// <summary>
+        /// Upgrades cluster software (Network or DDoS Protection)
+        /// </summary>
+        /// <param name="upg"></param>
+        /// <param name="count"></param>
+        /// <param name="uhash"></param>
+        /// <returns></returns>
+        public async Task<JObject> UpgradeClusterSW(UpgradeCluster upg, int count = 10, string uhash = null)
+        {
+            long currentTimeMillis = vhUtils.CurrentTimeMsecs;
+
+            uhash = string.IsNullOrEmpty(uhash) ? "userHash_not_needed" : uhash;
+            return await vhUtils.JSONRequest("what::::cnt::::time::::user::::pass::::uhash",
+                (int)upg + "::::" + count + "::::" + currentTimeMillis + "::::" +
+                config.username + "::::" + config.password + "::::" + uhash,
+                "vh_upgradeClusterSoftware.php");
         }
 
         //public async Task<JObject> scanUser()

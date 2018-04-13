@@ -189,14 +189,14 @@ namespace vHackApi
             none,
         }
 
-        public async Task<JObject> upgradePC(string userHash, string hostname, OfWhat ofWhat)
+        public async Task<JObject> upgradePC(string userHash, string hostname, OfWhat ofWhat, int inst = 0, int much = 1)
         {
             /*
              
              */
 
-            return await vhUtils.JSONRequest("user::::pass::::uhash::::hostname::::ofwhat",
-                $"{config.username}::::{config.password}::::{userHash}::::{hostname}::::{ofWhat.ToString()}",
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::hostname::::ofwhat::::inst::::much",
+                $"{config.username}::::{config.password}::::{userHash}::::{hostname}::::{ofWhat.ToString()}::::{inst}::::{much}",
                 "vh_upgradePC.php");
         }
 
@@ -356,13 +356,13 @@ namespace vHackApi
                 $"{config.username}::::{config.password}::::{userHash}", "vh_ranking.php");
         }
 
-        public async Task<JObject> getMails(string userHash = "")
+        public async Task<JObject> getMails(int action = 3, string userHash = "")
         {
             if (string.IsNullOrEmpty(userHash))
                 userHash = "userHash_not_needed";
 
             return await vhUtils.JSONRequest("user::::pass::::uhash::::action",
-                $"{config.username}::::{config.password}::::{userHash}::::list", "vh_mails.php", 3);
+                $"{config.username}::::{config.password}::::{userHash}::::list", "vh_mails.php", action);
         }
 
         public async Task<string> readMail(int id, string userHash = "")
@@ -374,5 +374,72 @@ namespace vHackApi
                 $"{config.username}::::{config.password}::::{userHash}::::getmail::::{id}", "vh_mails.php");
         }
 
+        public async Task<JObject> getArenaInfo(string userHash = "")
+        {
+            /*
+             * {"attleft":"5","arenarep":"965","arank":568618,"wincount":"7","losecount":"9","data":[{"username":"DYNA1 | chrisdzid","score":"5552","elo":"973","medal":"0","target":"839074","wins":"0","lose":"1","online":"0"},{"username":"MatVeiQaaa","score":"4339","elo":"973","medal":"0","target":"544123","wins":"1","lose":"2","online":"0"},{"username":"chepe6191","score":"4473","elo":"972","medal":"0","target":"490062","wins":"14","lose":"16","online":"0"},{"username":"<PW> | NieGrzeczny","score":"19297","elo":"971","medal":"0","target":"149245","wins":"3","lose":"4","online":"0"},{"username":"NW14 | arresto","score":"17136","elo":"970","medal":"0","target":"543678","wins":"5","lose":"6","online":"0"},{"username":"INDO. | zer0days","score":"12730","elo":"969","medal":"0","target":"574661","wins":"8","lose":"10","online":"0"},{"username":"BingBongBooey","score":"11487","elo":"969","medal":"0","target":"626873","wins":"4","lose":"5","online":"0"},{"username":"F@TE | 
+             * ...
+             */
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash",
+                $"{config.username}::::{config.password}::::{userHash}", "vh_arenaInfo.php");
+        }
+
+        public async Task<JObject> ArenaAttack(int target, string userHash = "")
+        {
+            /*
+             * {"left":"21591","attleft":"4","arenarep":"990","arank":"568527","wincount":"8","losecount":"9","result":"4","winelo":""}
+             */
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.JSONRequest("user::::pass::::uhash::::target",
+                $"{config.username}::::{config.password}::::{userHash}::::{target}", "vh_arenaAttack.php");
+        }
+
+        public async Task<JObject> GetDailyData(string userHash = "")
+        {
+            /*
+             * {"user_id":"1057014","login":"0","scan1":"0","scan2":"0","transfer1":"0","transfer2":"0","time":"1523221201","result":"0","transfers":"191","scans":"119","resethours":"15","resetminutes":"22","gotmissions":"1",
+                "data":
+                [{"target":"154.109.199.35","reward":"50","creator":"Anonymous"},
+                {"target":"104.94.149.202","reward":"50","creator":"Anonymous"},
+                {"target":"87.200.143.174","reward":"50","creator":"Anonymous"},
+                {"target":"235.151.11.53","reward":"50","creator":"Anonymous"},
+                {"target":"239.139.233.42","reward":"50","creator":"Anonymous"},
+                {"target":"91.212.73.96","reward":"50","creator":"Anonymous"},
+                {"target":"85.24.53.114","reward":"50","creator":"Anonymous"},
+                {"target":"233.190.106.97","reward":"50","creator":"Anonymous"},
+                {"target":"133.196.140.12","reward":"50","creator":"Anonymous"},
+                {"target":"222.61.199.105","reward":"50","creator":"Anonymous"},
+                {"target":"248.144.43.203","reward":"50","creator":"Anonymous"},
+                ...
+             */
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            //return await vhUtils.JSONRequest("::::time::::user::::pass::::uhash",
+            //    $"::::{vhUtils.CurrentTimeMsecs}::::{config.username}::::{config.password}::::{userHash}", 
+            //    "vh_getDailyData.php");
+
+            return await vhUtils.JSONRequest("::::user::::pass::::uhash",
+                $"::::{config.username}::::{config.password}::::{userHash}",
+                "vh_getDailyData.php");
+        }
+
+        public async Task<JObject> GetDaily(int dtype, string userHash = "")
+        {
+            /*
+             * {"user_id":"1057014","login":"0","scan1":"0","scan2":"0","transfer1":"0","transfer2":"0","time":"1523221201","result":"0"}
+             */
+            if (string.IsNullOrEmpty(userHash))
+                userHash = "userHash_not_needed";
+
+            return await vhUtils.JSONRequest("dtype::::time::::user::::pass::::uhash",
+                $"{dtype}::::{vhUtils.CurrentTimeMsecs}::::{config.username}::::{config.password}::::{userHash}",
+                "vh_getDaily.php");
+        }
     }
 }

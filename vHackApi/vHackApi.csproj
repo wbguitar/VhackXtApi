@@ -120,6 +120,7 @@
       <DependentUpon>vHackDbModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Bot\AHackTimer.cs" />
+    <Compile Include="Bot\DailyTimer.cs" />
     <Compile Include="Bot\UpgradeStrategy.cs" />
     <Compile Include="Bot\HackBotNet.cs" />
     <Compile Include="Bot\IPSelector.cs" />

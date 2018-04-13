@@ -458,6 +458,16 @@ namespace vHackApi.HTTP
                                 response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}/iplist");
                             }
                         }
+                        else if (path == "/restart")
+                        {
+                            response = request.CreateResponse(HttpStatusCode.OK, "POST restart request");
+                            response.Redirect($"http://{config.vhServerHost}:{config.vhServerPort}");
+                            Task.Run(delegate
+                            {
+                                Thread.Sleep(1000);
+                                Environment.Exit(0);
+                            });
+                        }
                     }
                     else
                     {

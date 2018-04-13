@@ -18,6 +18,9 @@ namespace vHackApi.Api
         public static IConfig config { get; set; }
         public static Random rand = new Random((int)(DateTime.Now - DateTime.MinValue).TotalSeconds);
         public static string jsonTextC;
+
+        public static long CurrentTimeMsecs => (long)(DateTime.Now - new DateTime(1970, 01, 01)).TotalMilliseconds;
+        
         /**
          * The url of the current api.<br>
          * As of now it is {@value url}.
@@ -107,7 +110,7 @@ namespace vHackApi.Api
          * @throws ExecutionException 
          * @throws InterruptedException 
          */
-        public static async Task<JObject> JSONRequest(string format, string data, string php, int attempts = -1)
+        public static async Task<JObject> JSONRequest(string format, string data, string php, int attempts = 5)
         {
             string jsonText = "";
             try
@@ -184,7 +187,7 @@ namespace vHackApi.Api
             }
 
             if (attempts == 0)
-                return "0";
+                return null;
 
             if (attempts != -1)
                 attempts--;
@@ -440,7 +443,10 @@ namespace vHackApi.Api
             }
             try
             {
-                jSONObject.Add("time", currentTimeMillis + "");
+                if (jSONObject["time"] == null)
+                    jSONObject.Add("time", currentTimeMillis + "");
+                else
+                    jSONObject["time"] = currentTimeMillis + "";
             }
             catch (JsonException e2)
             {

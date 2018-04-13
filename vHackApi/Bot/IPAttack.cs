@@ -57,7 +57,7 @@ namespace vHackApi.Bot
             var console = api.getConsole();
 
             hackTimer = new Timer(async (o) => await timerCallback(o), new object[] { cfg, api, console }, TimeSpan.Zero, Period);
-
+            
             safeScan = cfg.safeScan;
 
 

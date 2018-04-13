@@ -72,7 +72,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="rootUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://api.vhack.cc/v/14/</Value>
+      <Value Profile="(Default)">https://api.vhack.cc/v/16/</Value>
     </Setting>
     <Setting Name="pcOrAttack" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">13</Value>
