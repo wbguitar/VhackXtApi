@@ -212,16 +212,27 @@ namespace vHackBot
                 // UNHANDLED EXCEPTIONS
                 AppDomain.CurrentDomain.UnhandledException += (s, e) =>
                 {
-                    var exc = e.ExceptionObject as Exception;
-                    logger.ErrorFormat("\n\n    *****   UNHANDELED EXCEPTION    *****\n\n");
-                    do
+                    try
                     {
-                        logger.ErrorFormat(exc.ToString());
-                        
-                    } while ((exc = exc.InnerException) != null);
-                    logger.InfoFormat("\n\n    *****   CLOSING APPLICATION    *****\n\n");
-                    runnable.Dispose();
-                    //Environment.Exit(0);
+                        var exc = e.ExceptionObject as Exception;
+                        logger.ErrorFormat("\n\n    *****   UNHANDELED EXCEPTION    *****\n\n");
+                        do
+                        {
+                            logger.ErrorFormat(exc.ToString());
+
+                        } while ((exc = exc.InnerException) != null);
+                        logger.InfoFormat("\n\n    *****   CLOSING APPLICATION    *****\n\n");
+                        runnable.Dispose();
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.ErrorFormat("\n\n    *****   ERROR IN UNHANDLEDEXCEPTION HANDLER    *****\n\n{0}",
+                            exc.ToString());
+                    }
+                    finally
+                    {
+                        Environment.Exit(0);
+                    }
                 };
 
 
