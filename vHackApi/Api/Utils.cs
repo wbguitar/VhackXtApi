@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -434,7 +435,8 @@ namespace vHackApi.Api
                 {
                     //if (split2[i] == "")
                     //    split2[i] = "null";
-                    jSONObject.Add(split[i].ToString(), split2[i].ToString());
+                    //jSONObject.Add(split[i].ToString(), split2[i].ToString());
+                    jSONObject[split[i]] = split2[i];
                 }
                 catch (JsonException e)
                 {
@@ -445,14 +447,20 @@ namespace vHackApi.Api
             {
                 if (jSONObject["time"] == null)
                     jSONObject.Add("time", currentTimeMillis + "");
-                else
-                    jSONObject["time"] = currentTimeMillis + "";
+                //else
+                //    jSONObject["time"] = currentTimeMillis + "";
             }
             catch (JsonException e2)
             {
                 Debug.Print(e2.StackTrace);
             }
             string jsonString = jSONObject.ToString().Replace("\n", "").Replace("\r", "").Replace(" ", "");
+
+            currentTimeMillis = (long) jSONObject["time"];
+
+            var username = (string)jSONObject["user"];
+            var password = (string)jSONObject["pass"];
+
             //jsonString = jsonString
             //    .Replace(System.Environment.NewLine, "")
             //    .Replace(" ", "");
@@ -461,12 +469,11 @@ namespace vHackApi.Api
             string a = generateUser(jsonString);
 
             string a2 = hashString(jsonString.Length + hashString(currentTimeMillis.ToString()));
-            string str5 = split2[0] + hashString(hashString(split2[1]));
+            string str5 = username + hashString(hashString(password));
             string str6 = hashString(currentTimeMillis + jsonString);
             string a3 = hashString(secret + hashString(hashString(generateUser(a2))));
-            string str9 = hashString(a3 + generateUser(str5)); //string str9 = generateUser(str5);
+            string str9 = hashString(a3 + generateUser(str5));
             string str7 = generateUser(str6);
-            //string str8 = hashString(hashString(a3 + hashString(hashString(str9) + str7)));
             string str8 = hashString(hashString(a3 + hashString(hashString(str9) + str7) + str9 + hashString(str7)));
             string retStr = rootUrl + php + "?user=" + a + "&pass=" + str8;
 

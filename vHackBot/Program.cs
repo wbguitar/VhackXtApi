@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -120,6 +122,14 @@ namespace vHackBot
 
         private static List<IHackTimer> timers;
         private static Thread serverThread;
+
+        static string GetRes(string url)
+        {
+            var req = WebRequest.CreateHttp(url);
+            
+            var res = req.GetResponse();
+            return new StreamReader(res.GetResponseStream()).ReadToEnd();
+        }
 
         private static void Run(IConfig cfg)
         {
