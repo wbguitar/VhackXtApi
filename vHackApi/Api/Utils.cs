@@ -143,6 +143,7 @@ namespace vHackApi.Api
             return jres;
         }
 
+        private static object semaphore = new object();
         //it'll just do the request without any checks
         /**
          * Makes a request to the api and returns the result as a string.
@@ -162,24 +163,27 @@ namespace vHackApi.Api
         {
             try
             {
-                var mul = ((double)rand.Next(1000) / 1000.0)* Math.Pow(-1, rand.Next(1, 3));
-                var elapsed = DateTime.Now - lastReq;
-                if (elapsed.TotalMilliseconds < vhConsole.WaitStep * mul)
-                    Thread.Sleep(vhConsole.WaitStep - (int)elapsed.TotalMilliseconds);
+                lock (semaphore)
+                {
+                    var mul = ((double)rand.Next(1000) / 1000.0) * Math.Pow(-1, rand.Next(1, 3));
+                    var elapsed = DateTime.Now - lastReq;
+                    if (elapsed.TotalMilliseconds < vhConsole.WaitStep * mul)
+                        Thread.Sleep(vhConsole.WaitStep - (int)elapsed.TotalMilliseconds);
 
-                var url = vhUtils.generateURL(format, data, php);
-                var req = WebRequest.CreateHttp(url);
+                    var url = vhUtils.generateURL(format, data, php);
+                    var req = WebRequest.CreateHttp(url);
 
-                var proxy = config?.proxy;
-                if (proxy != null)
-                    req.Proxy = proxy;
+                    var proxy = config?.proxy;
+                    if (proxy != null)
+                        req.Proxy = proxy;
 
-                var res = req.GetResponse();
-                var resTxt = new StreamReader(res.GetResponseStream()).ReadToEnd();
+                    var res = req.GetResponse();
+                    var resTxt = new StreamReader(res.GetResponseStream()).ReadToEnd();
 
-                lastReq = DateTime.Now;
+                    lastReq = DateTime.Now;
 
-                return resTxt;
+                    return resTxt; 
+                }
             }
             catch (Exception e)
             {

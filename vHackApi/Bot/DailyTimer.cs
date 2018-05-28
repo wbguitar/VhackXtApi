@@ -11,12 +11,12 @@ using vHackApi.Interfaces;
 
 namespace vHackApi.Bot
 {
-    public class DailyTimer: AHackTimer<DailyTimer>
+    public class DailyTimer : AHackTimer<DailyTimer>
     {
         public override void Set(IConfig cfg, vhAPI api)
         {
-            Period = TimeSpan.FromSeconds(10);
-            
+            Period = TimeSpan.FromSeconds(20);
+
             Pause = () =>
             {
                 hackTimer.Change(0, Timeout.Infinite);
@@ -56,41 +56,53 @@ namespace vHackApi.Bot
             var upd = new Update(cfg);
             hackTimer = new Timer(async (o) =>
                 {
-                    return;
+                    if (!Monitor.TryEnter(this))
+                        return;
 
-                if (!Monitor.TryEnter(this))
-                    return;
-                
-                try
-                {
-                    var mi = await MyInfo.Fetch(api.getConsole());
-                    var console = api.getConsole();
-                    //var cluster = await console.ClusterSystem(mi.UHash);
-                    var res = await console.UpgradeClusterSW(vhConsole.UpgradeCluster.Network);
-                    res = await console.UpgradeClusterSW(vhConsole.UpgradeCluster.Protection);
-
-
-                    //
-                    //var hash = await api.getStats(Stats.uhash);
-                    //var data = await upd.GetDailyData(hash);
-                    //System.Console.WriteLine(data);
-
-                    for (int i = 1; i <= 5; i++)
+                    try
                     {
-                        var data = await upd.GetDaily(i);
-                        System.Console.WriteLine(data);
-                    }
+                        var console = api.getConsole();
+                        //var cluster = await console.ClusterSystem(mi.UHash);
+                        var res = await console.UpgradeClusterSW(vhConsole.UpgradeCluster.Network);
+                        res = await console.UpgradeClusterSW(vhConsole.UpgradeCluster.Protection);
 
+
+
+                        var hash = api.UserHash; //await api.getStats(Stats.uhash);
+                        var data = await upd.GetDailyData(hash);
+                        System.Console.WriteLine(data);
+
+                        if ((int) data["login"] == 0)
+                        {
+                            var daily = await upd.GetDaily(1);
+                        }
+                        if ((int)data["scan1"] == 0)
+                        {
+                            var daily = await upd.GetDaily(2);
+                        }
+                        if ((int)data["scan2"] == 0)
+                        {
+                            var daily = await upd.GetDaily(3);
+                        }
+                        if ((int)data["transfer1"] == 0)
+                        {
+                            var daily = await upd.GetDaily(4);
+                        }
+                        if ((int)data["transfer2"] == 0)
+                        {
+                            var daily = await upd.GetDaily(5);
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        cfg.logger.Log("DailyTimer error: {0}", e.ToString());
+                    }
+                    finally
+                    {
+                        Monitor.Exit(this);
+                    }
                 }
-                catch (Exception e)
-                {
-                    
-                }
-                finally
-                {
-                    Monitor.Exit(this);
-                }
-            }
             , null, TimeSpan.Zero, Period);
         }
     }

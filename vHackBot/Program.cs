@@ -171,9 +171,8 @@ namespace vHackBot
                 var info = upd.botnetInfo();
 
                 //var career = upd.getCareerStatus(api.UserHash);
+
                 
-
-
                 //GlobalConfig.Init(cfg, api);
 
                 ProportionalUpgradeStrategy.Default.Init(cfg, api);
@@ -231,8 +230,8 @@ namespace vHackBot
                             logger.ErrorFormat(exc.ToString());
 
                         } while ((exc = exc.InnerException) != null);
-                        logger.InfoFormat("\n\n    *****   CLOSING APPLICATION    *****\n\n");
-                        runnable.Dispose();
+                        //logger.InfoFormat("\n\n    *****   CLOSING APPLICATION    *****\n\n");
+                        //runnable.Dispose();
                     }
                     catch (Exception exc)
                     {
@@ -241,7 +240,7 @@ namespace vHackBot
                     }
                     finally
                     {
-                        Environment.Exit(0);
+                        //Environment.Exit(0);
                     }
                 };
 

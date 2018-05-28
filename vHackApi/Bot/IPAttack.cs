@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Antlr.Runtime;
 using Griffin.Logging.Loggers;
 using vHackApi.Api;
 using vHackApi.Console;
@@ -98,6 +99,12 @@ namespace vHackApi.Bot
 
             try
             {
+                var cluster = await c.CheckCluster();
+                if ((int) cluster["blocked"] == 1)
+                {
+                    cfg.logger.Log("CLUSTER UNDER ATTACK, bypass host attack");
+                    return;
+                }
                 // during contests better run as an IP scanner, so that can find ips 
                 // that are watched by FBI
                 if (vhUtils.IsContestRunning())
