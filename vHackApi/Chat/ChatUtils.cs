@@ -54,16 +54,22 @@ namespace vHackApi.Chat
         public void Run()
         {
             var sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            //sock.Connect("51.255.93.109", 7531);
-            sock.Connect(_cfg.chatIp, _cfg.chatPort);
+            var myId = string.Empty;
+            var str2 = string.Empty;
+            var connect = new Action(delegate{
+                //sock.Connect("51.255.93.109", 7531);
+                sock.Connect(_cfg.chatIp, _cfg.chatPort);
 
-            String str2 = "v[" + _cfg.chatUser;
-            var myId = _api.getStats(Stats.id).Result;
-            //String str2 = "v[" + api.getUsername();
-            var msg = ("NICK " + str2 + "\r\n");
-            msg += ("USER " + myId + " 0 * : vHack XT@Android\r\n");
+                str2 = "v[" + _cfg.chatUser;
+                myId = _api.getStats(Stats.id).Result;
+                //String str2 = "v[" + api.getUsername();
+                var msg = ("NICK " + str2 + "\r\n");
+                msg += ("USER " + myId + " 0 * : vHack XT@Android\r\n");
 
-            sock.Send(_encoding.GetBytes(msg));
+                sock.Send(_encoding.GetBytes(msg));
+            });
+
+            //connect();
 
             var vhackxy = "#vHackXT";
 
@@ -130,6 +136,16 @@ namespace vHackApi.Chat
                 PrivateMessage(Rule.Me, myId, _cfg.chatUser, s);
             };
 
+            var sleeps = new TimeSpan[]
+            {
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromMinutes(10),
+                TimeSpan.FromMinutes(30),
+            };
+            var sleepIdx = 0;
             Task.Run(() =>
             {
                 while (run)
@@ -138,6 +154,9 @@ namespace vHackApi.Chat
                     {
                         try
                         {
+                            if (!sock.Connected)
+                                connect();
+
                             var bytes = new byte[1024];
                             var count = sock.Receive(bytes);
 
@@ -162,6 +181,20 @@ namespace vHackApi.Chat
                                     _cfg.logger.Log("Error parsing chat lines: {0}", exc.ToString());
                                 }
                             }
+                        }
+                        catch (SocketException exc)
+                        {
+                            _cfg.logger.Log("Chat socket error: {0}", exc.ToString());
+
+                            if (exc.SocketErrorCode == SocketError.NetworkDown ||
+                                exc.SocketErrorCode == SocketError.NetworkReset ||
+                                exc.SocketErrorCode == SocketError.NetworkUnreachable ||
+                                exc.SocketErrorCode == SocketError.TimedOut)
+                            {
+                                Thread.Sleep(sleeps[sleepIdx]);
+                                sleepIdx += (sleepIdx >= sleeps.Length - 1) ? 0 : 1;
+                            }
+
                         }
                         catch (Exception exc)
                         {
