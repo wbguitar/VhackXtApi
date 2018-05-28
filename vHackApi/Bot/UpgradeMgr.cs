@@ -264,7 +264,7 @@ namespace vHackApi.Bot
             var count = (int) bnInfo["count"];
             var energy = (int) bnInfo["energy"];
             var pieces = (int) bnInfo["pieces"];
-            var nextlvl = (int) career["nextlevel"];
+            var nextlvl = count > 0 ? (int) career["nextlevel"] : -1;
 
             if (pieces >= 30)
             {
@@ -396,88 +396,85 @@ namespace vHackApi.Bot
             //    upgrade = getUpgrade(energy, money);
             //}
 
-
-             if (upgrade == UpgradePCStatus.Attack)
+            if (nextlvl >= 0) // if == -1 means no botnet are available
             {
-                if (nextlvl <= _levelsTable.Length)
+                if (upgrade == UpgradePCStatus.Attack)
                 {
-                    // if we have enough strenght we try to attack next level
-                    var minV = _levelsTable[nextlvl - 1];
-                    var strength = (int)bnInfo["strength"];
-                    // TODO: bypassed for now
-                    //if (strength > minV * 1.35)
-                    //{
-                    //    var startRes = await upd.startLevel("userHash_not_needed", nextlvl);
-                    //}
+                    if (nextlvl <= _levelsTable.Length)
+                    {
+                        // if we have enough strenght we try to attack next level
+                        var minV = _levelsTable[nextlvl - 1];
+                        var strength = (int)bnInfo["strength"];
+                        // TODO: bypassed for now
+                        //if (strength > minV * 1.35)
+                        //{
+                        //    var startRes = await upd.startLevel("userHash_not_needed", nextlvl);
+                        //}
+                    }
+
+                    // attack the last level of last chapter (earn much money)
+                    var lvlToSmash = nextlvl - nextlvl % 10; // TODO: WHY WITH 20 DOESN'T WORK?
+                                                             //var lvlToSmash = 10;
+
+                    var smashResult = await upd.startLevel(info.UHash, lvlToSmash);
+                    logger.Log("Attacking botnet level {0}, result {1}", lvlToSmash, smashResult["result"]);
                 }
 
-                // attack the last level of last chapter (earn much money)
-                var lvlToSmash = nextlvl - nextlvl % 10; // TODO: WHY WITH 20 DOESN'T WORK?
-                //var lvlToSmash = 10;
-               
-                var smashResult = await upd.startLevel(info.UHash, lvlToSmash);
-                logger.Log("Attacking botnet level {0}, result {1}", lvlToSmash, smashResult["result"]);
-            }
-
-
-            // HIJACK!!
-            var hsinfo = await upd.hotspotInfo();
-            var mystrength = (long)bnInfo["strength"];
-            if ((int) hsinfo["myhotspot"] == 0) // no hotspot owned
-            {
-                var arr = (JArray) hsinfo["data"];
-                for (int i = 0; i < arr.Count; i++)
+                // HIJACK!!
+                var hsinfo = await upd.hotspotInfo();
+                var mystrength = (long)bnInfo["strength"];
+                if ((int)hsinfo["myhotspot"] == 0) // no hotspot owned
                 {
-                    var host = (string) arr[i]["host"];
-                    var strength = (long)arr[i]["strength"];
-                    if (mystrength >= strength)
+                    var arr = (JArray)hsinfo["data"];
+                    for (int i = 0; i < arr.Count; i++)
                     {
-                        // lets hijack this sucker!!!11
-                        var hjres = await upd.startHijack(vhConsole.uHash, host);
-                        if ((int) hjres["result"] == 0)
+                        var host = (string)arr[i]["host"];
+                        var strength = (long)arr[i]["strength"];
+                        if (mystrength >= strength)
                         {
-                            logger.Log("Succesfully hijacked host {0}", host);
-                            break;
+                            // lets hijack this sucker!!!11
+                            var hjres = await upd.startHijack(vhConsole.uHash, host);
+                            if ((int)hjres["result"] == 0)
+                            {
+                                logger.Log("Succesfully hijacked host {0}", host);
+                                break;
+                            }
+                            else
+                                logger.Log("Unable hijack host {0}", host);
                         }
-                        else
-                            logger.Log("Unable hijack host {0}", host);
                     }
                 }
-            }
 
-
-            // ARENA
-            var ai = await upd.getArenaInfo();
-            var attacks = (int) ai["attleft"];
-            if (attacks > 0)
-            {
-                var reputation = (long) ai["arenarep"];
-                var rank = (long) ai["arank"];
-                //var reputation = ai["arenarep"];
-                //var reputation = ai["arenarep"];
-                var data = (JArray) ai["data"];
-                foreach (var t in data)
+                // ARENA
+                var ai = await upd.getArenaInfo();
+                var attacks = (int)ai["attleft"];
+                if (attacks > 0)
                 {
-                    var usr = (JObject) t;
-                    var rep = (long) usr["elo"];
-                    var target = (int) usr["target"];
-                    var score = (long) usr["score"];
-                    var username = (string) usr["username"];
-
-                    if (reputation > rep && mystrength > score)
+                    var reputation = (long)ai["arenarep"];
+                    var rank = (long)ai["arank"];
+                    //var reputation = ai["arenarep"];
+                    //var reputation = ai["arenarep"];
+                    var data = (JArray)ai["data"];
+                    foreach (var t in data)
                     {
-                        var res = await upd.ArenaAttack(target);
-                        attacks = (int)res["attleft"];
-                        reputation = (int)res["arenarep"];
+                        var usr = (JObject)t;
+                        var rep = (long)usr["elo"];
+                        var target = (int)usr["target"];
+                        var score = (long)usr["score"];
+                        var username = (string)usr["username"];
+
+                        if (reputation > rep && mystrength > score)
+                        {
+                            var res = await upd.ArenaAttack(target);
+                            attacks = (int)res["attleft"];
+                            reputation = (int)res["arenarep"];
+                        }
+
+                        if (attacks == 0)
+                            break;
                     }
-
-                    if (attacks == 0)
-                        break;
                 }
-
-                
             }
-
         }
 
         private async Task doPackages(MyInfo info, Update upd, IConfig cfg)
