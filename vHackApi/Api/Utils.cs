@@ -137,9 +137,11 @@ namespace vHackApi.Api
                 Debug.Print(e.StackTrace);
 
             }
+            if (attempts <= 0)
+                return null;
 
             //var jreqTask = JSONRequest(format, data, php);
-            var jres = await JSONRequest(format, data, php);
+            var jres = await JSONRequest(format, data, php, --attempts);
             return jres;
         }
 
