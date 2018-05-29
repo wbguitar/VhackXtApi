@@ -186,11 +186,12 @@ namespace vHackApi.Chat
                         {
                             _cfg.logger.Log("Chat socket error: {0}", exc.ToString());
 
-                            if (exc.SocketErrorCode == SocketError.NetworkDown ||
-                                exc.SocketErrorCode == SocketError.NetworkReset ||
-                                exc.SocketErrorCode == SocketError.NetworkUnreachable ||
-                                exc.SocketErrorCode == SocketError.TimedOut)
+                            //if (exc.SocketErrorCode == SocketError.NetworkDown ||
+                            //    exc.SocketErrorCode == SocketError.NetworkReset ||
+                            //    exc.SocketErrorCode == SocketError.NetworkUnreachable ||
+                            //    exc.SocketErrorCode == SocketError.TimedOut)
                             {
+                                _cfg.logger.Log("Pausing for {0}", sleeps[sleepIdx]);
                                 Thread.Sleep(sleeps[sleepIdx]);
                                 sleepIdx += (sleepIdx >= sleeps.Length - 1) ? 0 : 1;
                             }
