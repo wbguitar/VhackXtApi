@@ -79,12 +79,12 @@ namespace vHackApi.Console
         /// </summary>
         /// <param name="uhash"></param>
         /// <returns></returns>
-        public async Task<JObject> CheckCluster(string uhash = null)
+        public async Task<JObject> CheckCluster(string uhash = null, int attempts = 1)
         {
             uhash = string.IsNullOrEmpty(uhash) ? "userHash_not_needed" : uhash;
             return await vhUtils.JSONRequest("user::::pass::::uhash",
                                      config.username + "::::" + config.password + "::::" + uhash,
-                                     "vh_ClusterData.php");
+                                     "vh_ClusterData.php", attempts);
         }
         
         /// <summary>

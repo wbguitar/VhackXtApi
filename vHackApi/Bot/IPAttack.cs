@@ -100,7 +100,7 @@ namespace vHackApi.Bot
             try
             {
                 var cluster = await c.CheckCluster();
-                if ((int) cluster["blocked"] == 1)
+                if (cluster != null && (int) cluster["blocked"] == 1)
                 {
                     cfg.logger.Log("CLUSTER UNDER ATTACK, bypass host attack");
                     return;
